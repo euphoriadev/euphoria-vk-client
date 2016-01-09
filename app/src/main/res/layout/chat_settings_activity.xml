@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#212121">
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:text="Название чата"
+                    android:textSize="25sp"
+                    android:textIsSelectable="false"
+                    android:textColor="#bdbdbd"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginLeft="10dp"/>
+            <EditText
+                    android:layout_width="215dp"
+                    android:layout_height="40dp"
+                    android:text="New Text"
+                    android:maxLines="1"
+                    android:inputType="textCapSentences"
+                    android:id="@+id/tvChatTitle"
+                    android:textSize="25sp"
+                    android:background="@drawable/bg_text"
+                    android:layout_marginLeft="10dp"/>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:text="Участники"
+                    android:textSize="25sp"
+                    android:textIsSelectable="false"
+                    android:textColor="#bdbdbd"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginLeft="10dp"/>
+
+        </LinearLayout>
+
+        <ru.euphoriadev.vk.view.CircleImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_margin="10dp"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/tvChatIcon"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+            android:orientation="horizontal"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_text"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp">
+
+
+        <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="#dbdbdb"
+                android:id="@+id/chatUsers"
+                android:dividerHeight="0dp">
+
+        </ListView>
+
+
+    </LinearLayout>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add"
+                android:textColor="#dbdbdb"
+                android:textSize="30sp"
+                android:layout_weight="1"
+                android:paddingLeft="60dp"
+                android:id="@+id/addChat"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Quit"
+                android:textColor="#dbdbdb"
+                android:textSize="30sp"
+                android:layout_weight="1"
+                android:paddingLeft="60dp"
+                android:id="@+id/qChat"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

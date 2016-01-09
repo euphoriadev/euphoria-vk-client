@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res/ru.euphoriadev.vk">
+
+    <item
+        android:id="@+id/menuMessageAttach"
+        android:icon="@drawable/ic_attach_file_white_24dp"
+        android:title="@string/attach"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/menuMessageDelete"
+        android:icon="@drawable/ic_delete_white"
+        android:title="@string/delete"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/menuStatsMessages"
+        android:title="@string/statistics_messages"
+        app:showAsAction="collapseActionView"/>
+
+    <item
+        android:id="@+id/menuMessageMaterialsOfDialog"
+        android:title="@string/materials_from_talk"/>
+
+    <item
+        android:id="@+id/menuMessageTranslateAll"
+        android:title="@string/translate_all"/>
+
+    <item
+        android:id="@+id/menuUpdateMessages"
+        android:title="@string/update"/>
+
+</menu>

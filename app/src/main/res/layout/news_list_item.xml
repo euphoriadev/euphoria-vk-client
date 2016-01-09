@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="#424242"
+        card_view:cardCornerRadius="4dp">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="vertical"
+                  android:padding="16dp"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_height="wrap_content">
+
+            <ru.euphoriadev.vk.view.CircleImageView
+                    android:layout_width="45dp"
+                    android:id="@+id/ivPhoto_news"
+                    android:src="@drawable/camera_b"
+                    android:layout_height="45dp"/>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:orientation="vertical"
+                          android:layout_height="wrap_content">
+
+
+                <TextView android:layout_width="wrap_content"
+                          android:text="Android BLOG"
+                          android:id="@+id/tvGroupName_news"
+                          android:layout_marginLeft="16dp"
+                          android:layout_marginBottom="3dp"
+                          android:textAppearance="?android:attr/textAppearanceMedium"
+                          android:layout_height="wrap_content"/>
+
+                <TextView android:layout_width="wrap_content"
+                          android:text="Вчера в 17:16"
+                          android:id="@+id/tvTime_news"
+                          android:layout_marginLeft="16dp"
+                          android:textAppearance="?android:attr/textAppearanceSmall"
+                          android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1px"
+              android:layout_marginTop="4dp"
+              android:background="@android:color/darker_gray"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Сегодня очередной производитель выпустил какой-то телефон, Конечно за огромную сумму"
+                android:id="@+id/tvTextOfPost_news"
+                android:layout_gravity="center_horizontal"/>
+
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:orientation="horizontal"
+                      android:visibility="gone"
+                      android:layout_height="wrap_content">
+
+            <ImageButton android:layout_width="wrap_content"
+                         android:layout_weight="1"
+                         android:id="@+id/ibLike_news"
+                         style="?android:attr/borderlessButtonStyle"
+                         android:layout_height="40dp"/>
+
+            <ImageButton android:layout_width="wrap_content"
+                         android:layout_weight="1"
+                         style="?android:attr/borderlessButtonStyle"
+                         android:layout_height="wrap_content"/>
+
+            <ImageButton android:layout_width="wrap_content"
+                         android:layout_weight="1"
+                         style="?android:attr/borderlessButtonStyle"
+                         android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

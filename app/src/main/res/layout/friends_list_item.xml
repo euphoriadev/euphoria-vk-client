@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:paddingLeft="16dp"
+              android:gravity="center_vertical"
+              android:paddingRight="16dp"
+              android:layout_height="72dp">
+
+    <ru.euphoriadev.vk.view.CircleImageView
+            android:layout_width="45dp"
+            android:paddingRight="16dp"
+            android:id="@+id/ivUserPhoto"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/camera_b"
+            android:layout_height="45dp"/>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+
+        <TextView android:layout_width="wrap_content"
+                  android:singleLine="true"
+                  android:maxLines="1"
+                  android:id="@+id/tvUserName"
+                  android:layout_marginBottom="6dp"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textColor="@android:color/primary_text_dark"
+                  android:text="Игорь Моорзкин"
+                  android:layout_height="wrap_content"/>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_height="wrap_content">
+
+            <TextView android:layout_width="wrap_content"
+                      android:text="Online"
+                      android:layout_weight="1"
+                      android:id="@+id/tvUserOnline"
+                      android:textColor="@android:color/secondary_text_dark"
+                      android:layout_height="wrap_content"/>
+
+            <TextView android:layout_width="wrap_content"
+                      android:singleLine="true"
+                      android:maxLines="1"
+                      android:id="@+id/tvUserScreenName"
+                      android:textAppearance="?android:attr/textAppearanceSmall"
+                      android:textColor="@android:color/secondary_text_dark"
+                      android:text=" @igorek100 "
+                      android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

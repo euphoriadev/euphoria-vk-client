@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context=".MusicPlayerActivity">
+
+    <LinearLayout
+        android:id="@+id/ivCover"
+        android:layout_width="match_parent"
+        android:layout_height="390dp"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/cate"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/llPlayerBackgroundPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.51"
+            android:background="#a5000000"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbarPlayer"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:minHeight="?attr/actionBarSize"
+                app:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/ivLoop"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginLeft="14dp"
+                    android:layout_weight="0.1"
+                    android:background="@drawable/ic_loop"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvPlayerTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center_horizontal"
+                        android:text="Love To Dance"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textColor="@android:color/primary_text_dark"/>
+
+                    <TextView
+                        android:id="@+id/tvPlayerArtist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_horizontal"
+                        android:text="PinkinLark LLC"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/secondary_text_dark"/>
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/ivTrans"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginRight="14dp"
+                    android:layout_weight="0.1"
+                    android:background="@drawable/ic_volume_up"/>
+
+            </LinearLayout>
+
+            <SeekBar
+                android:id="@+id/pbPlayer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progress="30"
+                android:max="100"
+                android:src="@android:drawable/progress_horizontal"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/ibPlayerSkipPrev"
+                    android:layout_width="62dp"
+                    android:layout_height="62dp"
+                    android:background="@drawable/ic_skip_previous"/>
+
+                <ImageButton
+                    android:id="@+id/ibPlayerPlay"
+                    android:layout_width="74dp"
+                    android:layout_height="74dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="50dp"
+                    android:background="@drawable/ic_play_arrow"/>
+
+                <ImageButton
+                    android:id="@+id/ibPlayerSkipNext"
+                    android:layout_width="62dp"
+                    android:layout_height="62dp"
+                    android:background="@drawable/ic_skip_next"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:orientation="vertical">
+
+        <!--<include-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout="@layout/playlist"/>-->
+
+        <!--<include-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout="@layout/playlist"/>-->
+
+        <!--<include-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout="@layout/playlist"/>-->
+
+    </LinearLayout>
+
+</FrameLayout>

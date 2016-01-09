@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:fab="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context=".MessageHistoryActivity"
+              tools:menu="main_menu">
+
+    <View
+        android:id="@+id/statusBarBackground"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <ru.euphoriadev.vk.view.CircleImageView
+            android:id="@+id/ivPhoto_message_toolbar"
+            android:visibility="gone"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="6dp"
+            android:src="@drawable/camera_b"/>
+
+    </android.support.v7.widget.Toolbar>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/lvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:divider="@android:color/transparent"
+            android:smoothScrollbar="true"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:background="@drawable/toolbar_dropshadow"/>
+
+        <View
+            android:id="@+id/vshadow_history"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/message_dporshadow"/>
+
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:windowBackground"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp"
+        android:layout_marginRight="8dp"
+        android:gravity="center"
+        android:paddingTop="12dp">
+
+        <ImageButton
+            android:id="@+id/btnMessageAdd"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:visibility="gone"
+            android:layout_marginLeft="6dp"
+            android:background="?android:windowBackground"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_attachment"
+            />
+
+        <EditText
+            android:id="@+id/messageText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/msg_bubble_outgoing"
+            android:hint="@string/write_message"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="7"
+            android:layout_marginLeft="8dp"
+            android:minHeight="42dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="12dp"
+            tools:text="its test message from Euphoria!"
+            tools:textColor="@color/black"
+            />
+
+
+        <ru.euphoriadev.vk.view.fab.FloatingActionButton
+            android:id="@+id/fabMessageSebd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginBottom="3dp"
+            android:src="@drawable/ic_pets_white"
+            fab:fab_shadow="false"
+            fab:fab_type="mini"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

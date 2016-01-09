@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="prefs">Нашлатування</string>
+    <string name="search">Пошук</string>
+    <string name="statistics_messages">Статистика повідомлень</string>
+    <string name="profile">Профіль</string>
+    <string name="friends">Друзі</string>
+    <string name="messages">Повідомлення</string>
+    <string name="forward_messages">[Переслані повідомлення]</string>
+    <string name="audios">Аудіозаписи</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="exit">Вихід</string>
+    <string name="update">Оновити</string>
+    <string name="members">учасників</string>
+    <string name="title_members">Учасники розмови</string>
+    <string name="authorization">Авторизація</string>
+    <string name="preview">Попередній перегляд</string>
+    <string name="exit_for_account">Вихід з аккаунта</string>
+    <string name="themes">Тема</string>
+    <string name="colour">Кольорова гама</string>
+    <string name="check_internet">Будь ласка, перевірте Ваше підключення до мережі</string>
+    <string name="others">Інше</string>
+    <string name="about">Про програму</string>
+
+    <!--<string name="changelog">-->
+        <!--<u>0.6</u>\n-->
+        <!--• Покращено метод оновлення повідомлень;\n-->
+        <!--• Перемикання теми без перезавантаження додатки;\n-->
+        <!--• Інший механізм завантаження повідомлень;\n-->
+        <!--• Оптимізація;\n-->
+        <!--\n-->
+        <!--<u>0.5.1</u>\n-->
+        <!--• Виправлений баг з розмитою фотографією користувача і вічним онлайном;\n-->
+        <!--\n-->
+        <!--<u>0.5</u>\n-->
+        <!--• Оптимізовано запуск програми;\n-->
+        <!--• Експерементальная функція - відправка невдалих повідомлень, як тільки з'явитися стабільне підключеннядомережі;\n-->
+        <!--• Фарбування непрочитаних повідомлень;\n• Вхід в допомогою токена;\n-->
+        <!--• Чорна та темна тема;\n-->
+        <!--• Статус онлайну в листуванні;\n-->
+        <!--• Скачування діалогу;\n-->
+        <!--• OTA - оновлення програми з самої програми;\n-->
+        <!--• Матеріали з бесіди;\n-->
+        <!--• Матеріальні настройки;\n-->
+        <!--• недо музичний плеєр;\n-->
+        <!--• Вічний і фантомний онлайн;\n-->
+        <!--• Мало помітні поліпшення і виправлення;\n-->
+        <!--\n-->
+        <!--<u>0.2</u>\n-->
+        <!--• Список подарунків;\n-->
+        <!--• Лічильники в профілі;\n-->
+        <!--• Пошук по групах;\n-->
+        <!--• Кількість непрочитаних повідомлень в діалогах;\n-->
+        <!--• 2 нових теми;\n-->
+        <!--• Англійська мова;\n-->
+        <!--• Drawer header для teal теми;\n-->
+        <!--• Системний шрифт;\n-->
+        <!--\n-->
+        <!--<u>0.1</u>\n-->
+        <!--• Відображення імені користувача в діалозі;\n-->
+        <!--• Можливість включити блюренний аватар в драйвері;\n-->
+        <!--• дрібні поліпшення і виправлення багів;\n-->
+        <!--• Нова іконка;\n-->
+        <!--• Зміна шрифту;\n-->
+        <!--• Оновлення діалогів та історії;\n-->
+        <!--• Перероблений список діалогів;\n-->
+        <!--• Покращено відображення картинок в історії;\n-->
+        <!--• Роздільники в списку діалогів;\n-->
+        <!--• Повідомлення;\n-->
+        <!--• Відображення груп;\n-->
+        <!--• Перероблений список друзів;\n-->
+        <!--\n-->
+        <!--<u>0.0.9</u>\n-->
+        <!--• Завантаження аватарів в бесіді;\n-->
+        <!--• переслати повідомлення можна відкрити;\n-->
+        <!--• Аудіозаписи;\n-->
+        <!--• Завантаження зображень у історії собщений;\n-->
+        <!--• Текст повертається на рідній мові;\n-->
+        <!--• Відображення смайлів;\n-->
+        <!--• Відображення аудіозаписів в историии повідомлень;\n-->
+        <!--• Відображення стікерів;\n-->
+        <!--• Відображення документів;\n-->
+        <!--• Відображення подарунків;\n-->
+        <!--• Статистика повідомлення завантажується набагато швидше;\n-->
+        <!--• Статус набору повідомлення (Користувач набирає повідомлення…);\n-->
+        <!--• переработанности налаштування програми;\n-->
+        <!--• долучення ColorPicker, Режим офлайн, відключення статусу набору повідомлення, а так самоперефарбування хмарки повідомлення в залежності від теми;\n-->
+        <!--• Налаштування бесіди;\n-->
+        <!--• Видалення повідомлень;\n-->
+        <!--• Там по тулбарі - список учасників бесіди;\n-->
+        <!--\n-->
+        <!--<u>0.0.8</u>\n-->
+        <!--• Заголовок в шторці;\n-->
+        <!--• Прибрано пункт "Профіль", Відкриття профілю по кліку на аватар в шторці;\n-->
+        <!--• Оффлайн завантаження профілю;\n-->
+        <!--• Нові пузирікі для повідомлень;\n-->
+        <!--• Виправлено баг з наползаніем статус бару на тулбар;\n-->
+        <!--• При натисканні на посилання - додаток не вилітає;\n-->
+        <!--• Статус останнього заходу користувача видно в тулбарі;\n-->
+        <!--• Завантаження старих повідомлень в листуванні;\n-->
+        <!--• Виправлено зникнення імені у користувача при відправленні стікера;\n-->
+        <!--• Показ нових повідомлень заявок в шторці;\n-->
+        <!--• Кількість учасників у бесіді;\n-->
+        <!--• Виправлена ​​помилка з вильотом при підрахунку статистикою повідомлень на деяких пристроях;\n-->
+        <!--• Тінь над полем для введення тексту в діалогах;\n-->
+        <!--• Показ пересланих повідомлень;\n-->
+        <!--• Добавленни світлі теми;\n-->
+        <!--• Ручне оновлення історії повідомлень;\n-->
+        <!--• Оффлайн завантаження історії повідомлень;\n-->
+        <!--• Збереження статистики повідомлень;\n-->
+        <!--• Показ дати отрпавкі повідомлення в історії листування;\n-->
+        <!--\n-->
+        <!--<u>0.0.7</u>\n-->
+        <!--• Переїзд на Gradle;\n-->
+        <!--• MaterialDrawer!;\n-->
+        <!--• зміни деяких колірні схеми;\n-->
+        <!--• Напівпрозорий StatusBar і NavigationBar на KitKat;\n-->
+        <!--• Перехід в профіль, при кліку користувача в друзях;\n-->
+        <!--• Вихід з аккаунта перенесений в шторку;\n-->
+        <!--• І налаштування теж;\n-->
+        <!--• Пункт "Статистика повідомлень" в діалозі;\n-->
+        <!--• Інша анімація завантаження діалогів;\n-->
+        <!--• Новини;\n-->
+        <!--\n-->
+        <!--<u>0.0.6</u>\n-->
+        <!--• Оптимізація списку повідомлень;\n-->
+        <!--• Великі повідомлення обрізаються;\n-->
+        <!--• Фарбування статус бару в колір теми;\n-->
+        <!--• Завантаження старих діалогів;\n-->
+        <!--• Новий профіль;\n-->
+        <!--• Відкриття профілю після натискання на фото;\n-->
+        <!--• Віджет пошуку в toolbar;\n-->
+        <!--• FloatingActionButton;\n-->
+        <!--• Трохи змінена розмітка діалогу;\n-->
+        <!--• Додавання тема "Teal", "Dark", "Black", "Purple";\n-->
+        <!--• При зміні орієнтації, актівті НЕ пересоздается;\n-->
+        <!--• Підправлені теми і трохи змінити колір фону;\n-->
+        <!--• Завантаження фото в історії повідомлень;\n-->
+        <!--\n-->
+        <!--<u>0.0.5</u>\n-->
+        <!--• Історія повідомлень користувача;\n-->
+        <!--• Відправлення повідомлень;\n-->
+        <!--• Виправлені імена користувачів (Null Null);\n-->
+        <!--• Автопоновлення списку повідомлень;\n-->
+        <!--• Анімація при натисканні на діалог;\n-->
+        <!--• Dark, Orange, Blue колірні схеми;\n-->
+        <!--• Roboto шрифт;\n-->
+        <!--• Тінь під toolbar видна на всіх версіях андроїд;\n-->
+        <!--• Підсвічування непрочитаних повідомлень;\n-->
+        <!--• Повне завантаження при першому запуску;\n-->
+        <!--\n-->
+        <!--<u>0.0.4</u>\n-->
+        <!--• Список діалогів;\n-->
+        <!--• Сортування за популярністю;\n-->
+        <!--• Іконка в NavigationDrawer має анімацію;\n-->
+        <!--• Indigo, Red, Blue теми;\n-->
+        <!--\n-->
+        <!--<u>0.0.3</u>\n-->
+        <!--• Нова іконка програми;\n-->
+        <!--• Оффлайн зарузка списку друзів і картинок!;\n-->
+        <!--• SwipeToRefresh;\n-->
+        <!--• Change log;\n-->
+        <!--• Смужка прокрутки;\n-->
+        <!--• Круглі аватарки в списку друзів;\n-->
+        <!--• Анімація списку друзів;\n-->
+        <!--\n-->
+        <!--<u>0.0.2</u>\n-->
+        <!--• Нові можливості:\n-->
+        <!--- Піст на стіну;\n-->
+        <!--- Зміни статусу, його відображення;\n-->
+        <!--- Список друзів;\n-->
+        <!--- Завжди включених оффлайн;\n-->
+        <!--- Налаштування;\n-->
+        <!--\n-->
+        <!--<u>0.0.1\n</u>-->
+        <!--• <b>Перший запуск!<i>04.02.2015</i></b>;\n-->
+        <!--• Navigation Drawer;\n-->
+        <!--• <b>Тема програми:</b>-->
+        <!--• Material Desing;\n-->
+        <!--• вікно нашлатувань;\n-->
+        <!--• частковий англійський;\n-->
+        <!--• авторизація;\n-->
+        <!--• вихід з облікового запису;\n-->
+        <!--• можливість публікувати записи на стіну;\n-->
+        <!--• список змін;\n-->
+        <!--\n-->
+    <!--</string>-->
+    <string name="news">Новини</string>
+    <string name="online">В мережі</string>
+    <string name="load_old">ЗАВАНТАЖИТИ ЩЕ</string>
+    <string name="change_log">Список змін</string>
+    <string name="color_swatch_description">Color %1$d</string>
+    <string name="color_swatch_description_selected">Color %1$d selected</string>
+    <string name="color_picker_default_title">Select a Color</string>
+    <string name="pick_color">Виберіть колір</string>
+    <string name="delete_message">Відалити повідомлення</string>
+    <string name="add">Додати</string>
+    <string name="owner_of_chat">творець бесіди</string>
+    <string name="invited_by">"запросив(ила) "</string>
+    <string name="gift">[Подарунок]</string>
+    <string name="prefs_night_theme">Нічний режим</string>
+    <string name="prefs_night_theme_description">Нічна тема</string>
+    <string name="prefs_app_color">Кольорова схема</string>
+    <string name="prefs_app_color_description">Колір, який буде використовуватися в програми</string>
+    <string name="prefs_color_in_msg">Колір отриманих повідомлень</string>
+    <string name="prefs_color_in_msg_description">Перефарбовувати фон бульбашки в колір теми</string>
+    <string name="prefs_color_out_msg">Колір відправлених повідомлень</string>
+    <string name="prefs_color_out_msg_description">Перефарбовувати фон бульбашки в колір теми</string>
+    <string name="prefs_visiblity">Видимість</string>
+    <string name="prefs_offline">Оффлайн</string>
+    <string name="prefs_offline_description">Вас не буде видно в мережі</string>
+    <string name="prefs_hide_typing">Приховувати статус набору повідомлення</string>
+    <string name="prefs_hide_typing_description">«Користувач набирає повідомлення…» не буде відображатися</string>
+    <string name="prefs_about">Про програму</string>
+    <string name="prefs_version">Версія</string>
+    <string name="prefs_changelog">Список змін</string>
+    <string name="prefs_changelog_description">Натисніть для перегляду</string>
+    <string name="prefs_title_ui">Оформлення</string>
+    <string name="prefs_blur_header">Розмита фотографія</string>
+    <string name="prefs_blur_header_description">Буде показуватися розмита фотографія користувача в драйвері, замість
+        фону
+    </string>
+    <string name="prefs_select_locale">Вибір мови</string>
+    <string name="prefs_select_locale_description">Буде використаний обраний вами мову, незалежно від налаштування
+        системи
+    </string>
+    <string name="chat">" (Бесіда) "</string>
+    <string name="groups">Спільноти</string>
+    <string name="type_group">Спільнота</string>
+    <string name="type_page">Публічна сторінка</string>
+    <string name="type_event">Спільнота</string>
+    <string name="offline">Оффлайн</string>
+    <string name="prefs_show_divider">Показувати роздільники</string>
+    <string name="prefs_show_divider_description">Будуть показані роздільники в списку діалогів</string>
+    <string name="prefs_font">Шрифт</string>
+    <string name="prefs_font_description">Стиль тексту, який буде використовуватися в програми</string>
+    <string name="prefs_group_description">Натисніть, що б вступити в групу програми, якщо ви хочете бачити все
+                зміни про програму
+    </string>
+    <string name="all">"Всього сообщений: "</string>
+    <string name="incoming">"Отримані: "</string>
+    <string name="outgoing">"Відправлені: "</string>
+    <string name="already_in_group">Ви вже складається в спільноти</string>
+    <string name="thank_you">Дякуємо!</string>
+    <string name="gifts">Подарунки</string>
+    <string name="prefs_use_second_profile">Використовувати другий профіль</string>
+    <string name="prefs_use_second_profile_description">(Ще не здійснено)</string>
+    <string name="videos">Відеозапис</string>
+    <string name="prefs_other">Інше</string>
+    <string name="prefa_unstable_connection">Режим RFM</string>
+    <string name="prefa_unstable_connection_description">Режим RFN (Resend Failed Messages) дозволяє не турбуватися про
+        поганому підключенні до мережі, в цьому випадку програма подбати про те, що б всі ваші повідомлення були
+        доставлені (навіть якщо воно вимкнене).
+    </string>
+    <string name="sending">Оправлення…</string>
+    <string name="error">Помилка</string>
+    <string name="check_update">Перевірити оновлення</string>
+    <string name="download_dialog">Завантажити діалог</string>
+    <string name="download_dialog_with">Викачуємо діалог</string>
+    <string name="started_download_dialog">Розпочато скачування діалогу</string>
+    <string name="enter">Введіть</string>
+    <string name="login">Віхид</string>
+    <string name="login_description">Ви можете залишити поле user id порожнім, проте так ви отримаєте тільки доступ до
+        повідомлень
+    </string>
+    <string name="materials_from_talk">Матеріали бесіди</string>
+    <string name="click_to_update">Натисніть для перевірки оновлення</string>
+    <string name="found_new_version">"Знайдена нова версія програми: "</string>
+    <string name="prefs_online_status">Онлайн статус</string>
+    <string name="prefs_online_statu_description">Вічний - постійно \"онлайн \"; \nФантомний - онлайн без зміни дати виходу;
+    </string>
+    <string name="download_ask">Завантажити?</string>
+    <string name="you">Я</string>
+    <string name="authorization_successfully">Авторизація пройшла успішно… Будь ласка зачекайте…</string>
+    <string name="login_with_token">Вхід з access token</string>
+    <string name="no_updates">У вас остання версія програми</string>
+    <string name="write_message">Повідомлення…</string>
+    <string name="download_history_successful">Історія успішно завантажено</string>
+
+    <string name="prefs_notification">Повідомлення</string>
+    <string name="prefs_notification_enable">Включити</string>
+    <string name="prefs_notification_enable_description">Оповіщати і прихід нових повідомлень</string>
+    <string name="prefs_vibration">Вібрація</string>
+    <string name="prefs_led_indicator">LED Индикатор</string>
+    <string name="new_messages">нових повідомлень</string>
+    <string name="is_typing">Набирає текст…</string>
+
+    <string name="delete_dialog">Видалити діалог</string>
+    <string name="delete_doc">Видалити документ</string>
+    <string name="load_saved_dialog">Завантажити збережений діалог</string>
+    <string name="exit_for_account_description">Ви впевнені, що хочете вийти з облікового запису?</string>
+    <string name="creating_chat">Створення чату</string>
+    <string name="error_decrypting">Сталася помилка декодування</string>
+    <string name="message_copied">Повідомлення скопійовано</string>
+    <string name="translator">Яндекс Перекладач</string>
+    <string name="translation_text">Переклад тексту, будь Ласка, зачекайте…</string>
+    <string name="important_messages">Важливі повідомлення</string>
+    <string name="prefs_message_encryption">Шифрування повідомлень</string>
+    <string name="prefs_message_encryption_description">При надсиланні нового повідомлення довгим тапом - воно буде зашифровываться вибраним алгоритмом. Для розшифровки потрібно натиснути на повідомлення</string>
+    <string name="join_in_group_ask">Вставити в групу додатки</string>
+    <string name="join_in_group_ask_description">Хочете вступити в групу, що б спостерігати за разватием додатки?</string>
+    <string name="prefs_drawer">Бічна шторка</string>
+    <string name="prefs_drawer_description">Налаштування оформлення заголовка бічній шторки (Drawer-a)</string>
+    <string name="chat_name">Назва чату</string>
+
+    <string name="prefs_bug_report">Баг-репорт</string>
+    <string name="prefs_enable_log">Активувати логування</string>
+    <string name="prefs_enable_log_description">Зберігати дії програми у файл на SD\пможливо зниження продуктивності на найслабкіших пристроях</string>
+    <string name="prefs_clear_log">Очистити логи</string>
+</resources>

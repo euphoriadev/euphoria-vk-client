@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="prefs">Настройки</string>
+    <string name="search">Поиск</string>
+    <string name="statistics_messages">Статистика сообщений</string>
+    <string name="navigation_drawer_open">Open navigation drawe</string>
+    <string name="navigation_drawer_close">Close navigation drawe</string>
+
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="profile">Профиль</string>
+    <string name="friends">Друзья</string>
+    <string name="messages">Сообщения</string>
+    <string name="forward_messages">[Пересланные сообщения]</string>
+    <string name="auidos">Аудиозаписи</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="exit">Выход</string>
+    <string name="update">Обновить</string>
+    <string name="members">участников</string>
+    <string name="title_members">Участники беседы</string>
+
+    <string name="authorization">Авторизация</string>
+    <string name="preview">Предпросмотр</string>
+    <string name="exit_for_account">Выход из аккаунта</string>
+    <string name="themes">Тема</string>
+    <string name="colour">Цветовая гамма</string>
+    <string name="check_internet">Пожалуйста, проверте Ваше подключение к интернету</string>
+    <string name="others">Прочее</string>
+    <string name="about">О приложении</string>
+    <string name="click_to_update">Нажмите для проверки обновления</string>
+
+</resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="screen_array">
+        <!--<item>Новости</item>-->
+        <item>Друзья</item>
+        <item>Сообщения</item>
+        <item>Аудиозаписи</item>
+        <item>Группы</item>
+        <item>Подарки</item>
+    </string-array>
+
+    <string-array name="online_status_array">
+        <item>Оффлайн</item>
+        <item>Вечный</item>
+        <item>Фантомный</item>
+    </string-array>
+
+    <string-array name="message_dialog_array">
+        <item>Переслать</item>
+        <item>Скопировать текст</item>
+        <item>Расшифровать</item>
+        <item>Перевод</item>
+        <item>Удалить</item>
+    </string-array>
+
+    <string-array name="prefs_drawer_header_array">
+        <item>Обычный</item>
+        <item>Сплошной фон</item>
+        <item>Размытый аватар</item>
+    </string-array>
+
+    <string-array name="tabs_material_of_dialog_array">
+        <item>Изображения</item>
+        <item>Видео</item>
+        <item>Аудио</item>
+        <item>Документы</item>
+    </string-array>
+
+    <string-array name="friends_sort_array">
+        <item>Все друзья</item>
+        <item>Онлайн</item>
+        <item>Оффлайн</item>
+    </string-array>
+
+    <string-array name="font_family_array">
+        <item>Roboto</item>
+        <item>RobotoCondensed</item>
+        <item>DroidSans</item>
+        <item>Системный</item>
+    </string-array>
+
+    <string-array name="text_weight_array">
+        <item>Нормальный</item>
+        <item>Очень тонкий</item>
+        <item>Тонкий</item>
+        <item>Средний</item>
+        <item>Жирный</item>
+    </string-array>
+
+</resources>

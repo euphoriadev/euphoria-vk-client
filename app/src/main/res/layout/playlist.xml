@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:gravity="center_vertical"
+              android:layout_width="match_parent"
+              android:paddingLeft="16dp"
+              android:paddingRight="16dp"
+              android:paddingTop="6dp"
+              android:paddingBottom="6dp"
+              android:layout_height="72dp">
+
+    <ru.euphoriadev.vk.view.CircleImageView
+        android:layout_width="45dp"
+        android:layout_marginRight="20dp"
+        android:id="@+id/ivCover"
+        android:layout_height="45dp"
+        android:src="@drawable/cate"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_weight="1">
+
+        <TextView android:layout_width="wrap_content"
+                  android:text="Love To Dance"
+                  android:singleLine="true"
+                  android:maxLines="1"
+                  android:id="@+id/tvTitle_audio"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:layout_marginBottom="6dp"
+                  android:textColor="?android:textColorPrimary"
+                  android:layout_height="wrap_content"/>
+
+        <TextView android:layout_width="wrap_content"
+                  android:text="PinkinLark LLC"
+                  android:id="@+id/tvArtist_audio"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:textColor="?android:textColorSecondary"
+                  android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginLeft="20dp"
+        android:src="@drawable/ic_equalizer"/>
+
+</LinearLayout>

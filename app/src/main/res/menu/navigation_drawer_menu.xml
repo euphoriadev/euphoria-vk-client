@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navFriends"
+            android:icon="@drawable/ic_people_white"
+            android:title="@string/friends"/>
+        <item
+            android:id="@+id/navMessages"
+            android:icon="@drawable/ic_question_answer_white"
+            android:title="@string/messages"/>
+        <item
+            android:id="@+id/navAudios"
+            android:icon="@drawable/ic_audiotrack_white"
+            android:title="@string/audios"/>
+
+        <item
+            android:id="@+id/navVideos"
+            android:icon="@drawable/ic_movie"
+            android:title="@string/videos"/>
+        <item
+            android:id="@+id/navGroups"
+            android:icon="@drawable/ic_group_work"
+            android:title="@string/groups"/>
+        <item
+            android:id="@+id/navGifts"
+            android:icon="@drawable/ic_card_giftcard_white"
+            android:title="@string/gifts"/>
+
+        <item
+            android:id="@+id/navDocs"
+            android:icon="@drawable/ic_folder"
+            android:title="@string/docs"/>
+
+        <item
+            android:id="@+id/navNotes"
+            android:icon="@drawable/ic_event_note"
+            android:title="@string/notes"/>
+
+    </group>
+
+
+
+
+    <group
+        android:id="@+id/navMenuOther"
+        android:checkableBehavior="none">
+        <!--<item-->
+            <!--android:title=""-->
+            <!--app:actionLayout="@layout/navigation_user_item"-->
+            <!--/>-->
+
+        <!--<item-->
+            <!--app:showAsAction="ifRoom|collapseActionView"-->
+            <!--app:actionLayout="@layout/navigation_user_item"-->
+            <!--/>-->
+
+        <!--<item-->
+            <!--android:title=""-->
+            <!--app:showAsAction="ifRoom|collapseActionView"-->
+            <!--app:actionLayout="@layout/navigation_user_item"-->
+            <!--/>-->
+
+        <item
+            android:id="@+id/navPrefs"
+            android:icon="@drawable/ic_settings_white"
+            android:title="@string/prefs"/>
+        <item
+            android:id="@+id/navExit"
+            android:icon="@drawable/ic_settings_power_white"
+            android:title="@string/exit_for_account"/>
+    </group>
+
+</menu>

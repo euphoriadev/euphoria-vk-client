@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="72dp"
+              android:gravity="center_vertical"
+              android:orientation="horizontal"
+              android:paddingLeft="16dp"
+              android:paddingRight="16dp">
+
+    <ImageView
+        android:id="@+id/ivGroupSelected"
+        android:src="@drawable/ic_selected"
+        android:visibility="visible"
+        android:layout_marginRight="16dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"/>
+
+    <ru.euphoriadev.vk.view.CircleImageView
+        android:id="@+id/ivGroupPhoto"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/camera_b"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvGroupTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="TimeVK for Android"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/primary_text_dark"/>
+
+        <TextView
+            android:id="@+id/tvGroupStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Открытая группа | 200 Участников"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/secondary_text_dark"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

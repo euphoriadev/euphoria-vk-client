@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="164dp">
+
+    <ImageView
+        android:id="@+id/drawerBackgroundHeader"
+        android:layout_width="match_parent"
+        android:layout_height="164dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/drawer_header_black"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="164dp"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <ru.euphoriadev.vk.view.CircleImageView
+            android:id="@+id/drawerIvPhoto"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:paddingTop="16dp"
+            android:src="@drawable/camera_b"/>
+
+        <TextView
+            android:id="@+id/drawerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="Igor Morozkin"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+        <TextView
+            android:id="@+id/drawerStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="its user status!"/>
+    </LinearLayout>
+
+</FrameLayout>
+

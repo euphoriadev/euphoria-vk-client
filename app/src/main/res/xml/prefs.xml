@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/prefs_title_ui" >
+        <CheckBoxPreference android:title="@string/prefs_night_theme"
+                            android:defaultValue="false"
+                            android:summary="@string/prefs_night_theme_description"/>
+
+        <PreferenceScreen android:title="@string/prefs_app_color"
+                            android:summary="@string/prefs_app_color_description"/>
+
+        <CheckBoxPreference android:title="@string/prefs_color_in_msg"
+                            android:defaultValue="false"
+                            android:summary="@string/prefs_color_in_msg_description"/>
+
+        <CheckBoxPreference android:title="@string/prefs_color_out_msg"
+                            android:defaultValue="true"
+                            android:summary="@string/prefs_color_out_msg_description"/>
+
+        <CheckBoxPreference android:title="@string/prefs_blur_header"
+                            android:defaultValue="false"
+                            android:summary="@string/prefs_blur_header_description"/>
+
+        <CheckBoxPreference android:title="@string/prefs_select_locale"
+                            android:defaultValue="false"
+                            android:summary="@string/prefs_select_locale_description"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/prefs_visiblity">
+
+        <CheckBoxPreference android:title="@string/prefs_offline"
+                            android:defaultValue="true"
+                            android:summary="@string/prefs_offline_description"/>
+
+        <CheckBoxPreference android:title="@string/prefs_hide_typing"
+                            android:defaultValue="false"
+                            android:summary="@string/prefs_hide_typing_description"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/prefs_about">
+
+        <PreferenceScreen android:title="@string/prefs_version"
+                            android:summary="@string/prefs_version_description"/>
+
+        <PreferenceScreen android:title="@string/prefs_changelog"
+                            android:summary="@string/prefs_changelog_description"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

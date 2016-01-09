@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="prefs">Preferences</string>
+    <string name="search">Search</string>
+    <string name="statistics_messages">Statistics of messages</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="profile">Profile</string>
+    <string name="friends">Friends</string>
+    <string name="messages">Messages</string>
+    <string name="audios">Audios</string>
+    <string name="forward_messages">[Forwarded messages]</string>
+    <string name="auidos">Audio</string>
+    <string name="videos">Videos</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="exit">Exit</string>
+    <string name="update">Update</string>
+    <string name="members">members</string>
+    <string name="title_members">Members of the chat</string>
+    <string name="sending">Sending...</string>
+
+
+    <string name="authorization">Authorization</string>
+    <string name="preview">Preview</string>
+    <string name="exit_for_account">Exit from account</string>
+    <string name="themes">Themes</string>
+    <string name="colour">Colors</string>
+    <string name="check_internet">Please check Your Internet connection</string>
+    <string name="others">Others</string>
+    <string name="about">About</string>
+    <string name="info_for_app">Version: 0.2;\n
+        Stage: <b>Beta</b>;\n</string>
+
+    <string name="news">News</string>
+    <string name="online">Online</string>
+    <string name="load_old">LOAD OTHERS</string>
+    <string name="change_log">Changelog</string>
+
+    <string name="color_swatch_description">Color %1$d</string>
+    <string name="color_swatch_description_selected">Color %1$d selected</string>
+    <string name="color_picker_default_title">Select a Color</string>
+    <string name="pick_color">Select a color</string>
+    <string name="delete_message">Delete message</string>
+    <string name="add">Add</string>
+    <string name="owner_of_chat">Creator conversation</string>
+    <string name="invited_by">"invited by "</string>
+    <string name="gift">[gify]</string>
+    <string name="prefs_night_theme">Night mode</string>
+    <string name="prefs_night_theme_description">Night theme</string>
+    <string name="prefs_app_color">Color scheme</string>
+    <string name="prefs_app_color_description">The color that will be used in the application</string>
+    <string name="prefs_color_in_msg">Color received messages</string>
+    <string name="prefs_color_in_msg_description">Repaint the background of the bubble in the color theme</string>
+    <string name="prefs_color_out_msg">Color incoming messages</string>
+    <string name="prefs_color_out_msg_description">Repaint the background of the bubble in the color theme</string>
+    <string name="prefs_visiblity">Visibility</string>
+    <string name="prefs_offline">Offline</string>
+    <string name="prefs_offline_description">You will not be seen on the vk</string>
+    <string name="prefs_hide_typing">Hide typing</string>
+    <string name="prefs_hide_typing_description"><![CDATA[
+        <<User is typing the message…>> will not be displayed]]></string>
+    <string name="prefs_about">About</string>
+    <string name="prefs_version">Version</string>
+    <string name="prefs_version_description">0.2.1</string>
+    <string name="prefs_changelog">Chengelog</string>
+    <string name="prefs_changelog_description">Click to view</string>
+    <string name="prefs_title_ui">Making</string>
+    <string name="prefs_blur_header">Blure photo in the drawer</string>
+    <string name="prefs_blur_header_description">Will seem blurry photo of a person in a drawer, instead
+        background
+    </string>
+    <string name="prefs_select_locale">Language selection</string>
+    <string name="prefs_select_locale_description">will be used by the chosen language, regardless of the settingssystem</string>
+    <string name="chat">" (Chat) "</string>
+    <string name="groups">Groups</string>
+    <string name="type_group">Group</string>
+    <string name="type_page">Page</string>
+    <string name="type_event">Event</string>
+    <string name="offline">Offline</string>
+    <string name="prefs_show_divider">Show dividers</string>
+    <string name="prefs_show_divider_description">Will be shown dividers in the conversation list</string>
+    <string name="prefs_font">Font</string>
+    <string name="prefs_font_description">The style of the text, which will be used in the application</string>
+    <string name="prefs_group_description">Click to join the official group application, if you want to see all
+        changes on the app</string>
+    <string name="all">"All messages: "</string>
+    <string name="incoming">"Incoming: "</string>
+    <string name="outgoing">"Outgoing: "</string>
+    <string name="already_in_group">You are already in the group</string>
+    <string name="thank_you">Thank you!</string>
+    <string name="gifts">Gifts</string>
+    <string name="prefs_use_second_profile">Use a second user profile</string>
+    <string name="prefs_use_second_profile_description">(Not yet implemented)
+    </string>
+    <string name="prefs_other">Other</string>
+    <string name="prefa_unstable_connection">Mode RFM</string>
+    <string name="prefa_unstable_connection_description">Mode RFN (Resend Failed Messages) allows not to worry about bad Internet, In this case the application to ensure that all your messages have been delivered (even if the app is turned off).
+    </string>
+    <string name="error">Error</string>
+    <string name="check_update">Check update</string>
+    <string name="download_dialog">Download dialog</string>
+    <string name="download_dialog_with">Download dialog</string>
+    <string name="started_download_dialog">Started the download dialog</string>
+    <string name="enter">Enter</string>
+    <string name="login">Login</string>
+    <string name="login_description">You can leave user id field blank, however, so you will only have access to messages</string>
+    <string name="materials_from_talk">Materials from talk</string>
+    <string name="click_to_update">Click to check for updates</string>
+    <string name="found_new_version">"Found a new version of app: "</string>
+    <string name="prefs_online_status">Online status</string>
+    <string name="prefs_online_statu_description">
+        Eternal - always \"online\";\Phantom - online without changing the date
+        output;\n
+    </string>
+    <string name="download_ask">Download?</string>
+    <string name="you">You</string>
+    <string name="authorization_successfully">Authorization successfully, please wait</string>
+    <string name="login_with_token">Login with access token</string>
+    <string name="no_updates">You have the latest version of the app</string>
+    <string name="write_message">Write a message…</string>
+    <string name="download_history_successful">диалог успешно скачен</string>
+    <string name="prefs_notification">Notifications</string>
+    <string name="prefs_notification_enable">Enable notifications</string>
+    <string name="prefs_notification_enable_description">Alert and the arrival of new messages</string>
+    <string name="prefs_vibration">Vibration</string>
+    <string name="prefs_led_indicator">LED Indicator</string>
+    <string name="new_messages">new messages</string>
+    <string name="is_typing">is typing…</string>
+    <string name="delete_dialog">Delete dialog</string>
+    <string name="delete_doc">Delete Doc</string>
+    <string name="load_saved_dialog">Load a saved dialog</string>
+    <string name="exit_for_account_description">Are you sure you want to log out??</string>
+    <string name="creating_chat">Creating the chat</string>
+    <string name="error_decrypting">An error occurred decrypting</string>
+    <string name="message_copied">Message copied</string>
+    <string name="translator">Yandex Translator</string>
+    <string name="translation_text">Translation of the text, please wait…</string>
+    <string name="important_messages">Important messages</string>
+    <string name="prefs_message_encryption">Message encryption</string>
+    <string name="prefs_message_encryption_description">When sending new messages with a long tap - it will be encrypted by the selected algorithm. To decrypt you need to click on the message</string>
+    <string name="join_in_group_ask">Join in group</string>
+    <string name="join_in_group_ask_description">Want to join in group to watch development of this application?</string>
+    <string name="prefs_drawer">Navigation Drawer</string>
+    <string name="prefs_drawer_description">Customize the appearance of Navigation Drawer header,</string>
+    <string name="chat_name">Name of chat</string>
+
+    <string name="prefs_bug_report">Bug report</string>
+    <string name="prefs_enable_log">Enable log</string>
+    <string name="prefs_enable_log_description">Save actions to a file on SD card\nMay reduce performance on slower devices</string>
+    <string name="prefs_clear_log">Cleanup logs</string>
+    <string name="docs">Docs</string>
+    <string name="notes">Notes</string>
+    <string name="translate_text.please_wait">Translate the text. It takes a few seconds…</string>
+    <string name="translate_all">Translate all</string>
+    <string name="all_words">All words: </string>
+    <string name="prefs_font_weight">Font weight</string>
+    <string name="prefs_font_family">Font family</string>
+    <string name="delete">Delete</string>
+    <string name="attach">Attach</string>
+</resources>

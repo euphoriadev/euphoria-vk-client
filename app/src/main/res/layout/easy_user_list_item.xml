@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="72dp"
+              android:gravity="center_vertical"
+              android:orientation="horizontal">
+
+    <ru.euphoriadev.vk.view.CircleImageView
+        android:id="@+id/ivUserPhoto"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/camera_b"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:paddingBottom="5dp"
+            android:singleLine="true"
+            android:text="Pavel Durov"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/primary_text_dark"/>
+
+        <TextView
+            android:id="@+id/tvUserOnline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Online"
+            android:textColor="@android:color/secondary_text_dark"/>
+    </LinearLayout>
+
+
+    <CheckBox
+        android:id="@+id/cbUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center"
+        android:focusable="false"
+        android:layout_marginRight="16dp"/>
+
+</LinearLayout>

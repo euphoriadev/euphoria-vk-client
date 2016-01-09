@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="screen_array">
+        <!--<item>Новости</item>-->
+        <item>Друзі</item>
+        <item>Повідомлення</item>
+        <item>Аудіозаписи</item>
+        <item>Групи</item>
+        <item>Подарунки</item>
+    </string-array>
+
+    <string-array name="online_status_array">
+        <item>Оффлайн</item>
+        <item>Вічний</item>
+        <item>Фантомный</item>
+    </string-array>
+
+    <string-array name="message_dialog_array">
+        <item>Переслати</item>
+        <item>Скопіювати текст</item>
+        <item>Розшифрувати</item>
+        <item>Переклад</item>
+        <item>Видалити</item>
+    </string-array>
+
+    <string-array name="prefs_drawer_header_array">
+        <item>Обычынй</item>
+        <item>Сплошной фон</item>
+        <item>Розмитий аватар</item>
+    </string-array>
+
+    <string-array name="tabs_material_of_dialog_array">
+        <item>Зображення</item>
+        <item>Відео</item>
+        <item>Аудіо</item>
+        <item>Документи</item>
+    </string-array>
+
+    <string-array name="friends_sort_array">
+        <item>Всі друзі</item>
+        <item>Онлайн</item>
+        <item>Оффлайн</item>
+    </string-array>
+
+</resources>
