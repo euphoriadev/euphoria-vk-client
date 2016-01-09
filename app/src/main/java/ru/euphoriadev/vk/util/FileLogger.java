@@ -45,7 +45,6 @@ public class FileLogger {
     private File currentFile;
     private static Thread.UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
 
-
     public static final Thread.UncaughtExceptionHandler DEFAULT_ERROR_HANDLER = new Thread.UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
@@ -84,7 +83,7 @@ public class FileLogger {
             Log.w(TAG, "onCreate");
         }
         try {
-            FileHelper.writeToTextFile(currentFile, "[----- start log ".concat(sdf.format(System.currentTimeMillis()).concat(" -----]".concat("\n"))), true);
+            FileHelper.writeText(currentFile, "[----- start log ".concat(sdf.format(System.currentTimeMillis()).concat(" -----]".concat("\n"))), true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -100,7 +99,7 @@ public class FileLogger {
             return;
         }
 
-        FileHelper.writeToTextFile(logger.currentFile, logger.getFormatedText(tag, message, "I", null), true);
+        FileHelper.writeText(logger.currentFile, logger.getFormatedText(tag, message, "I", null), true);
 
     }
 
@@ -114,7 +113,7 @@ public class FileLogger {
             return;
         }
 
-        FileHelper.writeToTextFile(logger.currentFile, logger.getFormatedText(tag, message, "W", null), true);
+        FileHelper.writeText(logger.currentFile, logger.getFormatedText(tag, message, "W", null), true);
     }
 
     public static void e(String tag, String message, Throwable e) {
@@ -127,7 +126,7 @@ public class FileLogger {
             return;
         }
 
-        FileHelper.writeToTextFile(logger.currentFile, logger.getFormatedText(tag, message, "E", e), true);
+        FileHelper.writeText(logger.currentFile, logger.getFormatedText(tag, message, "E", e), true);
     }
 
     public static void e(String tag, String message) {
