@@ -7,6 +7,7 @@ Euphoria is app for social network Vkontakte on Android with a focus on speed. W
 - 20 Themes;
 - Encrypter for messages;
 - Mode RFM (Resend Failed Messages);
+- Eternal or phantom online
 - Fast speed of work
 - Completely free
 
@@ -15,3 +16,10 @@ We use the library from app Kate Mobile by thest1: https://github.com/thest1/And
 
 Picasso for load images from network: https://github.com/square/picasso
 
+# Development
+The app is developed by only 2 peoples, in their spare time. Therefore, the development process can be very long. 
+if you like to work on a new feature, please create an issue so we could discuss it together with you.
+Also, you can contact us by email: igmorozkin@gmail.com
+
+# Bug Report
+Recently the app learned how to write logs on SD. If you experience a crash, please send the logs to us.
