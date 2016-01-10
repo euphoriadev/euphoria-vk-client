@@ -4,10 +4,10 @@ import android.graphics.Bitmap;
 
 /**
  * Created by Igor on 04.07.15.
- *
+ * <p/>
  * Stack Blur v1.0 from
  * http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html
- *
+ * <p/>
  * Java Author: Mario Klingemann <mario at quasimondo.com>
  * http://incubator.quasimondo.com
  * created Feburary 29, 2004
@@ -17,7 +17,7 @@ import android.graphics.Bitmap;
  * This is a compromise between Gaussian Blur and Box blur
  * It creates much better looking blurs than Box Blur, but is
  * 7x faster than my Gaussian Blur implementation.
- *
+ * <p/>
  * I called it Stack Blur because this describes best how this
  * filter works internally: it creates a kind of moving stack
  * of colors whilst scanning through the image. Thereby it
@@ -26,10 +26,10 @@ import android.graphics.Bitmap;
  * colors on the topmost layer of the stack are either added on
  * or reduced by one, depending on if they are on the right or
  * on the left side of the stack.
- *
+ * <p/>
  * If you are using this algorithm in your code please add
  * the following line:
- *
+ * <p/>
  * Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
  */
 public class FastBlur {
@@ -56,7 +56,7 @@ public class FastBlur {
         if (sentBitmap.isMutable()) {
             bitmap = sentBitmap;
         } else
-        bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
+            bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
         if (radius < 1) {
             return (null);
@@ -79,7 +79,7 @@ public class FastBlur {
         int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
         int vmin[] = new int[Math.max(w, h)];
 
-        int divsum = (div + 1) >> 1;
+        int divsum = (div + 1)>>1;
         divsum *= divsum;
         int dv[] = new int[256 * divsum];
         for (i = 0; i < 256 * divsum; i++) {
@@ -102,8 +102,8 @@ public class FastBlur {
             for (i = -radius; i <= radius; i++) {
                 p = pix[yi + Math.min(wm, Math.max(i, 0))];
                 sir = stack[i + radius];
-                sir[0] = (p & 0xff0000) >> 16;
-                sir[1] = (p & 0x00ff00) >> 8;
+                sir[0] = (p & 0xff0000)>>16;
+                sir[1] = (p & 0x00ff00)>>8;
                 sir[2] = (p & 0x0000ff);
                 rbs = r1 - Math.abs(i);
                 rsum += sir[0] * rbs;
@@ -143,8 +143,8 @@ public class FastBlur {
                 }
                 p = pix[yw + vmin[x]];
 
-                sir[0] = (p & 0xff0000) >> 16;
-                sir[1] = (p & 0x00ff00) >> 8;
+                sir[0] = (p & 0xff0000)>>16;
+                sir[1] = (p & 0x00ff00)>>8;
                 sir[2] = (p & 0x0000ff);
 
                 rinsum += sir[0];
@@ -206,7 +206,7 @@ public class FastBlur {
             stackpointer = radius;
             for (y = 0; y < h; y++) {
                 // Preserve alpha channel: ( 0xff000000 & pix[yi] )
-                pix[yi] = (0xff000000 & pix[yi]) | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum];
+                pix[yi] = (0xff000000 & pix[yi]) | (dv[rsum]<<16) | (dv[gsum]<<8) | dv[bsum];
 
                 rsum -= routsum;
                 gsum -= goutsum;
