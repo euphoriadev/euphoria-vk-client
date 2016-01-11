@@ -28,8 +28,11 @@ import java.util.WeakHashMap;
  * A simple utils for {@link android.view.View}
  */
 public class ViewUtil {
-    /** Views for update typefaces */
+    /**
+     * Views for update typefaces
+     */
     private static final Set<TextView> sSetViews = Collections.newSetFromMap(new WeakHashMap<TextView, Boolean>());
+
     /**
      * Specify an optional color filter for the drawable
      *
@@ -63,6 +66,7 @@ public class ViewUtil {
         drawable.setColorFilter(colorFilter);
         return drawable;
     }
+
     /**
      * Set {@link Typeface} to {@link TextView} or child,
      * if font not in cache - puts it.
@@ -111,6 +115,12 @@ public class ViewUtil {
         setTypeface(view, TypefaceManager.getFontFamily(), TypefaceManager.getTextWeight());
     }
 
+    /**
+     * Set {@link Typeface} from Preferences,
+     * to all {@link View} of {@link ViewGroup}
+     *
+     * @param group the group to set typeface
+     */
     public static void setTypeface(ViewGroup group) {
         for (int i = 0; i < group.getChildCount(); i++) {
             View child = group.getChildAt(i);
@@ -142,7 +152,7 @@ public class ViewUtil {
     public static SpannableString createTypefaceSpan(CharSequence title) {
         Typeface typeface = TypefaceManager.getTypeface(AppLoader.appContext, TypefaceManager.getFontFamily(), TypefaceManager.getTextWeight());
         SpannableString newTitle = new SpannableString(title);
-        newTitle.setSpan(new TypefaceSpan("" , typeface), 0 , newTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        newTitle.setSpan(new TypefaceSpan("", typeface), 0, newTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         return newTitle;
     }
 
@@ -184,7 +194,7 @@ public class ViewUtil {
     }
 
     /**
-     *  Update {@link Typeface} at all Views, which were changed this class
+     * Update {@link Typeface} at all Views, which were changed this class
      */
     public static void refreshViewsForTypeface() {
         TypefaceManager.updateTypefaceValues();
