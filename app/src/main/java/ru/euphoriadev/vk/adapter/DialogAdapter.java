@@ -408,27 +408,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
                     .load(message.isChat() ? message.photo_50 == null ? user.photo_50 : message.photo_50 : user.photo_50) // загрузка
                     .placeholder(R.drawable.camera_b) // заглушка
                     .config(Bitmap.Config.RGB_565)
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            holder.ivPhoto.setImageBitmap(bitmap);
-                            holder.ivPhoto.setText("");
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                            holder.ivPhoto.setImageDrawable(new ColorDrawable(ThemeManager.getThemeColor(context)));
-                            holder.ivPhoto.setTextSize(Utils.pxFromDp(context, 24));
-                            holder.ivPhoto.setText(String.valueOf(item.user.first_name.charAt(0)));
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-                            holder.ivPhoto.setImageDrawable(new ColorDrawable(ThemeManager.getThemeColor(context)));
-                            holder.ivPhoto.setTextSize(Utils.pxFromDp(context, 24));
-                            holder.ivPhoto.setText(String.valueOf(item.user.first_name.charAt(0)));
-                        }
-                    }); // вставка
+                    .into(holder.ivPhoto);
         } catch (Exception e) {
             e.printStackTrace();
         }
