@@ -75,8 +75,8 @@ public class DocsAdapter extends BaseArrayAdapter<VKDocument> {
 
         }
 
-//        final Bitmap bitmap = Utils.drawableToBitmap(iv.getDrawable());
-//        Utils.drawText("Text", bitmap);
+//        final Bitmap bitmap = AndroidUtils.drawableToBitmap(iv.getDrawable());
+//        AndroidUtils.drawText("Text", bitmap);
 //        iv.setImageBitmap(bitmap);
 
 

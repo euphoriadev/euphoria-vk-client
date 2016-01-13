@@ -1,6 +1,5 @@
 package ru.euphoriadev.vk.service;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -8,14 +7,11 @@ import android.content.SharedPreferences;
 import android.os.*;
 import android.os.Process;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.SparseArray;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.concurrent.TimeUnit;
 
 import ru.euphoriadev.vk.MessageHistoryActivity;
 import ru.euphoriadev.vk.R;
@@ -26,7 +22,7 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.NotificationsHelper;
 import ru.euphoriadev.vk.util.FileLogger;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 /**
  * Created by Igor on 13.11.15.
@@ -70,7 +66,7 @@ public class LongPollService extends Service {
                     VKLongPollServer pollServer = api.getLongPollServer(null, null);
 
                     while (isRunning) {
-                        if (!Utils.isInternetConnection(LongPollService.this)) {
+                        if (!AndroidUtils.isInternetConnection(LongPollService.this)) {
                             Thread.sleep(5000);
                             continue;
                         }

@@ -26,6 +26,10 @@
     <string name="about">О приложении</string>
 
     <string name="changelog">
+        <u>0.9</u>\n
+        • Open Source!;\n
+        • Возможность установить фон на чат!;\n
+        \n
         <u>0.8</u>\n
         • Заметки;\n
         • Документы: скачивание, удаление, просмотр;\n
@@ -382,4 +386,5 @@
     <string name="prefs_font_family">Семейство шрифтов</string>
     <string name="delete">Удалить</string>
     <string name="attach">Прикрепить</string>
+    <string name="set_wallpaper">Установить фон</string>
 </resources>

@@ -2,7 +2,6 @@ package ru.euphoriadev.vk;
 
 import android.os.*;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 //import android.support.v7.internal.widget.ThemeUtils;
 import android.support.v7.widget.Toolbar;
 import android.view.*;
@@ -15,11 +14,10 @@ import ru.euphoriadev.vk.adapter.ChoiceUserAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.KeyboardUtil;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,7 +58,7 @@ public class CreateChatActivity extends BaseThemedActivity {
     }
 
     private void loadUsers() {
-        if (!Utils.isInternetConnection(this)) {
+        if (!AndroidUtils.isInternetConnection(this)) {
             Toast.makeText(this, R.string.check_internet, Toast.LENGTH_LONG).show();
             return;
         }

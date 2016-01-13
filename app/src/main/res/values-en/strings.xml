@@ -159,4 +159,5 @@
     <string name="prefs_font_family">Font family</string>
     <string name="delete">Delete</string>
     <string name="attach">Attach</string>
+    <string name="set_wallpaper">Set wallpaper on char</string>
 </resources>

@@ -37,6 +37,7 @@ public class ThemeManager {
     public static final String PREF_KEY_FORCED_LOCALE = "forced_locale";
     public static final String PREF_KEY_IS_DARK_THEME = "is_dark_theme";
     public static final String PREF_KEY_DRAWER_HEADER = "making_drawer_header";
+    public static final String PREF_KEY_MESSAGE_WALLPAPER_PATH = "message_wallpaper_path";
 
     /** Drawer header states **/
     public static final int DRAWER_HEADER_DEFAULT = 0;
@@ -367,6 +368,7 @@ public class ThemeManager {
      * Cached themes values
      */
     private static String sLocale;
+    private static String sMessageWallpaperPath;
     private static int sColourTheme = -1;
     private static int sAccentColor = -1;
     private static int sThemeColor = -1;
@@ -413,7 +415,7 @@ public class ThemeManager {
             if (!drawingStatusBar) {
                 context.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-                int statusBarHeight = Utils.getStatusBarHeight(context);
+                int statusBarHeight = AndroidUtils.getStatusBarHeight(context);
                 View decorView = context.getWindow().getDecorView();
                 View view = new View(context);
                 view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, statusBarHeight));
@@ -486,7 +488,7 @@ public class ThemeManager {
 
 //            View statusBarView = activity.findViewById(R.id.statusBarBackground);
 //            if (statusBarView != null) {
-//                Utils.setStatusBarColor(activity, statusBarView);
+//                AndroidUtils.setStatusBarColor(activity, statusBarView);
 //            }
         }
     }
@@ -496,6 +498,7 @@ public class ThemeManager {
             SharedPreferences prefs = AppLoader.getLoader().getPreferences();
 
             sLocale = prefs.getString(PREF_KEY_FORCED_LOCALE, Locale.getDefault().getLanguage());
+            sMessageWallpaperPath = prefs.getString(PREF_KEY_MESSAGE_WALLPAPER_PATH, "");
             sColourTheme = Integer.parseInt(prefs.getString(PREF_KEY_THEME_COLOUR, String.valueOf(DEFAULT_COLOR)));
 //          sAccentColor = Integer.parseInt(prefs.getString(PREF_KEY_COLOR_ACCENT, String.valueOf(DEFAULT_ACCENT_COLOR)));
             sIsDarkTheme = prefs.getBoolean(PREF_KEY_IS_DARK_THEME, true);
@@ -645,6 +648,11 @@ public class ThemeManager {
                 break;
         }
         return resultHeader;
+    }
+
+    public static String getWallpaperPath(Context context) {
+        loadThemePreferences(context);
+        return sMessageWallpaperPath;
     }
 
 }

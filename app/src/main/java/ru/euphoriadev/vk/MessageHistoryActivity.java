@@ -6,10 +6,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.*;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -18,6 +23,9 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import ru.euphoriadev.vk.adapter.*;
 import ru.euphoriadev.vk.api.Api;
@@ -28,7 +36,9 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.*;
+import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,38 +53,32 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
     private ListView lvHistory;
     private EditText etMessageText;
-    private ru.euphoriadev.vk.view.fab.FloatingActionButton fabSend;
     private ArrayList<MessageItem> history;
-    private MessageAdapter adapter;
     private MessageCursorAdapter cursorAdapter;
+    private MessageAdapter adapter;
 
     private SQLiteDatabase database;
     private DBHelper helper;
-    private boolean forceClose;
-
     private ExecutorService executor;
+
     private Api api;
-    private Account account;
     private long uid;
     private long chat_id;
     private long lastTypeNotification;
+    private boolean forceClose;
     private boolean hideTyping;
-    private boolean isButtonPositionOflistView = true;
+    private boolean isButtonPositionOflistView;
     private boolean isLoadingOldMessages = false;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ThemeManagerOld manager = new ThemeManagerOld(this);
-//        manager.setBasicTheme();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.message_history_activity);
 
-        Utils.setStatusBarColor(this, findViewById(R.id.statusBarBackground));
 
-        uid = getIntent().getExtras().getLong("user_id");
         String fullName = getIntent().getExtras().getString("fullName");
+        uid = getIntent().getExtras().getLong("user_id");
         chat_id = getIntent().getExtras().getLong("chat_id");
         long users_count = getIntent().getExtras().getLong("users_count");
         boolean isOnline = getIntent().getExtras().getBoolean("online");
@@ -92,9 +96,26 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         lvHistory.setStackFromBottom(true);
 
         etMessageText = (EditText) findViewById(R.id.messageText);
+        etMessageText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!hideTyping && System.currentTimeMillis() - lastTypeNotification > 5000)
+                    setTyping();
+            }
+        });
         ViewUtil.setTypeface(etMessageText);
 
-        fabSend = (ru.euphoriadev.vk.view.fab.FloatingActionButton) findViewById(R.id.fabMessageSebd);
+        FloatingActionButton fabSend = (FloatingActionButton) findViewById(R.id.fabMessageSebd);
         fabSend.setColorNormal(ThemeUtils.getThemeAttrColor(this, R.attr.colorAccent));
         fabSend.setColorPressed(ViewUtil.getPressedColor(fabSend.getColorNormal()));
         fabSend.setOnClickListener(new View.OnClickListener() {
@@ -104,16 +125,11 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             }
         });
 
-        if (manager.isNightTheme()) {
+        if (!ThemeManager.isDarkTheme()) {
             ViewUtil.setFilter(fabSend, Color.BLACK);
         }
 
-        if (manager.isLight()) {
-            etMessageText.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
-//            fabSend.setImageDrawable(iconSend);
-        } else {
-            etMessageText.getBackground().setColorFilter(Color.parseColor("#424242"), PorterDuff.Mode.MULTIPLY);
-        }
+        etMessageText.getBackground().setColorFilter(ThemeManager.isDarkTheme() ? Color.parseColor("#424242") : Color.WHITE, PorterDuff.Mode.MULTIPLY);
 
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -132,7 +148,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             getSupportActionBar().setSubtitle(isOnline ? getResources().getString(R.string.online) : getResources().getString(R.string.offline));
         }
         ViewUtil.setTypeface(toolbar);
-
 
         lvHistory.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -181,7 +196,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             }
         });
 
-
         lvHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -192,101 +206,11 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     return;
                 }
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MessageHistoryActivity.this);
-                builder.setItems(R.array.message_dialog_array, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                // Переслать
-                                break;
-                            case 1:
-                                // Копировать
-                                Utils.copyTextToClipboard(MessageHistoryActivity.this, messageItem.message.body);
-                                Toast.makeText(MessageHistoryActivity.this, R.string.message_copied, Toast.LENGTH_SHORT).show();
-                                break;
-
-                            case 2:
-                                // Расшифровать
-                                String decryptMessage = decryptMessage(messageItem.message.body);
-                                // если расшифровывание прошло удачно
-                                if (decryptMessage != null) {
-                                    messageItem.message.body = decryptMessage;
-                                    adapter.notifyDataSetChanged();
-                                } else {
-                                    // произошла ошибка, либо не та шифровка в настройках, либо это обычное сообщение
-                                    Toast.makeText(MessageHistoryActivity.this, R.string.error_decrypting, Toast.LENGTH_LONG).show();
-                                }
-                                break;
-
-                            case 3:
-                                final String[] translatedMessage = new String[1];
-                                // Переводчик
-                                AlertDialog.Builder alerBuilder = new AlertDialog.Builder(MessageHistoryActivity.this);
-                                alerBuilder.setTitle(getResources().getString(R.string.translator))
-                                        .setMessage(getResources().getString(R.string.translation_text))
-                                        .setPositiveButton("OK", null)
-                                        .setNegativeButton("Copy", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                if (!TextUtils.isEmpty(translatedMessage[0])) {
-                                                    Utils.copyTextToClipboard(MessageHistoryActivity.this, translatedMessage[0]);
-                                                    Toast.makeText(MessageHistoryActivity.this, R.string.message_copied, Toast.LENGTH_LONG).show();
-                                                }
-                                            }
-                                        });
-                                final AlertDialog alertDialog = alerBuilder.create();
-                                alertDialog.show();
-
-
-                                YandexTranslator translator = new YandexTranslator(MessageHistoryActivity.this);
-                                translator.translateAsync(messageItem.message.body, YandexTranslator.Language.ENGLISH.toString(), YandexTranslator.Language.RUSSIAN.toString(), new YandexTranslator.OnCompleteListener() {
-                                    @Override
-                                    public void onCompleteTranslate(YandexTranslator translator, String message) {
-                                        alertDialog.setMessage(message);
-                                        translatedMessage[0] = message;
-                                    }
-                                });
-                                break;
-
-                            case 4:
-                                // Удалить
-                                ArrayList<MessageItem> messages = new ArrayList<>();
-                                messages.add(messageItem);
-                                deleteMessages(messages);
-
-                                if (adapter.getMessages().remove(messageItem)) {
-                                    database.execSQL("DELETE FROM " + DBHelper.MESSAGES_TABLE + " WHERE " + DBHelper.MESSAGE_ID + " = " + messageItem.message.mid);
-                                    adapter.notifyDataSetChanged();
-                                }
-                                break;
-
-                        }
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
+                makeMessageOptionsDialog(messageItem);
             }
+
         });
 
-
-        etMessageText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!hideTyping && System.currentTimeMillis() - lastTypeNotification > 5000)
-                    setTyping();
-            }
-        });
 
         fabSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -309,12 +233,95 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             public void onClick(View v) {
                 if (chat_id != 0) getChatMembers();
 
-                lvHistory.smoothScrollToPosition(adapter != null ? adapter.getCount() : cursorAdapter != null ? cursorAdapter.getCount() : 0);
             }
         });
 
         executor = Executors.newSingleThreadExecutor();
         getMessages(from_saved);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        loadWallpaperFromSD();
+    }
+
+    private void makeMessageOptionsDialog(final MessageItem messageItem) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MessageHistoryActivity.this);
+        builder.setItems(R.array.message_dialog_array, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        // Переслать
+                        break;
+                    case 1:
+                        // Копировать
+                        AndroidUtils.copyTextToClipboard(MessageHistoryActivity.this, messageItem.message.body);
+                        Toast.makeText(MessageHistoryActivity.this, R.string.message_copied, Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case 2:
+                        // Расшифровать
+                        String decryptMessage = decryptMessage(messageItem.message.body);
+                        // если расшифровывание прошло удачно
+                        if (decryptMessage != null) {
+                            messageItem.message.body = decryptMessage;
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            // произошла ошибка, либо не та шифровка в настройках, либо это обычное сообщение
+                            Toast.makeText(MessageHistoryActivity.this, R.string.error_decrypting, Toast.LENGTH_LONG).show();
+                        }
+                        break;
+
+                    case 3:
+                        final String[] translatedMessage = new String[1];
+                        // Переводчик
+                        AlertDialog.Builder alerBuilder = new AlertDialog.Builder(MessageHistoryActivity.this);
+                        alerBuilder.setTitle(getResources().getString(R.string.translator))
+                                .setMessage(getResources().getString(R.string.translation_text))
+                                .setPositiveButton("OK", null)
+                                .setNegativeButton("Copy", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (!TextUtils.isEmpty(translatedMessage[0])) {
+                                            AndroidUtils.copyTextToClipboard(MessageHistoryActivity.this, translatedMessage[0]);
+                                            Toast.makeText(MessageHistoryActivity.this, R.string.message_copied, Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                        final AlertDialog alertDialog = alerBuilder.create();
+                        alertDialog.show();
+
+
+                        YandexTranslator translator = new YandexTranslator(MessageHistoryActivity.this);
+                        translator.translateAsync(messageItem.message.body, YandexTranslator.Language.ENGLISH.toString(), YandexTranslator.Language.RUSSIAN.toString(), new YandexTranslator.OnCompleteListener() {
+                            @Override
+                            public void onCompleteTranslate(YandexTranslator translator, String message) {
+                                alertDialog.setMessage(message);
+                                translatedMessage[0] = message;
+                            }
+                        });
+                        break;
+
+                    case 4:
+                        // Удалить
+                        ArrayList<MessageItem> messages = new ArrayList<>();
+                        messages.add(messageItem);
+                        deleteMessages(messages);
+
+                        if (adapter.getMessages().remove(messageItem)) {
+                            database.execSQL("DELETE FROM " + DBHelper.MESSAGES_TABLE + " WHERE " + DBHelper.MESSAGE_ID + " = " + messageItem.message.mid);
+                            adapter.notifyDataSetChanged();
+                        }
+                        break;
+
+                }
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void getAllMessages() {
@@ -351,7 +358,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         alert = builder.create();
         alert.show();
 
-        if (Utils.isInternetConnection(getApplicationContext()))
+        if (AndroidUtils.isInternetConnection(getApplicationContext()))
             new Thread() {
                 @Override
                 public void run() {
@@ -418,7 +425,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                                 } else {
                                     count[2]++;
                                 }
-                                wordsCount = wordsCount + Utils.getWordsCount(message.body);
+                                wordsCount = wordsCount + AndroidUtils.getWordsCount(message.body);
                             }
                             dialogs.clear();
                             dialogs.trimToSize();
@@ -594,7 +601,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         cursor.close();
 
         // если нет интернета
-        if (!Utils.isInternetConnection(this)) {
+        if (!AndroidUtils.isInternetConnection(this)) {
             return;
         }
 
@@ -682,8 +689,10 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     e.printStackTrace();
                     ;
                 } finally {
-                    database.setTransactionSuccessful();
-                    database.endTransaction();
+                    if (database.inTransaction()) {
+                        database.setTransactionSuccessful();
+                        database.endTransaction();
+                    }
                 }
             }
         });
@@ -691,7 +700,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     }
 
     private void setTyping() {
-        if (!Utils.isInternetConnection(this)) {
+        if (!AndroidUtils.isInternetConnection(this)) {
             return;
         }
         this.lastTypeNotification = System.currentTimeMillis();
@@ -941,7 +950,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     }
 
 
-
     private void fillList(ArrayList<MessageItem> list, Cursor cursor) {
         VKUser emptyUser = new VKUser();
         history.ensureCapacity(cursor.getCount());
@@ -980,13 +988,15 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+
                 try {
-                    api.removeUserFromChat(chat_id, account.user_id);
+                    api.removeUserFromChat(chat_id, Api.get().getUserId());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+        finish();
     }
 
     private void translateAllMessages(final String languageTo) {
@@ -1031,7 +1041,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                             dialog.setMessage(translateTextWait + "\n" + "Переведенно " + finalCount + " сообщений из " + history.size());
                         }
                     });
-                    translateAttachMessages(item.message, translator);
+                    translateAttachMessages(item.message, translator, languageTo);
                 }
 
                 runOnUiThread(new Runnable() {
@@ -1046,7 +1056,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         });
     }
 
-    private void translateAttachMessages(VKMessage message, YandexTranslator translator) {
+    private void translateAttachMessages(VKMessage message, YandexTranslator translator, String languageTo) {
         if (message.attachments.isEmpty()) {
             return;
         }
@@ -1061,11 +1071,56 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             VKMessage item = attachment.message;
             String text = translator.translate(item.body,
                     YandexTranslator.Language.AUTO_DETECT.toString(),
-                    YandexTranslator.Language.ENGLISH.toString());
+                    languageTo);
 
             if (text != null) {
                 item.body = text;
             }
+        }
+    }
+
+    private void pickImageFromGallery() {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, 100);
+    }
+
+
+    private void loadWallpaperFromSD() {
+        String path = ThemeManager.getWallpaperPath(this);
+        if (!TextUtils.isEmpty(path)) {
+            ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
+            Picasso.with(this)
+                    .load(new File(path))
+                    .fit()
+                    .into(ivWallpaper);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.w("MessageActivity", "requestCode: " + requestCode);
+        Log.w("MessageActivity", "resultCode: " + resultCode);
+
+        if (resultCode == RESULT_OK) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+            Cursor cursor = getContentResolver().query(
+                    selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String filePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            PrefManager.putString(ThemeManager.PREF_KEY_MESSAGE_WALLPAPER_PATH, filePath);
+            ThemeManager.updateThemeValues();
+            loadWallpaperFromSD();
+
+            Log.w("MessageActivity", "image path is " + filePath);
         }
     }
 
@@ -1121,16 +1176,14 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
             case R.id.menuUpdateMessages:
                 adapter.clear();
-//                getHistory();
+                getMessages(false);
                 break;
 
             case R.id.menuMessageMaterialsOfDialog:
-
                 Intent intent = new Intent(getApplicationContext(), DialogMaterialsActivity.class);
                 intent.putExtra("user_id", uid);
                 intent.putExtra("chat_id", chat_id);
                 startActivity(intent);
-//                getHistory();
                 break;
 
             case R.id.menuMessageTranslateAll:
@@ -1138,13 +1191,11 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 final CharSequence[] items = new CharSequence[languages.length];
                 for (int i = 0; i < languages.length; i++) {
                     items[i] = languages[i].name();
-//                    items[i] = "Item " + i;
                 }
 
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MessageHistoryActivity.this);
                 builder.setTitle("На какой язык перевести?");
-//                builder.setMessage("На какой язык перевести?");
                 builder.setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -1157,6 +1208,9 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             case R.id.menuMessageDelete:
                 deleteMessages(adapter.getSelectedItems());
                 adapter.disableMultiSelectMode();
+                break;
+
+            case R.id.menuWallpaper: pickImageFromGallery();
                 break;
 
             case android.R.id.home:

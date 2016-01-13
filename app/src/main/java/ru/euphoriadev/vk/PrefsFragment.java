@@ -18,7 +18,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -37,10 +36,9 @@ import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AppLoader;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.pref.MaterialCheckBoxPreference;
 import ru.euphoriadev.vk.view.pref.MaterialListPreference;
@@ -428,6 +426,19 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         rootScreen.addPreference(categoryAbout);
 
+        Preference gitHubPreference = new MaterialPreference(getActivity());
+        gitHubPreference.setTitle("Open Source");
+        gitHubPreference.setSummary("Посмотреть исходный код проекта на GitHub");
+        gitHubPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/EuphoriaDev/Euphoria-VK-Client"));
+                startActivity(browserIntent);
+                return true;
+            }
+        });
+        categoryAbout.addPreference(gitHubPreference);
+
 
         Preference versionScreen = new MaterialPreference(getActivity());
         versionScreen.setTitle(getActivity().getString(R.string.prefs_version) + ": " + BuildConfig.VERSION_NAME);
@@ -487,7 +498,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
                                     @Override
                                     public void run() {
                                         String text = isMemberGroup ? getActivity().getString(R.string.already_in_group) : getActivity().getString(R.string.thank_you);
-                                        Utils.showToast(getActivity(), text, true);
+                                        AndroidUtils.showToast(getActivity(), text, true);
                                     }
                                 });
                             }

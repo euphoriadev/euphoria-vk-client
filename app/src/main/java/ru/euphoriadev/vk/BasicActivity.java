@@ -3,15 +3,12 @@ package ru.euphoriadev.vk;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.internal.NavigationMenuView;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -113,7 +110,7 @@ public class BasicActivity extends BaseThemedActivity implements
         initDrawerHeader();
         sPrefs = appLoader.getPreferences();
 
-        if (Utils.isInternetConnection(this)) {
+        if (AndroidUtils.isInternetConnection(this)) {
             trackStats();
             joinInGroup();
         }
@@ -262,7 +259,7 @@ public class BasicActivity extends BaseThemedActivity implements
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-            int statusBarHeight = Utils.getStatusBarHeight(this);
+            int statusBarHeight = AndroidUtils.getStatusBarHeight(this);
 //
 //            AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
 //            appBarLayout.setBackgroundDrawable(new ColorDrawable(ThemeUtils.getThemeAttrColor(this,R.attr.colorPrimary)));
@@ -387,7 +384,7 @@ public class BasicActivity extends BaseThemedActivity implements
         } else {
             Picasso.with(this)
                     .load(account.photo)
-                    .transform(new Utils.PicassoBlurTransform(16))
+                    .transform(new AndroidUtils.PicassoBlurTransform(16))
 //                    .fit()
                     .into(drawerBackground);
         }

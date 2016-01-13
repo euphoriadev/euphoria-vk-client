@@ -29,7 +29,7 @@ import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 import java.util.ArrayList;
 
@@ -106,7 +106,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     private void loadFriends(final boolean onlyUpdate) {
-        if (!Utils.isInternetConnection(getActivity())) {
+        if (!AndroidUtils.isInternetConnection(getActivity())) {
             Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
             return;
         }

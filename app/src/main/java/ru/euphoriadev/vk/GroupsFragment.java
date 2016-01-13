@@ -23,7 +23,7 @@ import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 import java.util.ArrayList;
 
@@ -213,7 +213,7 @@ public class GroupsFragment extends Fragment {
 
                     // Если есть подключение к интернету, то сначала удаляем список групп
                     // а потом на их место загружаем новые и заносим в базу данных
-                    if (Utils.isInternetConnection(activity)) {
+                    if (AndroidUtils.isInternetConnection(activity)) {
                         ArrayList<VKGroup> apiGroups = api.getGroups(api.getUserId());
                         if (!apiGroups.isEmpty()) {
                             Cursor c = database.rawQuery("SELECT * FROM " + DBHelper.USER_GROUP_TABLE + " WHERE user_id = " + api.getUserId(), null);

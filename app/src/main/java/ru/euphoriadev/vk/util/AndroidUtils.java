@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public class Utils {
+public class AndroidUtils {
 
     SharedPreferences sPrefs;
 
@@ -70,7 +70,6 @@ public class Utils {
     public static void showToast(Context c, String text, boolean longLength) {
         int duration = longLength ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
         Toast.makeText(c, text, duration).show();
-
     }
 
     // Нужно добавить строчку в manifest:
@@ -106,34 +105,6 @@ public class Utils {
     }
 
 
-    @Deprecated
-    public static void checkUpdate(final Activity activity, final Api api) {
-        ThreadExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String update = api.getStorage("isCanUpdate");
-                    if (update.contains("true")) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-                                        .setTitle("Обновление!")
-                                        .setMessage("Найдено обновление приложения, Обновить?")
-                                        .setPositiveButton("Да", null);
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
-                            }
-                        });
-                    }
-
-                } catch (JSONException | IOException | KException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
     public static Bitmap processingBitmap(Bitmap src) {
         Bitmap dest = Bitmap.createBitmap(
                 src.getWidth(), src.getHeight(), src.getConfig());
@@ -158,28 +129,6 @@ public class Utils {
         }
         return dest;
     }
-
-//    public void blur(Bitmap background, View view) {
-//        long startMs = System.currentTimeMillis();
-//        float scaleFactor = 1;
-//        float radius = 20;
-//        if (downScale.isChecked()) {
-//            scaleFactor = 8;
-//            radius = 2;
-//        }
-//
-//        Bitmap overlay = Bitmap.createBitmap((int) (view.getMeasuredWidth()/scaleFactor),
-//                (int) (view.getMeasuredHeight()/scaleFactor), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(overlay);
-//        canvas.translate(-view.getLeft()/scaleFactor, -view.getTop()/scaleFactor);
-//        canvas.scale(1 / scaleFactor, 1 / scaleFactor);
-//        Paint paint = new Paint();
-//        paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-//        canvas.drawBitmap(background, 0, 0, paint);
-//
-//        overlay = FastBlur.doBlur(overlay, (int)radius, true);
-//        view.setBackground(new BitmapDrawable(getResources(), overlay));
-//    }
 
 
     public static int dpFromPx(final Context context, final int px) {
@@ -326,22 +275,17 @@ public class Utils {
     }
 
 
-//    public static boolean isSingleLine(String message) {
-//        for (int i = 0; i < message.length(); i++) {
-//            if (message.charAt(i) == '\n') {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-
-    /* Checks if external storage is available for read and write */
+    /**
+     * Checks if external storage is available for read and write
+     */
     public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
     }
 
-    /* Checks if external storage is available to at least read */
+    /**
+     * Checks if external storage is available to at least read
+     */
     public static boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state) ||

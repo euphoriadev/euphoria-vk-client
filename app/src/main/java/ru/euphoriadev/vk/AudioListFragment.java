@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -16,10 +15,9 @@ import android.widget.Toast;
 import ru.euphoriadev.vk.adapter.AudioAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKAudio;
-import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 import java.util.ArrayList;
 
@@ -213,7 +211,7 @@ public class AudioListFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public void onRefresh() {
-        if (Utils.isInternetConnection(getActivity())) {
+        if (AndroidUtils.isInternetConnection(getActivity())) {
             getAudios(true);
         } else {
             setRefreshing(false);

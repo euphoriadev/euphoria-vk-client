@@ -30,7 +30,7 @@ public class HttpGetRequest extends HttpBaseRequest<String> {
 //    @Override
 //    protected String parseResult(InputStream is) {
 //        try {
-//            return Utils.convertStreamToString(is);
+//            return AndroidUtils.convertStreamToString(is);
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

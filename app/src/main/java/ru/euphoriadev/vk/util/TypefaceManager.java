@@ -11,7 +11,6 @@ import android.util.SparseArray;
  * <p/>
  * The Typeface manager for Fonts.
  * The main feature is the caching of fonts to save memory
- *
  */
 
 public class TypefaceManager {
@@ -86,21 +85,11 @@ public class TypefaceManager {
         switch (fontFamily) {
             case FontFamily.ROBOTO:
                 switch (textWeight) {
-                    case TextWeight.THIN:
-                        typefaceName = ROBOTO_TINT;
-                        break;
-                    case TextWeight.LIGHT:
-                        typefaceName = ROBOTO_LIGHT;
-                        break;
-                    case TextWeight.NORMAL:
-                        typefaceName = ROBOTO_REGULAR;
-                        break;
-                    case TextWeight.MEDIUM:
-                        typefaceName = ROBOTO_MEDIUM;
-                        break;
-                    case TextWeight.BOLD:
-                        typefaceName = ROBOTO_BOLD;
-                        break;
+                    case TextWeight.THIN: typefaceName = ROBOTO_TINT; break;
+                    case TextWeight.LIGHT: typefaceName = ROBOTO_LIGHT; break;
+                    case TextWeight.NORMAL: typefaceName = ROBOTO_REGULAR; break;
+                    case TextWeight.MEDIUM: typefaceName = ROBOTO_MEDIUM; break;
+                    case TextWeight.BOLD: typefaceName = ROBOTO_BOLD; break;
                 }
                 break;
 

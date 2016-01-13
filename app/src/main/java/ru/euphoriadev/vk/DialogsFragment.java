@@ -64,9 +64,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     DialogAdapter adapter;
     ArrayList<DialogItem> dialogItems;
-    HashMap<Long, VKUser> mapUsers;
 
-    DBHelper helper;
     SQLiteDatabase database = null;
     SharedPreferences preferences;
 
@@ -217,10 +215,10 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onRefresh() {
-        if (Utils.isInternetConnection(getActivity())) {
+        if (AndroidUtils.isInternetConnection(getActivity())) {
             loadDialogs(true);
         } else {
-            Utils.showToast(activity, getResources().getString(R.string.check_internet), true);
+            AndroidUtils.showToast(activity, getResources().getString(R.string.check_internet), true);
             swipeLayout.setRefreshing(false);
 
 //            Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), R.string.check_internet, Snackbar.LENGTH_LONG).show();
@@ -472,7 +470,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
     private void loadDialogs(final boolean onlyUpdate) {
-//        if (!Utils.isInternetConnection(getActivity())) {
+//        if (!AndroidUtils.isInternetConnection(getActivity())) {
 //            Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), R.string.check_internet, Snackbar.LENGTH_LONG).show();
 //        }
         getDialogs(onlyUpdate);
@@ -512,7 +510,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     }
 
                     // если попросили только обновить диалоги
-                    if (onlyUpdate && Utils.isInternetConnection(getActivity())) {
+                    if (onlyUpdate && AndroidUtils.isInternetConnection(getActivity())) {
                         Log.w(TAG, "Only update dialogs");
 
                         ArrayList<VKMessage> vkDialogs = api.getMessagesDialogs(0, 30, null, null);
@@ -568,7 +566,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         dialogsFromDatabase.trimToSize();
                         dialogsFromDatabase = null;
                     }
-                    if (!Utils.isInternetConnection(getActivity())) {
+                    if (!AndroidUtils.isInternetConnection(getActivity())) {
                         // no connection to internet...
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -706,7 +704,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
      * TODO: на метод наложено ограничение, за один вызов нельзя удалить больше 10000 сообщений
      */
     private void deleteDialog(final long user_id, final long chat_id) {
-        if (!Utils.isInternetConnection(getActivity())) {
+        if (!AndroidUtils.isInternetConnection(getActivity())) {
             Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
             return;
         }

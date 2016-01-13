@@ -18,9 +18,8 @@ import ru.euphoriadev.vk.api.model.VKResolveScreenName;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 import java.util.ArrayList;
 
@@ -108,7 +107,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                             public void run() {
                                 startActivity(new Intent(getApplicationContext(), BasicActivity.class));
                                 finish();
-//                                Utils.showToast(getApplicationContext(), "Оффлайн включен!", true);
+//                                AndroidUtils.showToast(getApplicationContext(), "Оффлайн включен!", true);
                             }
                         });
                     } catch (Throwable e) {
@@ -160,10 +159,10 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         LinearLayout layout = new LinearLayout(this);
         layout.setLayoutParams(params);
         layout.setPadding(
-                Utils.pxFromDp(this, 16),
-                Utils.pxFromDp(this, 6),
-                Utils.pxFromDp(this, 16),
-                Utils.pxFromDp(this, 6));
+                AndroidUtils.pxFromDp(this, 16),
+                AndroidUtils.pxFromDp(this, 6),
+                AndroidUtils.pxFromDp(this, 16),
+                AndroidUtils.pxFromDp(this, 6));
         layout.setOrientation(LinearLayout.VERTICAL);
 
         layout.addView(inputLayoutUserId);

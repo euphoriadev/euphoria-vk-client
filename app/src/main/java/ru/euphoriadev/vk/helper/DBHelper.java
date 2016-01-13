@@ -246,7 +246,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
         dropTables(db);
         onCreate(db);
-
     }
 
     public void dropTables(SQLiteDatabase db) {
@@ -282,7 +281,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean exists(SQLiteDatabase db,String table) {
+    public boolean exists(SQLiteDatabase db, String table) {
         try {
             Cursor cursor = db.rawQuery("SELECT * FROM " + table, null);
             cursor.close();

@@ -199,7 +199,7 @@ public class YandexTranslator {
 //            }
 //
 //            is = new BufferedInputStream(connection.getInputStream());
-//            String stream = Utils.convertStreamToString(is);
+//            String stream = AndroidUtils.convertStreamToString(is);
 //            if (stream != null) {
 //                Log.i(TAG, stream);
 //                return new JSONObject(stream);

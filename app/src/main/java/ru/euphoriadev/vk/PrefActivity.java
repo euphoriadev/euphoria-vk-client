@@ -2,13 +2,10 @@ package ru.euphoriadev.vk;
 
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
@@ -36,7 +33,7 @@ public class PrefActivity extends BaseThemedActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
         View statusBarView = findViewById(R.id.statusBarPrefs);
-        Utils.setStatusBarColor(this, statusBarView);
+        AndroidUtils.setStatusBarColor(this, statusBarView);
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.container_prefs, new PrefsFragment()).commit();

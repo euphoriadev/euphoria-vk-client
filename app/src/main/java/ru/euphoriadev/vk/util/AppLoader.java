@@ -45,7 +45,6 @@ public class AppLoader extends Application {
     public static final String DROID_REGULAR = "DroidSans.ttf";
     public static final String DROID_BOLD = "DroidSans-Bold.ttf";
 
-
     /** Preferences key **/
     public static final String KEY_IS_NIGHT_THEME = "is_night_theme";
     public static final String KEY_COLOUR_THEME = "colour_theme";

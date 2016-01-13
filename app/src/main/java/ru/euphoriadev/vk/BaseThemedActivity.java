@@ -14,7 +14,7 @@ import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
- * Created by user on 23.12.15.
+ * Created by Igor on 23.12.15.
  */
 public class BaseThemedActivity extends AppCompatActivity {
     private final String TAG = "BaseThemedActivity";

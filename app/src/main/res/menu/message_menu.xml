@@ -24,6 +24,10 @@
         android:title="@string/materials_from_talk"/>
 
     <item
+        android:id="@+id/menuWallpaper"
+        android:title="@string/set_wallpaper"/>
+
+    <item
         android:id="@+id/menuMessageTranslateAll"
         android:title="@string/translate_all"/>
 

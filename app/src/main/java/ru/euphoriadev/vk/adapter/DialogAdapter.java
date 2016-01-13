@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.*;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -23,12 +21,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import ru.euphoriadev.vk.ProfileActivity;
 import ru.euphoriadev.vk.R;
@@ -37,12 +33,11 @@ import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
-import ru.euphoriadev.vk.util.Utils;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.TextCircleView;
 
@@ -273,13 +268,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         holder.tvFullName.setTextColor(fullNameTextColor);
         holder.tvFullName.setText(message.isChat() ? message.title : user.toString());
 
-//        if (!tManager.isSystemFont()) {
-//            holder.tvFullName.setTypeface(typeface);
-//            holder.tvBody.setTypeface(typeface);
-//            holder.tvDate.setTypeface(typeface);
-//            holder.tvUnreadCount.setTypeface(typeface);
-//        }
-
         final int fontFamily = TypefaceManager.getFontFamily();
         final int textWeight = TypefaceManager.getTextWeight();
         typefaceBold = TypefaceManager.getTypeface(context, fontFamily, textWeight != TypefaceManager.TextWeight.BOLD && textWeight != 0 ? textWeight + 1 : textWeight);
@@ -377,8 +365,8 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             }
 
             holder.onlineIndicator.setLayoutParams(new LinearLayout.LayoutParams(
-                    Utils.pxFromDp(context, user.online_mobile ? 15 : 10),
-                    Utils.pxFromDp(context, user.online_mobile ? 15 : 10)
+                    AndroidUtils.pxFromDp(context, user.online_mobile ? 15 : 10),
+                    AndroidUtils.pxFromDp(context, user.online_mobile ? 15 : 10)
             ));
             holder.onlineIndicator.getBackground().setColorFilter(ThemeUtils.getThemeAttrColor(context, R.attr.colorAccent), PorterDuff.Mode.MULTIPLY);
         } else {

@@ -38,8 +38,8 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
 import ru.euphoriadev.vk.service.LongPollService;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.Utils;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleImageView;
 
@@ -543,7 +543,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                             holder.tvBody.setVisibility(View.GONE);
                         }
 
-                        int inSampleSize = Utils.calculateInSampleSize(att.photo.height, att.photo.width, 604, 604);
+                        int inSampleSize = AndroidUtils.calculateInSampleSize(att.photo.height, att.photo.width, 604, 604);
 
 //                        final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
 //                                att.photo.width / inSampleSize,

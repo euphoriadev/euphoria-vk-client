@@ -1,8 +1,6 @@
 package ru.euphoriadev.vk;
 
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -17,9 +15,8 @@ import ru.euphoriadev.vk.adapter.MessageItem;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.Utils;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 /**
  * Created by user on 13.11.15.
@@ -36,7 +33,7 @@ public class ImportantMessagesActivity extends BaseThemedActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.important_layout_activity);
 
-//        Utils.setStatusBarColor(this, findViewById(R.id.statusBarBackground));
+//        AndroidUtils.setStatusBarColor(this, findViewById(R.id.statusBarBackground));
 
         listView = (ListView) findViewById(R.id.lvImportantMessages);
         toolbar = getToolbar();
@@ -50,7 +47,7 @@ public class ImportantMessagesActivity extends BaseThemedActivity {
     }
 
     private void loadMessages() {
-        if (!Utils.isInternetConnection(this)) {
+        if (!AndroidUtils.isInternetConnection(this)) {
             Toast.makeText(this, R.string.check_internet, Toast.LENGTH_LONG).show();
             return;
         }
