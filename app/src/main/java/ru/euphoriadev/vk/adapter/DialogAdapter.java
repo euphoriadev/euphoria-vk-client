@@ -39,6 +39,7 @@ import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
+import ru.euphoriadev.vk.view.CircleImageView;
 import ru.euphoriadev.vk.view.TextCircleView;
 
 import java.text.SimpleDateFormat;
@@ -85,12 +86,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
 
         fullNameTextColor = tManager.getPrimaryTextColor();
         bodyTextColor = tManager.getSecondaryTextColor();
-        String you = context.getString(R.string.you);
-        spannableString = Html.fromHtml("<b>" + you + ":&emsp;</b>");
         date = new Date(System.currentTimeMillis());
-        if (!tManager.isSystemFont())
-            typeface = Typeface.createFromAsset(this.context.getAssets(), tManager.getFont());
-        typefaceBold = Typeface.createFromAsset(this.context.getAssets(), "Roboto-Bold.ttf");
 
         helper = DBHelper.get(context);
         helper.open();
@@ -152,17 +148,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         }
     }
 
-//    public View getViewByPosition(int pos, ListView listView) {
-//        final int firstListItemPosition = listView.getFirstVisiblePosition();
-//        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
-//
-//        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
-//            return listView.getAdapter().getView(pos, null, listView);
-//        } else {
-//            final int childIndex = pos - firstListItemPosition;
-//            return listView.getChildAt(childIndex);
-//        }
-//    }
 
     public void connectToLongPollService() {
         try {
@@ -207,13 +192,13 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
     }
 
     static class ViewHolder {
-
         TextView tvFullName;
         TextView tvBody;
         TextView tvDate;
         View indicator;
         TextView tvUnreadCount;
-        TextCircleView ivPhoto;
+        CircleImageView ivPhoto;
+        CircleImageView ivLastPhotoUser;
         View onlineIndicator;
         //     LinearLayout lLayout;
 
@@ -221,7 +206,8 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             tvFullName = (TextView) v.findViewById(R.id.tvDialogTitle);
             tvBody = (TextView) v.findViewById(R.id.tvDialogBody);
             tvDate = (TextView) v.findViewById(R.id.tvDialogDate);
-            ivPhoto = (TextCircleView) v.findViewById(R.id.ivDialogPhoto);
+            ivPhoto = (CircleImageView) v.findViewById(R.id.ivDialogPhoto);
+            ivLastPhotoUser = (CircleImageView) v.findViewById(R.id.ivDialogLastPhotoUser);
             tvUnreadCount = (TextView) v.findViewById(R.id.tvUnreadCount);
             indicator = v.findViewById(R.id.vDialogUnreadIndicator);
             onlineIndicator = v.findViewById(R.id.viewDialogOnlineIndicator);
@@ -374,21 +360,26 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             holder.onlineIndicator.setVisibility(View.GONE);
         }
 
-        String you = context.getResources().getString(R.string.you);
 
         // если набирает текст
         if (item.isTyping) {
-            if (item.message.isChat())
-                holder.tvBody.setText(user.first_name + ": " + (context.getResources().getString(R.string.is_typing)));
-            else holder.tvBody.setText((context.getResources().getString(R.string.is_typing)));
-        } else
-            // если написал я
-            if (message.is_out) {
-                holder.tvBody.setText(Html.fromHtml("<b>" + you + ":  </b>" + message.body));
-            } else if (message.isChat())
-                holder.tvBody.setText(Html.fromHtml("<b>" + user.first_name + ":  </b>" + message.body));
-            else holder.tvBody.setText(message.body);
+            holder.tvBody.setText((context.getResources().getString(R.string.is_typing)));
+        } else {
+            holder.tvBody.setText(message.body);
+        }
 
+        if (item.message.is_out || item.message.isChat()) {
+            holder.ivLastPhotoUser.setVisibility(View.VISIBLE);
+
+            Picasso.with(context)
+                    .load(item.message.is_out ? Api.get().getAccount().photo : user.photo_50)
+                    .placeholder(R.drawable.camera_b)
+                    .config(Bitmap.Config.RGB_565)
+                    .into(holder.ivLastPhotoUser);
+        } else {
+            holder.ivLastPhotoUser.setVisibility(View.GONE);
+            holder.ivLastPhotoUser.setImageDrawable(null);
+        }
 
 //      Загрузка изображений
         try {

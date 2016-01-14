@@ -44,13 +44,8 @@ public class MaterialCheckBoxPreference extends CheckBoxPreference {
         checkBox = (CheckBox) view.findViewById(android.R.id.checkbox);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), android.R.attr.textColorPrimary));
+            titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), isEnabled() ? android.R.attr.textColorPrimary : android.R.attr.textColorSecondary));
 
-            if (!isEnabled()) {
-//                titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), android.R.attr.textColorSecondary));
-                titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), android.R.attr.textColorSecondary));
-
-            }
         }
 
 

@@ -31,10 +31,10 @@ public class MaterialPreference extends Preference {
         summaryView = (TextView) view.findViewById(android.R.id.summary);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            titleView.setTextColor(isEnabled() ? ThemeManager.getPrimaryTextColor() : ThemeManager.getSecondaryTextColor());
+            titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), isEnabled() ? android.R.attr.textColorPrimary : android.R.attr.textColorSecondary));
 
-            titleView.setEnabled(isEnabled());
-            summaryView.setEnabled(isEnabled());
+//            titleView.setEnabled(isEnabled());
+//            summaryView.setEnabled(isEnabled());
         }
 
         ViewUtil.setTypeface(titleView);

@@ -15,6 +15,7 @@
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginRight="16dp">
 
             <ru.euphoriadev.vk.view.TextCircleView
@@ -46,6 +47,7 @@
 
 
         <LinearLayout
+
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -80,14 +82,29 @@
 
             </LinearLayout>
 
-
-            <TextView
-                android:id="@+id/tvDialogBody"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:text="Привет, пользователь, это новый макет сообщенек"
-                android:textColor="@android:color/secondary_text_dark"/>
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ru.euphoriadev.vk.view.CircleImageView
+                    android:id="@+id/ivDialogLastPhotoUser"
+                    android:layout_width="29dp"
+                    android:layout_height="29dp"
+                    android:layout_marginRight="6dp"
+                    android:src="@drawable/camera_b"/>
+
+                <TextView
+                    android:id="@+id/tvDialogBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="Привет, пользователь, это новый макет сообщенек"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/secondary_text_dark"/>
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
