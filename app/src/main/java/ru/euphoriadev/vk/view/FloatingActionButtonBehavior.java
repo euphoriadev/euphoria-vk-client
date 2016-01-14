@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import ru.euphoriadev.vk.view.fab.*;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 
 /**

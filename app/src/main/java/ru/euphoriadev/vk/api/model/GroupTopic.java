@@ -1,8 +1,10 @@
 package ru.euphoriadev.vk.api.model;
 
-import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.Serializable;
+
 import ru.euphoriadev.vk.api.Api;
 
 public class GroupTopic implements Serializable {

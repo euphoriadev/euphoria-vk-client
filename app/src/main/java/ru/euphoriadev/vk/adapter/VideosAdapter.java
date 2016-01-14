@@ -2,14 +2,12 @@ package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,7 +21,6 @@ import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.api.model.VKVideo;
 import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.FileLogger;
 
 /**
  * Created by user on 23.11.15.
@@ -82,6 +79,16 @@ public class VideosAdapter extends ArrayAdapter<VideosAdapter.VideoItem> {
         return convertView;
     }
 
+    public static class VideoItem {
+        public VKUser user;
+        public VKVideo video;
+
+        public VideoItem(VKUser user, VKVideo video) {
+            this.user = user;
+            this.video = video;
+        }
+    }
+
     private class ViewHolder {
         public CardView cardView;
         public ImageView ivImage;
@@ -95,16 +102,6 @@ public class VideosAdapter extends ArrayAdapter<VideosAdapter.VideoItem> {
             tvTitle = (TextView) v.findViewById(R.id.tvVideoTitle);
             tvDuration = (TextView) v.findViewById(R.id.tvVideoDuration);
             tvDescription = (TextView) v.findViewById(R.id.tvVideoDescription);
-        }
-    }
-
-    public static class VideoItem {
-        public VKUser user;
-        public VKVideo video;
-
-        public VideoItem(VKUser user, VKVideo video) {
-            this.user = user;
-            this.video = video;
         }
     }
 

@@ -4,11 +4,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
-
-import java.util.ArrayList;
 
 /**
  * Created by Igor on 23.10.15.

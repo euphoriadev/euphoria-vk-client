@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
+    android:id="@+id/cardVideo"
+    style="@style/CardView.Light"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/tools"
-    android:id="@+id/cardVideo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    card_view:cardElevation="8dp"
-    card_view:cardCornerRadius="3dp"
     android:layout_marginBottom="12dp"
-    style="@style/CardView.Light">
+    card_view:cardCornerRadius="3dp"
+    card_view:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,45 +31,45 @@
                 android:id="@+id/viewVideoBGTime"
                 android:layout_width="50dp"
                 android:layout_height="25dp"
+                android:layout_gravity="bottom|right"
                 android:layout_margin="14dp"
-                android:background="@drawable/rectangle_rounded"
-                android:layout_gravity="bottom|right"/>
+                android:background="@drawable/rectangle_rounded"/>
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/tvVideoDuration"
                 android:layout_width="50dp"
                 android:layout_height="24dp"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="12:24"
-                android:textColor="@android:color/primary_text_dark"
-                android:gravity="center"
+                android:layout_gravity="bottom|right"
                 android:layout_margin="14dp"
-                android:layout_gravity="bottom|right" />
+                android:gravity="center"
+                android:text="12:24"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/primary_text_dark"/>
         </FrameLayout>
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tvVideoTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?android:textColorPrimary"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginBottom="6dp"
-            android:text="Palette Perfect: How Material Design Makes Color Easy"/>
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Palette Perfect: How Material Design Makes Color Easy"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:textColorPrimary"/>
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tvVideoDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?android:textColorSecondary"
-            android:layout_marginRight="16dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:maxLines="3"
-            android:text="Михаил Николаев | 1 700 Просмотров"/>
+            android:text="Михаил Николаев | 1 700 Просмотров"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:textColorSecondary"/>
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

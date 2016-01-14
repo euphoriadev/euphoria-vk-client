@@ -3,11 +3,7 @@ package ru.euphoriadev.vk.http;
 
 import android.util.Log;
 
-import java.io.*;
-import java.net.ResponseCache;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
+import java.io.InputStream;
 
 /**
  * Created by Igor on 11.12.15.

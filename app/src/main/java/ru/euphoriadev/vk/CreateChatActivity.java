@@ -1,15 +1,22 @@
 package ru.euphoriadev.vk;
 
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-//import android.support.v7.internal.widget.ThemeUtils;
 import android.support.v7.widget.Toolbar;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.adapter.ChoiceUserAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
@@ -19,8 +26,7 @@ import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
-import java.io.IOException;
-import java.util.ArrayList;
+//import android.support.v7.internal.widget.ThemeUtils;
 
 /**
  * Created by Igor on 01.11.15.

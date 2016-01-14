@@ -5,31 +5,32 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 
-import java.util.ArrayList;
-
 /**
  * Created by Igor on 01.11.15.
  */
 public class ChoiceUserAdapter extends BaseAdapter implements View.OnClickListener {
+    public ArrayList<Long> checkedUsers;
+    int primaryTextColor;
+    int secondaryTextColor;
     private LayoutInflater inflater;
     private Context context;
     private Picasso picasso;
     private ThemeManagerOld manager;
     private Typeface typeface;
     private ArrayList<VKUser> users;
-
-    public ArrayList<Long> checkedUsers;
-
-    int primaryTextColor;
-    int secondaryTextColor;
-
     private boolean isSystemFont;
 
     public ChoiceUserAdapter(Context context, ArrayList<VKUser> users) {

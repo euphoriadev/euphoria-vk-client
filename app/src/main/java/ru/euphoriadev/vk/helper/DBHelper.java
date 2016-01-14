@@ -8,23 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.Account;
 
 /**
  * Created by Igor on 06.03.15.
  */
 public class DBHelper extends SQLiteOpenHelper {
-
-    private static volatile DBHelper mHelper;
-    private SQLiteDatabase mDatabase;
-    private Context mContext;
-
-    private static final String DATABASE_NAME = "euphoria.db";
-    private static final int DATABASE_VERSION = 78;
-
 
     public static final String USERS_TABLE = "users";
     public static final String FRIENDS_TABLE = "friends";
@@ -37,8 +27,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String USER_GROUP_TABLE = "user_group";
     public static final String STATS_MESSAGES_TABLE= "stats_messages";
     public static final String FAILED_MESSAGES_TABLE= "failed_messages";
-
-
     public static final String _ID = "_id";
     public static final String USER_ID = "user_id";
     public static final String OWNER_ID = "owner_id";
@@ -85,8 +73,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TYPE = "type";
     public static final String DESCRIPTION = "description";
     public static final String MEMBERS_COUNT = "members_count";
-
-
+    private static final String DATABASE_NAME = "euphoria.db";
+    private static final int DATABASE_VERSION = 78;
     private static final String SQL_CREATE_TABLE_USERS = "CREATE TABLE " + USERS_TABLE +
             " (" + USER_ID + " INTEGER PRIMARY KEY ON CONFLICT REPLACE, " +
             " [" + FIRST_NAME + "] VARCHAR(255), " +
@@ -102,13 +90,11 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + PHOTO_MAX + "] VARCHAR(255), " +
             " [" + POSITION_DECIMAL + "] DECIMAL" +
             ");";
-
     private static final String SQL_CREATE_TABLE_FRIENDS = "CREATE TABLE " + FRIENDS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + USER_ID + "] INTEGER, " +
             " [" + FRIEND_ID + "] INTEGER " +
             ");";
-
     private static final String SQL_CREATE_TABLE_DIALOGS = "CREATE TABLE " + DIALOGS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + USER_ID + "] INTEGER, " +
@@ -123,7 +109,6 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + PHOTO_50 + "] VARCHAR(255), " +
             " [" + PHOTO_100 + "] VARCHAR(255)" +
             ");";
-
     private final static String SQL_CREATE_TABLE_MESSAGES = "CREATE TABLE " + MESSAGES_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + MESSAGE_ID + "] INTEGER, " +
@@ -135,7 +120,6 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + IS_OUT + "] INTEGER, " +
             " [" + IMPORTANT + "] INTEGER" +
             ");";
-
     private final static String SQL_CREATE_TABLE_SAVED_MESSAGES = "CREATE TABLE " + SAVED_MESSAGES_TABLE + "_%1$s" +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + MESSAGE_ID + "] INTEGER, " +
@@ -147,7 +131,6 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + IS_OUT + "] INTEGER, " +
             " [" + IMPORTANT + "] INTEGER" +
             ");";
-
     private final static String SQL_CREATE_TABLE_STATS_MESSAGES = "CREATE TABLE " + STATS_MESSAGES_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + USER_ID + "] INTEGER, " +
@@ -156,7 +139,6 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + INCOMING_COUNT + "] INTEGER, " +
             " [" + OUTGOING_COUNT + "] INTEGER" +
             ");";
-
     private final static String SQL_CREATE_TABLE_AUDIOS = "CREATE TABLE " + AUDIOS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + AUDIO_ID + "] INTEGER, " +
@@ -167,7 +149,6 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + URL + "] VARCHAR(255), " +
             " [" + LYRICS_ID + "] INTEGER " +
             ");";
-
     private final static String SQL_CREATE_TABLE_DOCS = "CREATE TABLE " + DOCS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + OWNER_ID + "] INTEGER, " +
@@ -177,7 +158,6 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + URL + "] VARCHAR(255), " +
             " [" + PHOTO_100 + "] VARCHAR(255) " +
             ");";
-
     private final static String SQL_CREATE_TABLE_GROUPS = "CREATE TABLE " +  GROUPS_TABLE +
             " (" + GROUP_ID + " INTEGER PRIMARY KEY, " +
             " [" + NAME + "] VARCHAR(255), " +
@@ -192,20 +172,17 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + PHOTO_100 + "] VARCHAR(255), " +
             " [" + MEMBERS_COUNT + "] INTEGER " +
             ");";
-
     private final static String SQL_CREATE_TABLE_USER_GROUP = "CREATE TABLE " + USER_GROUP_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + GROUP_ID + "] INTEGER, " +
             " [" + USER_ID + "] INTEGER " +
             ");";
-
     private final static String SQL_CREATE_TABLE_FAILED_MESSAGES = "CREATE TABLE " + FAILED_MESSAGES_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + USER_ID + "] INTEGER, " +
             " [" + CHAT_ID + "] INTEGER, " +
             " [" + BODY + "] VARCHAR(255)" +
             ");";
-
     private static final String SQL_DELETE_DOCS = "DROP TABLE IF EXISTS " + DOCS_TABLE;
     private static final String SQL_DELETE_USERS = "DROP TABLE IF EXISTS " + USERS_TABLE;
     private static final String SQL_DELETE_AUDIOS = "DROP TABLE IF EXISTS " + AUDIOS_TABLE;
@@ -217,11 +194,23 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_SAVED_MESSAGES = "DROP TABLE IF EXISTS " + SAVED_MESSAGES_TABLE;
     private static final String SQL_DElETE_STATS_MESSAGES = "DROP TABLE IF EXISTS " + STATS_MESSAGES_TABLE;
     private static final String SQL_DELETE_FAILED_MESSAGES = "DROP TABLE IF EXISTS " + FAILED_MESSAGES_TABLE;
+    private static volatile DBHelper mHelper;
+    private SQLiteDatabase mDatabase;
+    private Context mContext;
 
 
     private DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.mContext = context;
+    }
+
+    public static DBHelper get(Context context) {
+        synchronized (DBHelper.class) {
+            if (mHelper == null) {
+                mHelper = new DBHelper(context);
+            }
+        }
+        return mHelper;
     }
 
     @Override
@@ -238,7 +227,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_TABLE_FAILED_MESSAGES);
         Log.w("SQLite", "Tables created");
     }
-
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -265,15 +253,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void createTableSavedMessages(SQLiteDatabase db, long uid) {
         db.execSQL(String.format(SQL_CREATE_TABLE_SAVED_MESSAGES, String.valueOf(uid)));
-    }
-
-    public static DBHelper get(Context context) {
-        synchronized (DBHelper.class) {
-            if (mHelper == null) {
-                mHelper = new DBHelper(context);
-            }
-        }
-        return mHelper;
     }
 
     public void open() {

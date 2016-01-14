@@ -15,8 +15,8 @@ import ru.euphoriadev.vk.adapter.MessageItem;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
  * Created by user on 13.11.15.

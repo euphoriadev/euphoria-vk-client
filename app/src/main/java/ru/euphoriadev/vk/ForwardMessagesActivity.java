@@ -1,18 +1,17 @@
 package ru.euphoriadev.vk;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import ru.euphoriadev.vk.adapter.MessageAdapter;
 import ru.euphoriadev.vk.adapter.MessageItem;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by user on 10.06.15.

@@ -1,22 +1,15 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
-import android.os.Environment;
 import android.support.v7.widget.CardView;
 import android.text.Html;
-import android.util.Xml;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

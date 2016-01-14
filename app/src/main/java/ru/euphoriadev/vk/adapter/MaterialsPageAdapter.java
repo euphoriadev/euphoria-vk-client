@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
 import ru.euphoriadev.vk.MaterialsFragment;
 import ru.euphoriadev.vk.R;
 
@@ -12,13 +13,12 @@ import ru.euphoriadev.vk.R;
  */
 public class MaterialsPageAdapter extends FragmentPagerAdapter {
 
-    private String[] tabs;
-    private MaterialsFragment[] fragments;
-
     public static final int POSITION_PICTURES = 0;
     public static final int POSITION_VIDEO = 1;
     public static final int POSITION_AUDIO = 2;
     public static final int POSITION_DOC = 3;
+    private String[] tabs;
+    private MaterialsFragment[] fragments;
 
     public MaterialsPageAdapter(Context context, FragmentManager fm) {
         super(fm);

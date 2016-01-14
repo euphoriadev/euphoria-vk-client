@@ -1,10 +1,10 @@
 package ru.euphoriadev.vk.adapter;
 
-import ru.euphoriadev.vk.api.model.VKMessage;
-import ru.euphoriadev.vk.api.model.VKUser;
-
 import java.io.Serializable;
 import java.util.Date;
+
+import ru.euphoriadev.vk.api.model.VKMessage;
+import ru.euphoriadev.vk.api.model.VKUser;
 
 /**
  * Created by user on 09.05.15.
@@ -14,12 +14,6 @@ public class MessageItem implements Serializable {
     public VKUser user;
     public Status status;
     public Date date;
-
-    public enum Status {
-        SENDING,
-        SENT,
-        ERROR
-    }
 
     public MessageItem(VKMessage message) {
         new MessageItem(message, new VKUser());
@@ -46,8 +40,14 @@ public class MessageItem implements Serializable {
         return this;
     }
 
-
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+
+    public enum Status {
+        SENDING,
+        SENT,
+        ERROR
     }
 }

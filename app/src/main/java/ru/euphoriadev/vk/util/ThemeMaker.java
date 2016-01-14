@@ -1,7 +1,6 @@
 package ru.euphoriadev.vk.util;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import org.xmlpull.v1.XmlPullParser;
 

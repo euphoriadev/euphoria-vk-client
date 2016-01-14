@@ -2,10 +2,8 @@ package ru.euphoriadev.vk.view.pref;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.preference.DialogPreference;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSeekBar;
-import android.util.AttributeSet;
 import android.widget.SeekBar;
 
 import ru.euphoriadev.vk.util.AndroidUtils;

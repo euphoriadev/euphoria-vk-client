@@ -1,8 +1,8 @@
 package ru.euphoriadev.vk.api.model;
 
-import java.io.Serializable;
-
 import org.json.JSONObject;
+
+import java.io.Serializable;
 
 public class VKGraffiti implements Serializable {
     private static final long serialVersionUID = 1L;

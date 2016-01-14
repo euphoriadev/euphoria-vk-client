@@ -1,10 +1,12 @@
 package ru.euphoriadev.vk.api.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.api.Api;
 
 public class VKComment implements Serializable {

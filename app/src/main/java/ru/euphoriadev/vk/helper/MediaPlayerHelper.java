@@ -1,11 +1,7 @@
 package ru.euphoriadev.vk.helper;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.media.session.PlaybackState;
-import android.os.IBinder;
 
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.service.PlayMusicService;

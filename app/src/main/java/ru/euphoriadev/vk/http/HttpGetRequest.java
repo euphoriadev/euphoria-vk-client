@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import ru.euphoriadev.vk.api.Utils;
-
 /**
  * Created by Igor on 11.12.15.
  * <p/>

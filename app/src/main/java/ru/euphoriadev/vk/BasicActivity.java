@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -27,18 +26,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
+
+import java.io.IOException;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
-import ru.euphoriadev.vk.util.*;
-
-import java.io.IOException;
+import ru.euphoriadev.vk.util.Account;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.AppLoader;
+import ru.euphoriadev.vk.util.FileLogger;
+import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.ViewUtil;
 
 
 public class BasicActivity extends BaseThemedActivity implements

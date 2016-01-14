@@ -1,34 +1,12 @@
 package ru.euphoriadev.vk.api.model;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class VKAttachment implements Serializable {
-    private static final long serialVersionUID = 1L;
-    public long id;//used only for wall post attached to message
-    public String type; //photo,posted_photo,video,audio,link,note,app,poll,doc,geo,message,page,album
-    public VKPhoto photo;
-    //public Photo posted_photo; 
-    public VKVideo video;
-    public VKAudio audio;
-    public VKLink link;
-    public VKNote note;
-    public VKGraffiti graffiti;
-    public VkApp app;
-    public VKPoll poll;
-    public Geo geo;
-    public VKDocument document;
-    public VKMessage message;
-    public VKWallMessage wallMessage;
-    public VKPage page;
-    public VKGift gift;
-    public VKSticker sticker;
-    public VKAlbum album;
-
     public static final String TYPE_LINK = "link";
     public static final String TYPE_GRAFITY = "graffiti";
     public static final String TYPE_NOTE = "note";
@@ -44,7 +22,26 @@ public class VKAttachment implements Serializable {
     public static final String TYPE_STICKER = "sticker";
     public static final String TYPE_ALUMB = "album";
     public static final String TYPE_GEO = "geo";
-
+    private static final long serialVersionUID = 1L;
+    public long id;//used only for wall post attached to message
+    public String type; //photo,posted_photo,video,audio,link,note,app,poll,doc,geo,message,page,album
+    public VKPhoto photo;
+    //public Photo posted_photo;
+    public VKVideo video;
+    public VKAudio audio;
+    public VKLink link;
+    public VKNote note;
+    public VKGraffiti graffiti;
+    public VkApp app;
+    public VKPoll poll;
+    public Geo geo;
+    public VKDocument document;
+    public VKMessage message;
+    public VKWallMessage wallMessage;
+    public VKPage page;
+    public VKGift gift;
+    public VKSticker sticker;
+    public VKAlbum album;
 
     public static ArrayList<VKAttachment> parseAttachments(JSONArray attachments, long from_id, long copy_owner_id, JSONObject geo_json) {
         ArrayList<VKAttachment> attachments_arr = new ArrayList<>();

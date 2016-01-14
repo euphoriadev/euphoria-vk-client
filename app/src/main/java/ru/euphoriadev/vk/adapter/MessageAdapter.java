@@ -5,7 +5,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -24,10 +32,17 @@ import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 import ru.euphoriadev.vk.ForwardMessagesActivity;
 import ru.euphoriadev.vk.R;
@@ -44,17 +59,21 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleImageView;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 /**
  * Created by Igor on 07.09.15.
  */
 public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements LongPollService.VKOnDialogListener {
 
+    private static final int DEFAULT_COLOR = Color.parseColor("#424242");
+    private static final int DEFAULT_DARK_COLOR = Color.parseColor("#303030");
     private final Object mLock = new Object();
-
+    public boolean isScrolling;
+    public boolean mShowTime;
+    int secondaryTextColorDark;
+    int secondaryTextColorLight;
+    int widthDisplay;
+    Drawable dBubbleOutgoing;
+    Drawable dBubbleIncoming;
     private Context mContext;
     private DBHelper mHelper;
     private SimpleDateFormat sdf;
@@ -65,35 +84,16 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     private boolean isBoundService;
     private long chat_id;
     private long uid;
-
-    public boolean isScrolling;
-    public boolean mShowTime;
-
     private int colorInMessages;
     private int colorOutMessages;
-
     private boolean isColorInMessages;
     private boolean isColorOutMessages;
-
     private int colorNotReadingInMessages;
     private int colorNotReadingOutMessages;
-
     private boolean isNightTheme;
     private boolean isBlackTheme;
-
-    int secondaryTextColorDark;
-    int secondaryTextColorLight;
-
-    private static final int DEFAULT_COLOR = Color.parseColor("#424242");
-    private static final int DEFAULT_DARK_COLOR = Color.parseColor("#303030");
-
     private int primaryDarkColorLight;
     private int primaryDarkColorDark;
-
-    int widthDisplay;
-
-    Drawable dBubbleOutgoing;
-    Drawable dBubbleIncoming;
 
     public MessageAdapter(Context context, ArrayList<MessageItem> values) {
         super(context, values);
@@ -276,7 +276,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                     holder.tvBody.setTextColor(primaryDarkColorDark);
                 }
             }
-            ;
             holder.llAttachContainer.setBackgroundDrawable(getDrawable(R.drawable.msg_bubble_incoming));
             if (item.message.read_state) {
                 if (isBlackTheme) {
@@ -773,10 +772,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         });
     }
 
-    private interface OnVKUserLoaded {
-        void onLoaded(VKUser user);
-    }
-
     public ArrayList<MessageItem> getMessages() {
         return getValues();
     }
@@ -846,6 +841,9 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         notifyDataSetChanged();
     }
 
+    private interface OnVKUserLoaded {
+        void onLoaded(VKUser user);
+    }
 
     private static class ViewHolder {
 

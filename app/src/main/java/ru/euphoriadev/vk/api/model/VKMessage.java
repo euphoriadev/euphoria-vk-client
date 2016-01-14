@@ -3,118 +3,116 @@ package ru.euphoriadev.vk.api.model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.Api;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import ru.euphoriadev.vk.api.Api;
+
 public class VKMessage implements Serializable {
+    public static final int UNREAD = 1;       // сообщение не прочитано
+    public static final int OUTBOX = 2;       // исходящее сообщение
+    public static final int REPLIED = 4;      // на сообщение был создан ответ
+    public static final int IMPORTANT = 8;    // помеченное сообщение
+    public static final int CHAT = 16;        // сообщение отправлено через диалог
+    public static final int FRIENDS = 32;     // сообщение отправлено другом
+    public static final int SPAM = 64;        // сообщение помечено как "Спам"
+    public static final int DELETED = 128;    // сообщение удалено (в корзине)
+    public static final int FIXED = 256;      // сообщение проверено пользователем на спам
+    public static final int MEDIA = 512;      // сообщение содержит медиаконтент
+    public static final int BESEDA = 8192;    // беседа
     private static final long serialVersionUID = 1L;
-
-
     /**
      * 	Message ID. (Not returned for forwarded messages), positive number
      */
     public long mid;
-
     /**
      *  For an incoming message, the user ID of the author. For an outgoing message, the user ID of the receiver.
      */
     public long uid;
-
     /**
      *  Date (in Unix time) when the message was sent.
      */
     public long date;
-
     /**
      *  Title of message or chat.
      */
     public String title;
-
     /**
      *  Message text
      */
     public String body;
-
     /**
      *  Message status (false — not read, true — read). (Not returned for forwarded messages
      */
     public boolean read_state;
-
     /**
      *  type (false — received, true — sent). (Not returned for forwarded messages.)
      */
     public boolean is_out;
-
     /**
      *  List of media-attachments;
      */
     public ArrayList<VKAttachment> attachments = new ArrayList<>();
-
     /**
      *  Chat ID
      */
     public long chat_id;
-
     /**
      *  User IDs of chat participants
      */
     public ArrayList<Long> chat_members;
-
     /**
      *  ID of user who started the chat.
      */
     public Long admin_id;
-
     /**
      *  Number of chat participants.
      */
     public long users_count;
-
     /**
      *  Whether the message is deleted (false — no, true — yes).
      */
     public boolean is_deleted;
-
     /**
      *  Whether the message is important
      */
     public boolean is_important;
-
     /**
      *  Whether the message contains smiles (false — no, true — yes).
      */
     public boolean emoji;
-
     /**
      *  URL of chat image with width size of 50px
      */
     public String photo_50;
-
     /**
      *  URL of chat image with width size of 100px
      */
     public String photo_100;
-
     /**
      *  URL of chat image with width size of 200px
      */
     public String photo_200;
-
     /**
      * The count of unread messages
      */
     public long unread;
-
     /**
      * Field transferred, if a service message
      */
     public String action;
-
-
     public int flag;
 
+    public VKMessage(String body, boolean isOut) {
+        this.body = body;
+        this.is_out = isOut;
+        this.date = System.currentTimeMillis() / 1000;
+    }
+
+    public VKMessage() {
+
+    }
 
     @Deprecated
     public static VKMessage parse(JSONObject o, boolean from_history, long history_uid, boolean from_chat, long me) throws NumberFormatException, JSONException {
@@ -169,29 +167,6 @@ public class VKMessage implements Serializable {
 //        m.json = o;
 
         return m;
-    }
-
-
-    public static final int UNREAD = 1;       // сообщение не прочитано
-    public static final int OUTBOX = 2;       // исходящее сообщение
-    public static final int REPLIED = 4;      // на сообщение был создан ответ
-    public static final int IMPORTANT = 8;    // помеченное сообщение
-    public static final int CHAT = 16;        // сообщение отправлено через диалог
-    public static final int FRIENDS = 32;     // сообщение отправлено другом
-    public static final int SPAM = 64;        // сообщение помечено как "Спам"
-    public static final int DELETED = 128;    // сообщение удалено (в корзине)
-    public static final int FIXED = 256;      // сообщение проверено пользователем на спам
-    public static final int MEDIA = 512;      // сообщение содержит медиаконтент
-    public static final int BESEDA = 8192;    // беседа
-
-    public VKMessage(String body, boolean isOut) {
-        this.body = body;
-        this.is_out = isOut;
-        this.date = System.currentTimeMillis() / 1000;
-    }
-
-    public VKMessage() {
-
     }
 
     public static VKMessage parse(JSONObject source) {
@@ -286,10 +261,6 @@ public class VKMessage implements Serializable {
         return m;
     }
 
-    public boolean isChat() {
-       return chat_id != 0;
-    }
-
     public static ArrayList<SearchDialogItem> parseSearchedDialogs(JSONArray array) {
         ArrayList<SearchDialogItem> items = new ArrayList<SearchDialogItem>();
         if (array == null)
@@ -335,6 +306,10 @@ public class VKMessage implements Serializable {
         return items;
     }
 
+    public boolean isChat() {
+        return chat_id != 0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -359,9 +334,8 @@ public class VKMessage implements Serializable {
         if (photo_100 != null ? !photo_100.equals(message.photo_100) : message.photo_100 != null) return false;
         if (photo_200 != null ? !photo_200.equals(message.photo_200) : message.photo_200 != null) return false;
         if (photo_50 != null ? !photo_50.equals(message.photo_50) : message.photo_50 != null) return false;
-        if (title != null ? !title.equals(message.title) : message.title != null) return false;
+        return !(title != null ? !title.equals(message.title) : message.title != null);
 
-        return true;
     }
 
     @Override

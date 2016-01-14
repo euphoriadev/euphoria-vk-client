@@ -9,9 +9,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.widget.ListView;
-import ru.euphoriadev.vk.R;
 
 import java.util.Locale;
+
+import ru.euphoriadev.vk.R;
 
 /**
  * Created by Igor on 27.03.15.
@@ -23,17 +24,15 @@ import java.util.Locale;
 @Deprecated
 public class ThemeManagerOld {
 
-    private SharedPreferences sPrefs;
-    private Context mContext;
-    private String mColour;
-    private static ThemeManagerOld instance;
-
     public static final String ROBOTO_LIGHT = "Roboto-Light.ttf";
     public static final String ROBOTO_REGULAR = "Roboto-Regular.ttf";
     public static final String DROID_REGULAR = "DroidSans.ttf";
     public static final String DROID_BOLD = "DroidSans-Bold.ttf";
-
     public static final String SYSTEM_FONT = "Default";
+    private static ThemeManagerOld instance;
+    private SharedPreferences sPrefs;
+    private Context mContext;
+    private String mColour;
 
     public ThemeManagerOld(Context context) {
         this.mContext = context;

@@ -2,6 +2,7 @@ package ru.euphoriadev.vk.api.model;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import ru.euphoriadev.vk.api.Api;
 
 public class PhotoTag {
@@ -19,6 +20,20 @@ public class PhotoTag {
     public double x2;
     public double y2;
     public int viewed;
+
+    public PhotoTag() {
+
+    }
+
+    public PhotoTag(Long owner_id, long pid, long uid, double x, double y, double x2, double y2) {
+        this.owner_id = owner_id;
+        this.pid = pid;
+        this.uid = uid;
+        this.x = x;
+        this.y = y;
+        this.x2 = x2;
+        this.y2 = y2;
+    }
     
     public static PhotoTag parse(JSONObject o) throws NumberFormatException, JSONException {
         PhotoTag t = new PhotoTag();
@@ -37,19 +52,5 @@ public class PhotoTag {
         t.y2 = o.optDouble("y2");
         t.viewed = o.optInt("viewed");
         return t;
-    }
-    
-    public PhotoTag() { 
-        
-    }
-    
-    public PhotoTag(Long owner_id, long pid, long uid, double x, double y, double x2, double y2) { 
-        this.owner_id = owner_id;
-        this.pid = pid;
-        this.uid = uid;
-        this.x = x;
-        this.y = y;
-        this.x2 = x2;
-        this.y2 = y2;
     }
 }

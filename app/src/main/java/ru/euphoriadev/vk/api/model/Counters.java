@@ -1,6 +1,5 @@
 package ru.euphoriadev.vk.api.model;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Counters {

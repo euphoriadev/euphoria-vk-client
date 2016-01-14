@@ -11,21 +11,26 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import java.util.ArrayList;
 
 import ru.euphoriadev.vk.adapter.GroupsAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKGroup;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.AndroidUtils;
-
-import java.util.ArrayList;
 
 /**
  * Created by user on 13.07.15.

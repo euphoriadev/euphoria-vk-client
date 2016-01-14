@@ -1,7 +1,6 @@
 package ru.euphoriadev.vk.helper;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -11,12 +10,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.SparseArray;
-import android.widget.RemoteViews;
+
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import ru.euphoriadev.vk.BasicActivity;
+
 import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.service.LongPollService;
 
 /**.
  * Класс помощик, который управляет уведомлениями

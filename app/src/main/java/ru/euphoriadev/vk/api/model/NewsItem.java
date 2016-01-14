@@ -1,13 +1,15 @@
 package ru.euphoriadev.vk.api.model;
 
 import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.NewsJTags;
 
 import java.util.ArrayList;
+
+import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.NewsJTags;
 
 public class NewsItem {
     public String type;

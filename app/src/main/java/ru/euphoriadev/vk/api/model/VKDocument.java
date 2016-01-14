@@ -1,6 +1,7 @@
 package ru.euphoriadev.vk.api.model;
 
 import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

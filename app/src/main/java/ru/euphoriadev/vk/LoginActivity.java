@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
 import ru.euphoriadev.vk.api.Auth;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.FileLogger;
@@ -36,14 +36,6 @@ public class LoginActivity extends Activity {
         webview.clearCache(false);
 
         webview.destroy();
-    }
-
-    class VkontakteWebViewClient extends WebViewClient {
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            super.onPageStarted(view, url, favicon);
-            parseUrl(url);
-        }
     }
 
     private void parseUrl(String url) {
@@ -78,5 +70,13 @@ public class LoginActivity extends Activity {
             webview = null;
         }
 
+    }
+
+    class VkontakteWebViewClient extends WebViewClient {
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            parseUrl(url);
+        }
     }
 }

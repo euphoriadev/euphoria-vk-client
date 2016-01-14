@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -26,6 +29,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+
 import ru.euphoriadev.vk.ProfileActivity;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.Api;
@@ -40,18 +48,13 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleImageView;
-import ru.euphoriadev.vk.view.TextCircleView;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 
 /**
  * Created by Igor on 30.03.15.
  */
 public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLongPollListener {
 
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
     private Context context;
     private LayoutInflater inflater;
     private ArrayList<DialogItem> dialogItems;
@@ -61,7 +64,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
     private ServiceConnection serviceConnection;
     private LongPollService longPollService;
     private boolean mBoundService = false;
-
     private Spanned spannableString;
     private DBHelper helper;
     private Typeface typeface;
@@ -70,9 +72,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
     private int bodyTextColor;
     private Date date;
     private int newMessage = 0;
-
-
-    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
 
 
     public DialogAdapter(final Context context, ArrayList<DialogItem> listMessages) {
@@ -189,31 +188,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
 
     public ArrayList<DialogItem> getDialogs() {
         return dialogItems;
-    }
-
-    static class ViewHolder {
-        TextView tvFullName;
-        TextView tvBody;
-        TextView tvDate;
-        View indicator;
-        TextView tvUnreadCount;
-        CircleImageView ivPhoto;
-        CircleImageView ivLastPhotoUser;
-        View onlineIndicator;
-        //     LinearLayout lLayout;
-
-        public ViewHolder(View v) {
-            tvFullName = (TextView) v.findViewById(R.id.tvDialogTitle);
-            tvBody = (TextView) v.findViewById(R.id.tvDialogBody);
-            tvDate = (TextView) v.findViewById(R.id.tvDialogDate);
-            ivPhoto = (CircleImageView) v.findViewById(R.id.ivDialogPhoto);
-            ivLastPhotoUser = (CircleImageView) v.findViewById(R.id.ivDialogLastPhotoUser);
-            tvUnreadCount = (TextView) v.findViewById(R.id.tvUnreadCount);
-            indicator = v.findViewById(R.id.vDialogUnreadIndicator);
-            onlineIndicator = v.findViewById(R.id.viewDialogOnlineIndicator);
-
-        }
-
     }
 
     @Override
@@ -452,7 +426,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         return view;
     }
 
-
     public synchronized void update(final VKMessage updateMessage) {
         DialogItem item = search(updateMessage.uid, updateMessage.chat_id);
         if (item != null) {
@@ -554,6 +527,31 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             dialogItems.trimToSize();
             dialogItems = null;
         }
+    }
+
+    static class ViewHolder {
+        TextView tvFullName;
+        TextView tvBody;
+        TextView tvDate;
+        View indicator;
+        TextView tvUnreadCount;
+        CircleImageView ivPhoto;
+        CircleImageView ivLastPhotoUser;
+        View onlineIndicator;
+        //     LinearLayout lLayout;
+
+        public ViewHolder(View v) {
+            tvFullName = (TextView) v.findViewById(R.id.tvDialogTitle);
+            tvBody = (TextView) v.findViewById(R.id.tvDialogBody);
+            tvDate = (TextView) v.findViewById(R.id.tvDialogDate);
+            ivPhoto = (CircleImageView) v.findViewById(R.id.ivDialogPhoto);
+            ivLastPhotoUser = (CircleImageView) v.findViewById(R.id.ivDialogLastPhotoUser);
+            tvUnreadCount = (TextView) v.findViewById(R.id.tvUnreadCount);
+            indicator = v.findViewById(R.id.vDialogUnreadIndicator);
+            onlineIndicator = v.findViewById(R.id.viewDialogOnlineIndicator);
+
+        }
+
     }
 
 }

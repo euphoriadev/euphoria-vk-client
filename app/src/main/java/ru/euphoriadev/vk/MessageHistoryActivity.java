@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.*;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
@@ -18,21 +18,17 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-
-import ru.euphoriadev.vk.adapter.*;
-import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.model.VKAttachment;
-import ru.euphoriadev.vk.api.model.VKFullUser;
-import ru.euphoriadev.vk.api.model.VKMessage;
-import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.helper.DBHelper;
-import ru.euphoriadev.vk.service.LongPollService;
-import ru.euphoriadev.vk.util.*;
-import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -40,6 +36,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import ru.euphoriadev.vk.adapter.BaseArrayAdapter;
+import ru.euphoriadev.vk.adapter.ChatMember;
+import ru.euphoriadev.vk.adapter.ChatMemberAdapter;
+import ru.euphoriadev.vk.adapter.MessageAdapter;
+import ru.euphoriadev.vk.adapter.MessageCursorAdapter;
+import ru.euphoriadev.vk.adapter.MessageItem;
+import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.model.VKAttachment;
+import ru.euphoriadev.vk.api.model.VKFullUser;
+import ru.euphoriadev.vk.api.model.VKMessage;
+import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.service.LongPollService;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.Encrypter;
+import ru.euphoriadev.vk.util.FileLogger;
+import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.util.ThemeUtils;
+import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.ViewUtil;
+import ru.euphoriadev.vk.util.YandexTranslator;
+import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 
 /**
  * Created by Igor on 15.03.15.
@@ -676,7 +696,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     adapter.connectToLongPoll();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    ;
                 } finally {
                     if (database.inTransaction()) {
                         database.setTransactionSuccessful();

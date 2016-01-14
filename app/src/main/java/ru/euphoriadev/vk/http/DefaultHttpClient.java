@@ -2,7 +2,6 @@ package ru.euphoriadev.vk.http;
 
 
 import android.os.AsyncTask;
-import android.text.AndroidCharacter;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;

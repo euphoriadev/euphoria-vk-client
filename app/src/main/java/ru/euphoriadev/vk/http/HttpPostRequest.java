@@ -1,8 +1,5 @@
 package ru.euphoriadev.vk.http;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
 /**
  * Created by user on 11.12.15.
  */

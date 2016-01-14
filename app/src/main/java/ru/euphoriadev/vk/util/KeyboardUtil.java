@@ -11,8 +11,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 
-import ru.euphoriadev.vk.R;
-
 /**
  * Created by user on 11.10.15.
  */
@@ -21,30 +19,6 @@ public class KeyboardUtil {
     private View decorView;
     private View contentView;
     private float initialDpDiff = -1;
-
-    public KeyboardUtil(Activity act, View contentView) {
-        this.decorView = act.getWindow().getDecorView();
-        this.contentView = contentView;
-
-        //only required on newer android versions. it was working on API level 19
-        if (Build.VERSION.SDK_INT >= 19) {
-            decorView.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
-        }
-    }
-
-    public void enable() {
-        if (Build.VERSION.SDK_INT >= 19) {
-            decorView.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
-        }
-    }
-
-    public void disable() {
-        if (Build.VERSION.SDK_INT >= 19) {
-            decorView.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
-        }
-    }
-
-
     //a small helper to allow showing the editText focus
     ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
@@ -84,6 +58,15 @@ public class KeyboardUtil {
         }
     };
 
+    public KeyboardUtil(Activity act, View contentView) {
+        this.decorView = act.getWindow().getDecorView();
+        this.contentView = contentView;
+
+        //only required on newer android versions. it was working on API level 19
+        if (Build.VERSION.SDK_INT >= 19) {
+            decorView.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
+        }
+    }
 
     /**
      * Helper to hide the keyboard
@@ -94,6 +77,18 @@ public class KeyboardUtil {
         if (act != null && act.getCurrentFocus() != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) act.getSystemService(Activity.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(act.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    public void enable() {
+        if (Build.VERSION.SDK_INT >= 19) {
+            decorView.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
+        }
+    }
+
+    public void disable() {
+        if (Build.VERSION.SDK_INT >= 19) {
+            decorView.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
         }
     }
 

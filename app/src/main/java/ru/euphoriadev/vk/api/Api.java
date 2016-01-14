@@ -1,12 +1,10 @@
 package ru.euphoriadev.vk.api;
 
-import android.content.Context;
 import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.model.*;
-import ru.euphoriadev.vk.util.Account;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -14,11 +12,44 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
+
+import ru.euphoriadev.vk.api.model.AudioAlbum;
+import ru.euphoriadev.vk.api.model.BannArg;
+import ru.euphoriadev.vk.api.model.City;
+import ru.euphoriadev.vk.api.model.CommentList;
+import ru.euphoriadev.vk.api.model.Counters;
+import ru.euphoriadev.vk.api.model.Country;
+import ru.euphoriadev.vk.api.model.FriendsList;
+import ru.euphoriadev.vk.api.model.GroupBanItem;
+import ru.euphoriadev.vk.api.model.GroupTopic;
+import ru.euphoriadev.vk.api.model.Newsfeed;
+import ru.euphoriadev.vk.api.model.PhotoTag;
+import ru.euphoriadev.vk.api.model.SearchDialogItem;
+import ru.euphoriadev.vk.api.model.VKAlbum;
+import ru.euphoriadev.vk.api.model.VKAttachment;
+import ru.euphoriadev.vk.api.model.VKAudio;
+import ru.euphoriadev.vk.api.model.VKChat;
+import ru.euphoriadev.vk.api.model.VKComment;
+import ru.euphoriadev.vk.api.model.VKDocument;
+import ru.euphoriadev.vk.api.model.VKFullUser;
+import ru.euphoriadev.vk.api.model.VKGift;
+import ru.euphoriadev.vk.api.model.VKGroup;
+import ru.euphoriadev.vk.api.model.VKLink;
+import ru.euphoriadev.vk.api.model.VKLongPollServer;
+import ru.euphoriadev.vk.api.model.VKMessage;
+import ru.euphoriadev.vk.api.model.VKNote;
+import ru.euphoriadev.vk.api.model.VKNotifications;
+import ru.euphoriadev.vk.api.model.VKPhoto;
+import ru.euphoriadev.vk.api.model.VKPoll;
+import ru.euphoriadev.vk.api.model.VKResolveScreenName;
+import ru.euphoriadev.vk.api.model.VKStatus;
+import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.api.model.VKVideo;
+import ru.euphoriadev.vk.api.model.VKWallMessage;
+import ru.euphoriadev.vk.util.Account;
 
 /**
  * VK Api. Модифицированная мной версия от разработчиков Kate Mobile
@@ -33,14 +64,17 @@ import java.util.zip.GZIPInputStream;
  *
  */
 public class Api {
-    static final String TAG = "Kate.Api";
-
     public static final String BASE_URL = "https://api.vk.com/method/";
     public static final String API_VERSION = "5.14";
-
+    static final String TAG = "Kate.Api";
+    private final static int MAX_TRIES = 3;
+    //TODO: it's not faster, even slower on slow devices. Maybe we should add an option to disable it. It's only good for paid internet connection.
+    static boolean enable_compression = true;
     private static Api mSingleton;
-    private Account mAccount;
     String language = Locale.getDefault().getLanguage();
+    String access_token;
+    String api_id;
+    private Account mAccount;
 
     private Api(String access_token, String api_id) {
         this.access_token = access_token;
@@ -50,14 +84,6 @@ public class Api {
     private Api(Account account) {
         this(account.access_token, Account.API_ID);
         this.mAccount = account;
-    }
-
-    public long getUserId() {
-        return mAccount.user_id;
-    }
-
-    public Account getAccount() {
-        return mAccount;
     }
 
     public static Api init(String access_token, String api_id) {
@@ -74,9 +100,100 @@ public class Api {
         return mSingleton;
     }
 
-
     public static Api get() {
         return mSingleton;
+    }
+
+    public static String sendRequestInternal(String url, String body, boolean is_post) throws IOException {
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) new URL(url).openConnection();
+//            connection.connect();
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
+            connection.setUseCaches(false);
+            connection.setDoOutput(is_post);
+            connection.setDoInput(true);
+            connection.setRequestMethod(is_post ? "POST" : "GET");
+            if (enable_compression)
+                connection.setRequestProperty("Accept-Encoding", "gzip");
+            if (is_post)
+                connection.getOutputStream().write(body.getBytes("UTF-8"));
+            int code = connection.getResponseCode();
+            Log.i(TAG, "code=" + code);
+            //It may happen due to keep-alive problem http://stackoverflow.com/questions/1440957/httpurlconnection-getresponsecode-returns-1-on-second-invocation
+            if (code == -1)
+                throw new WrongResponseCodeException("Network error");
+            //может стоит проверить на код 200
+            //on error can also read error stream from connection.
+            InputStream is = new BufferedInputStream(connection.getInputStream(), 8192);
+            String enc = connection.getHeaderField("Content-Encoding");
+            if (enc != null && enc.equalsIgnoreCase("gzip"))
+                is = new GZIPInputStream(is);
+            return Utils.convertStreamToString(is);
+        } finally {
+            if (connection != null)
+                connection.disconnect();
+        }
+    }
+
+    public static String unescape(String text) {
+        if (text == null)
+            return null;
+        return text.replace("&amp;", "&").replace("&quot;", "\"").replace("<br>", "\n").replace("&gt;", ">").replace("&lt;", "<")
+                .replace("<br/>", "\n").replace("&ndash;", "-").trim();
+        //Баг в API
+        //amp встречается в сообщении, br в Ответах тип comment_photo, gt lt на стене - баг API, ndash в статусе когда аудио транслируется
+        //quot в тексте сообщения из LongPoll - то есть в уведомлении
+    }
+
+    public static String unescapeWithSmiles(String text) {
+        return unescape(text)
+                //May be useful to someone
+                //.replace("\uD83D\uDE0A", ":-)")
+                //.replace("\uD83D\uDE03", ":D")
+                //.replace("\uD83D\uDE09", ";-)")
+                //.replace("\uD83D\uDE06", "xD")
+                //.replace("\uD83D\uDE1C", ";P")
+                //.replace("\uD83D\uDE0B", ":p")
+                //.replace("\uD83D\uDE0D", "8)")
+                //.replace("\uD83D\uDE0E", "B)")
+                //
+                //.replace("\ud83d\ude12", ":(")  //F0 9F 98 92
+                //.replace("\ud83d\ude0f", ":]")  //F0 9F 98 8F
+                //.replace("\ud83d\ude14", "3(")  //F0 9F 98 94
+                //.replace("\ud83d\ude22", ":'(")  //F0 9F 98 A2
+                //.replace("\ud83d\ude2d", ":_(")  //F0 9F 98 AD
+                //.replace("\ud83d\ude29", ":((")  //F0 9F 98 A9
+                //.replace("\ud83d\ude28", ":o")  //F0 9F 98 A8
+                //.replace("\ud83d\ude10", ":|")  //F0 9F 98 90
+                //
+                //.replace("\ud83d\ude0c", "3)")  //F0 9F 98 8C
+                //.replace("\ud83d\ude20", ">(")  //F0 9F 98 A0
+                //.replace("\ud83d\ude21", ">((")  //F0 9F 98 A1
+                //.replace("\ud83d\ude07", "O:)")  //F0 9F 98 87
+                //.replace("\ud83d\ude30", ";o")  //F0 9F 98 B0
+                //.replace("\ud83d\ude32", "8o")  //F0 9F 98 B2
+                //.replace("\ud83d\ude33", "8|")  //F0 9F 98 B3
+                //.replace("\ud83d\ude37", ":X")  //F0 9F 98 B7
+                //
+                //.replace("\ud83d\ude1a", ":*")  //F0 9F 98 9A
+                //.replace("\ud83d\ude08", "}:)")  //F0 9F 98 88
+                //.replace("\u2764", "<3")  //E2 9D A4
+                //.replace("\ud83d\udc4d", ":like:")  //F0 9F 91 8D
+                //.replace("\ud83d\udc4e", ":dislike:")  //F0 9F 91 8E
+                //.replace("\u261d", ":up:")  //E2 98 9D
+                //.replace("\u270c", ":v:")  //E2 9C 8C
+                //.replace("\ud83d\udc4c", ":ok:")  //F0 9F 91 8C
+                ;
+    }
+
+    public long getUserId() {
+        return mAccount.user_id;
+    }
+
+    public Account getAccount() {
+        return mAccount;
     }
 
     public void setAccessToken(String access_token) {
@@ -86,11 +203,6 @@ public class Api {
     public void setApiId(String api_id) {
         this.api_id = api_id;
     }
-
-    String access_token;
-    String api_id; 
-    //TODO: it's not faster, even slower on slow devices. Maybe we should add an option to disable it. It's only good for paid internet connection.
-    static boolean enable_compression = true;
 
     /**
      * utils methods**
@@ -132,9 +244,6 @@ public class Api {
         return sendRequest(params, false);
     }
 
-    private final static int MAX_TRIES = 3;
-
-
     private JSONObject sendRequest(VKParams params, boolean is_post) throws IOException, JSONException, KException {
         String url = getSignedUrl(params, is_post);
         String body = "";
@@ -160,44 +269,10 @@ public class Api {
         return root;
     }
 
-
     private void processNetworkException(int i, IOException ex) throws IOException {
         ex.printStackTrace();
         if (i == MAX_TRIES)
             throw ex;
-    }
-
-    public static String sendRequestInternal(String url, String body, boolean is_post) throws IOException {
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-//            connection.connect();
-            connection.setConnectTimeout(30000);
-            connection.setReadTimeout(30000);
-            connection.setUseCaches(false);
-            connection.setDoOutput(is_post);
-            connection.setDoInput(true);
-            connection.setRequestMethod(is_post ? "POST" : "GET");
-            if (enable_compression)
-                connection.setRequestProperty("Accept-Encoding", "gzip");
-            if (is_post)
-                connection.getOutputStream().write(body.getBytes("UTF-8"));
-            int code = connection.getResponseCode();
-            Log.i(TAG, "code=" + code);
-            //It may happen due to keep-alive problem http://stackoverflow.com/questions/1440957/httpurlconnection-getresponsecode-returns-1-on-second-invocation
-            if (code == -1)
-                throw new WrongResponseCodeException("Network error");
-            //может стоит проверить на код 200
-            //on error can also read error stream from connection.
-            InputStream is = new BufferedInputStream(connection.getInputStream(), 8192);
-            String enc = connection.getHeaderField("Content-Encoding");
-            if (enc != null && enc.equalsIgnoreCase("gzip"))
-                is = new GZIPInputStream(is);
-            return Utils.convertStreamToString(is);
-        } finally {
-            if (connection != null)
-                connection.disconnect();
-        }
     }
 
     private String getSignedUrl(VKParams params, boolean is_post) {
@@ -212,57 +287,6 @@ public class Api {
             args = params.getParamsString();
 
         return BASE_URL + params.method_name + "?" + args;
-    }
-
-    public static String unescape(String text) {
-        if (text == null)
-            return null;
-        return text.replace("&amp;", "&").replace("&quot;", "\"").replace("<br>", "\n").replace("&gt;", ">").replace("&lt;", "<")
-                .replace("<br/>", "\n").replace("&ndash;", "-").trim();
-        //Баг в API
-        //amp встречается в сообщении, br в Ответах тип comment_photo, gt lt на стене - баг API, ndash в статусе когда аудио транслируется
-        //quot в тексте сообщения из LongPoll - то есть в уведомлении
-    }
-
-    public static String unescapeWithSmiles(String text) {
-        return unescape(text)
-                //May be useful to someone
-                //.replace("\uD83D\uDE0A", ":-)")
-                //.replace("\uD83D\uDE03", ":D")
-                //.replace("\uD83D\uDE09", ";-)")
-                //.replace("\uD83D\uDE06", "xD")
-                //.replace("\uD83D\uDE1C", ";P")
-                //.replace("\uD83D\uDE0B", ":p")
-                //.replace("\uD83D\uDE0D", "8)")
-                //.replace("\uD83D\uDE0E", "B)")
-                //
-                //.replace("\ud83d\ude12", ":(")  //F0 9F 98 92
-                //.replace("\ud83d\ude0f", ":]")  //F0 9F 98 8F
-                //.replace("\ud83d\ude14", "3(")  //F0 9F 98 94
-                //.replace("\ud83d\ude22", ":'(")  //F0 9F 98 A2
-                //.replace("\ud83d\ude2d", ":_(")  //F0 9F 98 AD
-                //.replace("\ud83d\ude29", ":((")  //F0 9F 98 A9
-                //.replace("\ud83d\ude28", ":o")  //F0 9F 98 A8
-                //.replace("\ud83d\ude10", ":|")  //F0 9F 98 90
-                //                           
-                //.replace("\ud83d\ude0c", "3)")  //F0 9F 98 8C
-                //.replace("\ud83d\ude20", ">(")  //F0 9F 98 A0
-                //.replace("\ud83d\ude21", ">((")  //F0 9F 98 A1
-                //.replace("\ud83d\ude07", "O:)")  //F0 9F 98 87
-                //.replace("\ud83d\ude30", ";o")  //F0 9F 98 B0
-                //.replace("\ud83d\ude32", "8o")  //F0 9F 98 B2
-                //.replace("\ud83d\ude33", "8|")  //F0 9F 98 B3
-                //.replace("\ud83d\ude37", ":X")  //F0 9F 98 B7
-                //                           
-                //.replace("\ud83d\ude1a", ":*")  //F0 9F 98 9A
-                //.replace("\ud83d\ude08", "}:)")  //F0 9F 98 88
-                //.replace("\u2764", "<3")  //E2 9D A4   
-                //.replace("\ud83d\udc4d", ":like:")  //F0 9F 91 8D
-                //.replace("\ud83d\udc4e", ":dislike:")  //F0 9F 91 8E
-                //.replace("\u261d", ":up:")  //E2 98 9D   
-                //.replace("\u270c", ":v:")  //E2 9C 8C   
-                //.replace("\ud83d\udc4c", ":ok:")  //F0 9F 91 8C
-                ;
     }
 
     /**

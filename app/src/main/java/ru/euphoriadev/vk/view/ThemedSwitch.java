@@ -8,7 +8,6 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.util.AttributeSet;
 
-import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.util.ThemeManager;
 
 /**

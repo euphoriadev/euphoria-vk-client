@@ -3,11 +3,12 @@ package ru.euphoriadev.vk.api.model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.NewsJTags;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.NewsJTags;
 
 public class VKWallMessage implements Serializable {
     private static final long serialVersionUID = 1L;

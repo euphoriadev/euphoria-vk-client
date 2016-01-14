@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
 import ru.euphoriadev.vk.R;
 
 public class ColorPickerSwatch extends FrameLayout implements View.OnClickListener {
@@ -45,7 +46,7 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
 		this.mSwatchImage.setImageDrawable(new ColorStateDrawable(drawables, color));
 	}
 
-	public static abstract interface OnColorSelectedListener {
-		public abstract void onColorSelected(int color);
+	public interface OnColorSelectedListener {
+		void onColorSelected(int color);
 	}
 }

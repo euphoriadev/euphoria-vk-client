@@ -4,11 +4,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
-import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.util.Account;
-import ru.euphoriadev.vk.util.ThreadExecutor;
 
 import java.util.concurrent.TimeUnit;
+
+import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.util.Account;
 
 public class EternallOnlineService extends Service {
 

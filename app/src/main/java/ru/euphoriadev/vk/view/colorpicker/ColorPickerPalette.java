@@ -8,15 +8,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+
 import ru.euphoriadev.vk.R;
 
 
 public class ColorPickerPalette extends TableLayout {
+	public ColorPickerSwatch.OnColorSelectedListener mOnColorSelectedListener;
 	private String mDescription;
 	private String mDescriptionSelected;
 	private int mMarginSize;
 	private int mNumColumns;
-	public ColorPickerSwatch.OnColorSelectedListener mOnColorSelectedListener;
 	private int mSwatchLength;
 
 	public ColorPickerPalette(Context context) {

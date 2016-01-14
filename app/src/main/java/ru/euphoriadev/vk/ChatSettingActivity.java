@@ -5,14 +5,21 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKChat;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.util.Account;
-
-import java.util.ArrayList;
 
 /**
  * Created by user on 19.06.15.

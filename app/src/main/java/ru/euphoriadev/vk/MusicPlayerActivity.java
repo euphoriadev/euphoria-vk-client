@@ -9,7 +9,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import ru.euphoriadev.vk.api.model.VKAudio;
-import ru.euphoriadev.vk.helper.MediaPlayerHelper;
 import ru.euphoriadev.vk.util.AppLoader;
 
 /**

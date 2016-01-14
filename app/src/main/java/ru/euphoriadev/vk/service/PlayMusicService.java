@@ -3,47 +3,35 @@ package ru.euphoriadev.vk.service;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
-import android.media.MediaMetadata;
 import android.media.MediaPlayer;
-import android.media.session.MediaSession;
-import android.media.session.PlaybackState;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
-import android.support.v4.app.NavUtils;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import ru.euphoriadev.vk.BuildConfig;
 import ru.euphoriadev.vk.MusicPlayerActivity;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.helper.DBHelper;
-import ru.euphoriadev.vk.receiver.MediaPlayerReceiver;
 import ru.euphoriadev.vk.util.FileLogger;
 
 /**
  * Created by Igor on 06.10.15.
  */
 public class PlayMusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
-    private final static String TAG = "PlayMusicService";
-
     public static final String ACTION_PLAY = "ru.euphoriadev.vk.ACTION_PLAY";
     public static final String ACTION_PAUSE = "ru.euphoriadev.vk.ACTION_PAUSE";
     public static final String ACTION_STOP = "ru.euphoriadev.vk.ACTION_STOP";
     public static final String ACTION_CLOSE = "ru.euphoriadev.vk.ACTION_CLOSE";
     public static final String ACTION_NEXT_AUDIO = "ru.euphoriadev.vk.ACTION_NEXT";
     public static final String ACTION_PREV_AUDIO = "ru.euphoriadev.vk.ACTION_PREV";
-
+    private final static String TAG = "PlayMusicService";
     private String lastPlayUrl;
     private VKAudio mAudio;
     private MediaPlayer mMediaPlayer;

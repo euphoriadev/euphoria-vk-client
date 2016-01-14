@@ -12,14 +12,14 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.adapter.AudioAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-
-import java.util.ArrayList;
 
 /**
  * Created by user on 10.06.15.

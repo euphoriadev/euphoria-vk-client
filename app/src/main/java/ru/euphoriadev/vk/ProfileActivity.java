@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.Menu;
@@ -86,25 +85,6 @@ public class ProfileActivity extends BaseThemedActivity {
 
     }
 
-
-    private class BlurTransformation implements Transformation {
-        private int radius;
-
-        public BlurTransformation(int radius) {
-            this.radius = radius;
-        }
-
-        @Override
-        public Bitmap transform(Bitmap source) {
-            return FastBlur.doBlur(source, radius);
-        }
-
-        @Override
-        public String key() {
-            return "blur";
-        }
-    }
-
     private void getProfile(final OnCompleteListener listener) {
         ThreadExecutor.execute(new Runnable() {
             @Override
@@ -126,10 +106,6 @@ public class ProfileActivity extends BaseThemedActivity {
         });
     }
 
-    private interface OnCompleteListener {
-        void omComplete(VKUser user);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add("Send").setIcon(R.drawable.ic_pets_white).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -146,6 +122,28 @@ public class ProfileActivity extends BaseThemedActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private interface OnCompleteListener {
+        void omComplete(VKUser user);
+    }
+
+    private class BlurTransformation implements Transformation {
+        private int radius;
+
+        public BlurTransformation(int radius) {
+            this.radius = radius;
+        }
+
+        @Override
+        public Bitmap transform(Bitmap source) {
+            return FastBlur.doBlur(source, radius);
+        }
+
+        @Override
+        public String key() {
+            return "blur";
+        }
+    }
+
     public class AvatarImageBehavior extends CoordinatorLayout.Behavior<CircleImageView> {
 
         private final static float MIN_AVATAR_PERCENTAGE_SIZE   = 0.3f;
@@ -159,7 +157,11 @@ public class ProfileActivity extends BaseThemedActivity {
         private float mStartPosition;
         private int mStartXPosition;
         private float mStartToolbarPosition;
-
+        private int mStartYPosition;
+        private int mFinalYPosition;
+        private int finalHeight;
+        private int mStartHeight;
+        private int mFinalXPosition;
         public AvatarImageBehavior(Context context, AttributeSet attrs) {
             mContext = context;
             init();
@@ -174,13 +176,6 @@ public class ProfileActivity extends BaseThemedActivity {
         private void bindDimensions() {
             mAvatarMaxSize = 120;
         }
-
-        private int mStartYPosition;
-
-        private int mFinalYPosition;
-        private int finalHeight;
-        private int mStartHeight;
-        private int mFinalXPosition;
 
         @Override
         public boolean layoutDependsOn(CoordinatorLayout parent, CircleImageView child, View dependency) {

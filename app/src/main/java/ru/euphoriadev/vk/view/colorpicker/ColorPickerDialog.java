@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
+
 import ru.euphoriadev.vk.R;
 
 public class ColorPickerDialog extends DialogFragment implements ColorPickerSwatch.OnColorSelectedListener {
@@ -17,11 +18,11 @@ public class ColorPickerDialog extends DialogFragment implements ColorPickerSwat
 	protected int mColumns;
 	protected ColorPickerSwatch.OnColorSelectedListener mListener;
 	protected DialogInterface.OnDismissListener listener;
-	private ColorPickerPalette mPalette;
-	private ProgressBar mProgress;
 	protected int mSelectedColor;
 	protected int mSize;
 	protected int mTitleResId = R.string.color_picker_default_title;
+	private ColorPickerPalette mPalette;
+	private ProgressBar mProgress;
 
 	private void refreshPalette() {
 		if ((this.mPalette != null) && (this.mColors != null))

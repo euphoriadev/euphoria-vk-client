@@ -5,13 +5,22 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.text.TextUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
 
 import ru.euphoriadev.vk.util.AppLoader;
 
@@ -24,73 +33,6 @@ import ru.euphoriadev.vk.util.AppLoader;
 public class FileHelper {
 
     private BufferedWriter mWriter;
-
-    /**
-     * Open file for writing text
-     *
-     * @param file The file to open
-     * @return true if file is opened successfully, false if an error occurred
-     */
-    public boolean openFileForWrite(File file) {
-        try {
-            mWriter = new BufferedWriter(new FileWriter(file, true));
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
-     * Write text to opened file.
-     *
-     * @param text The text to write in file
-     */
-    public void writeText(String text) {
-        try {
-            mWriter.write(text);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Writes the character to opened file
-     *
-     * @param c the character to write
-     */
-    public void writeText(char c) {
-        try {
-            mWriter.write(c);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Flushes this writer. The contents of the buffer are committed to the
-     * target writer and it is then flushed
-     */
-    public void flushBuffer() {
-        try {
-            mWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * To close the stream to release resources.
-     * The text is immediately saved the file after calling this method
-     */
-    public void endWrite() {
-        try {
-            mWriter.flush();
-            mWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Reading a text file, this method is optimized,
@@ -516,6 +458,73 @@ public class FileHelper {
 
             if (connection != null)
                 connection.disconnect();
+        }
+    }
+
+    /**
+     * Open file for writing text
+     *
+     * @param file The file to open
+     * @return true if file is opened successfully, false if an error occurred
+     */
+    public boolean openFileForWrite(File file) {
+        try {
+            mWriter = new BufferedWriter(new FileWriter(file, true));
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Write text to opened file.
+     *
+     * @param text The text to write in file
+     */
+    public void writeText(String text) {
+        try {
+            mWriter.write(text);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Writes the character to opened file
+     *
+     * @param c the character to write
+     */
+    public void writeText(char c) {
+        try {
+            mWriter.write(c);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Flushes this writer. The contents of the buffer are committed to the
+     * target writer and it is then flushed
+     */
+    public void flushBuffer() {
+        try {
+            mWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * To close the stream to release resources.
+     * The text is immediately saved the file after calling this method
+     */
+    public void endWrite() {
+        try {
+            mWriter.flush();
+            mWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

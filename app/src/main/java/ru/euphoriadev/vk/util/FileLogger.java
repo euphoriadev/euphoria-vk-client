@@ -1,22 +1,14 @@
 package ru.euphoriadev.vk.util;
 
-import android.os.Environment;
 import android.util.Log;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.logging.Logger;
 
 import ru.euphoriadev.vk.BuildConfig;
-import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.model.Newsfeed;
 import ru.euphoriadev.vk.helper.FileHelper;
 
 /**
@@ -39,12 +31,10 @@ public class FileLogger {
     public static final String TAG = "FileLogger";
     public static final String LOGS_DIR = "Logs";
     private static FileLogger instance;
-
+    private static Thread.UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
     private AppLoader appLoader;
     private SimpleDateFormat sdf;
     private File currentFile;
-    private static Thread.UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
-
     public static final Thread.UncaughtExceptionHandler DEFAULT_ERROR_HANDLER = new Thread.UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
@@ -55,13 +45,6 @@ public class FileLogger {
             }
         }
     };
-
-    public static synchronized FileLogger get() {
-        if (instance == null) {
-            instance = new FileLogger();
-        }
-        return instance;
-    }
 
     private FileLogger() {
         appLoader = AppLoader.getLoader();
@@ -87,6 +70,13 @@ public class FileLogger {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static synchronized FileLogger get() {
+        if (instance == null) {
+            instance = new FileLogger();
+        }
+        return instance;
     }
 
     public static void i(String tag, String message) {
@@ -133,6 +123,25 @@ public class FileLogger {
         FileLogger.e(tag, message, null);
     }
 
+    /**
+     * Очистка всех логов приложения,
+     * TODO: Удаляет файлы, только если они начинаются с "log_"
+     */
+    public static void cleanup() {
+        FileLogger logger = get();
+        File dir = new File(AppLoader.getLoader().getExternalFilesDir().getAbsolutePath() + "/" + AppLoader.APP_DIR + "/" + LOGS_DIR);
+        if (!dir.exists()) {
+            return;
+        }
+        File[] filesLog = dir.listFiles();
+        for (File file : filesLog) {
+            if (file.getName().startsWith("log_")) {
+                file.delete();
+            }
+        }
+
+    }
+
     private String getFormatedText(String tag, String message, String state, Throwable e) {
         StringBuilder buffer = new StringBuilder(32);
         buffer.append(sdf.format(System.currentTimeMillis()));
@@ -162,25 +171,6 @@ public class FileLogger {
         }
         buffer.append("\n");
         return buffer.toString();
-    }
-
-    /**
-     * Очистка всех логов приложения,
-     * TODO: Удаляет файлы, только если они начинаются с "log_"
-     */
-    public static void cleanup() {
-        FileLogger logger = get();
-        File dir = new File(AppLoader.getLoader().getExternalFilesDir().getAbsolutePath() + "/" + AppLoader.APP_DIR + "/" + LOGS_DIR);
-        if (!dir.exists()) {
-            return;
-        }
-        File[] filesLog = dir.listFiles();
-        for (File file : filesLog) {
-            if (file.getName().startsWith("log_")) {
-                file.delete();
-            }
-        }
-        
     }
 
 }

@@ -33,21 +33,21 @@ import java.nio.charset.Charset;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.service.EternallOnlineService;
 import ru.euphoriadev.vk.util.Account;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AppLoader;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
-import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
+import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
+import ru.euphoriadev.vk.view.colorpicker.ColorPickerSwatch;
 import ru.euphoriadev.vk.view.pref.MaterialCheckBoxPreference;
 import ru.euphoriadev.vk.view.pref.MaterialListPreference;
 import ru.euphoriadev.vk.view.pref.MaterialPreference;
 import ru.euphoriadev.vk.view.pref.MaterialPreferenceCategory;
 import ru.euphoriadev.vk.view.pref.MaterialSwitchPreference;
-import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
-import ru.euphoriadev.vk.view.colorpicker.ColorPickerSwatch;
 import ru.euphoriadev.vk.view.pref.ProgressBarPreference;
 
 /**
@@ -514,7 +514,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         super.onResume();
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            if (isSetListView) return;;
+            if (isSetListView) return;
             View rootView = getView();
             ListView list = (ListView) rootView.findViewById(android.R.id.list);
             if (list != null) {

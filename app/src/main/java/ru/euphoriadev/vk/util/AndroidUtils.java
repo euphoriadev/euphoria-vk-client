@@ -2,26 +2,20 @@ package ru.euphoriadev.vk.util;
 
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ClipData;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.NotificationCompat;
 import android.text.ClipboardManager;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -33,34 +27,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Transformation;
 
-import org.json.JSONException;
-
-import ru.euphoriadev.vk.AndroidBug5497Workaround;
-import ru.euphoriadev.vk.MessageHistoryActivity;
-import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.KException;
-import ru.euphoriadev.vk.api.model.VKMessage;
-import ru.euphoriadev.vk.api.model.VKFullUser;
-import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.helper.DBHelper;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 public class AndroidUtils {
 

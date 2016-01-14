@@ -1,15 +1,8 @@
 package ru.euphoriadev.vk.http;
 
-import android.view.View;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-
-import ru.euphoriadev.vk.api.Api;
 
 /**
  * Created by Igor on 11.12.15.
@@ -23,9 +16,9 @@ import ru.euphoriadev.vk.api.Api;
  */
 public abstract class HttpBaseRequest<E> {
 
+    protected HttpParams mParams;
     private String mUrl;
     private OnErrorResponseListener errorListener;
-    protected HttpParams mParams;
 
     /**
      * Create new HTTP Request
@@ -58,12 +51,12 @@ public abstract class HttpBaseRequest<E> {
         return mParams == null ? mUrl : mParams.join(mUrl);
     }
 
-    public void setErrorListener(OnErrorResponseListener listener) {
-        this.errorListener = listener;
-    }
-
     public OnErrorResponseListener getErrorListener() {
         return errorListener;
+    }
+
+    public void setErrorListener(OnErrorResponseListener listener) {
+        this.errorListener = listener;
     }
 
     /**

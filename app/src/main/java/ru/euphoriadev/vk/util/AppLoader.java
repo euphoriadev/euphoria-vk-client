@@ -3,30 +3,20 @@ package ru.euphoriadev.vk.util;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 
 import java.io.File;
-import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.service.LongPollService;
 
 /**
  * Created by Igor on 16.11.15.
@@ -63,8 +53,7 @@ public class AppLoader extends Application {
     public static final String KEY_ENCRYPT_MESSAGES = "encrypt_messages";
     public static final String KEY_WRITE_LOG = "write_log";
     public static final String KEY_MAKING_DRAWER_HEADER = "making_drawer_header";
-
-
+    public static volatile Context appContext;
     /** Cached important preferences */
     public boolean isDarkTheme;
     public boolean writeLog;
@@ -72,13 +61,19 @@ public class AppLoader extends Application {
     public String forcedLocale;
     public String fontName;
     public String makingDrawerHeader;
-
-
-    public static volatile Context appContext;
     private SharedPreferences sPrefs;
     private ExecutorService mExecutor;
     private Handler mHandler;
 
+    public static AppLoader getLoader(Context applicationContext) {
+        return (AppLoader) applicationContext;
+    }
+
+    /** Methods for themes **/
+
+    public static AppLoader getLoader() {
+        return (AppLoader) appContext;
+    }
 
     @Override
     public void onCreate() {
@@ -97,8 +92,6 @@ public class AppLoader extends Application {
 //        TypefaceManager.setDefaultFonts();
         Thread.setDefaultUncaughtExceptionHandler(FileLogger.DEFAULT_ERROR_HANDLER);
     }
-
-    /** Methods for themes **/
 
     /**
      * Apply theme to activity, without {@link Activity#recreate()}
@@ -188,16 +181,6 @@ public class AppLoader extends Application {
         }
         return appContext.getResources().getDrawable(drawableId);
     }
-
-
-    public static AppLoader getLoader(Context applicationContext) {
-        return (AppLoader) applicationContext;
-    }
-
-    public static AppLoader getLoader() {
-        return (AppLoader) appContext;
-    }
-
 
     public SharedPreferences getPreferences() {
         return sPrefs;

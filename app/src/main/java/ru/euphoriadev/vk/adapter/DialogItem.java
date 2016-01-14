@@ -1,10 +1,9 @@
 package ru.euphoriadev.vk.adapter;
 
-import ru.euphoriadev.vk.api.model.VKMessage;
-import ru.euphoriadev.vk.api.model.VKFullUser;
-import ru.euphoriadev.vk.api.model.VKUser;
-
 import java.util.Date;
+
+import ru.euphoriadev.vk.api.model.VKMessage;
+import ru.euphoriadev.vk.api.model.VKUser;
 
 /**
  * Created by user on 09.05.15.

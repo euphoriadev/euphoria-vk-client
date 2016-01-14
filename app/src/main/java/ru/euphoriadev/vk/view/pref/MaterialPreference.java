@@ -6,9 +6,6 @@ import android.preference.Preference;
 import android.view.View;
 import android.widget.TextView;
 
-import ru.euphoriadev.vk.util.RefreshManager;
-import ru.euphoriadev.vk.util.Refreshable;
-import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
 

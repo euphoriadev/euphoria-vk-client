@@ -3,10 +3,11 @@ package ru.euphoriadev.vk.api.model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.Api;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import ru.euphoriadev.vk.api.Api;
 
 //Fields are optional. Should be null if not populated
 public class VKFullUser implements Serializable {

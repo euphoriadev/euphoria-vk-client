@@ -1,14 +1,14 @@
 package ru.euphoriadev.vk.api.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 public class VKNotification implements Serializable {
     
-    private static final long serialVersionUID = 1L;
     public static final String FOLLOW = "follow";
     public static final String FRIEND_ACCEPTED = "friend_accepted";
     public static final String MENTION = "mention";
@@ -31,7 +31,7 @@ public class VKNotification implements Serializable {
     public static final String COPY_POST = "copy_post";
     public static final String COPY_PHOTO = "copy_photo";
     public static final String COPY_VIDEO = "copy_video";
-    
+    private static final long serialVersionUID = 1L;
     public String type;
     public Long date;
     public Object parent;

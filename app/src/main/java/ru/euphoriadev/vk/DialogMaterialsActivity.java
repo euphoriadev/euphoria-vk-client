@@ -3,9 +3,11 @@ package ru.euphoriadev.vk;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.adapter.MaterialsPageAdapter;
 import ru.euphoriadev.vk.adapter.MessageAdapter;
 import ru.euphoriadev.vk.adapter.MessageItem;
@@ -15,8 +17,6 @@ import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-
-import java.util.ArrayList;
 
 /**
  * Created by user on 28.09.15.

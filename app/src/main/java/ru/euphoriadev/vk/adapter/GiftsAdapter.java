@@ -11,14 +11,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
-import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.util.ThemeManagerOld;
 
 /**
  * Created by user on 24.07.15.

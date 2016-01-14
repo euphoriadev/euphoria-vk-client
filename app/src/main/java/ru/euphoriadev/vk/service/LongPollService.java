@@ -4,7 +4,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.*;
+import android.os.Binder;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -21,14 +24,16 @@ import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.NotificationsHelper;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.FileLogger;
 
 /**
  * Created by Igor on 13.11.15.
  */
 public class LongPollService extends Service {
 
+    public static final String TAG = "VKOnLongPoll";
+    public static int messageCount = 0;
     @Deprecated
     private SparseArray<VKOnLongPollListener> mListeners;
     private VKOnDialogListener dialogListener;
@@ -39,11 +44,7 @@ public class LongPollService extends Service {
     private NotificationsHelper notificationsHelper;
     private LocalBinder mBinder = new LocalBinder();
     private boolean isRunning;
-
-    public static int messageCount = 0;
     private int lastSendMessageUid;
-
-    public static final String TAG = "VKOnLongPoll";
 
     @Override
     public void onCreate() {

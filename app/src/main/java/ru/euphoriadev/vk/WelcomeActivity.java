@@ -10,18 +10,22 @@ import android.support.v7.widget.AppCompatEditText;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.api.model.VKResolveScreenName;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.Account;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.AndroidUtils;
-
-import java.util.ArrayList;
 
 
 /**
@@ -30,12 +34,9 @@ import java.util.ArrayList;
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final int REQUEST_LOGIN = 1;
-
-    private Button btnAccessToken, btnLogin;
-
-
     Account account;
     Api api;
+    private Button btnAccessToken, btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

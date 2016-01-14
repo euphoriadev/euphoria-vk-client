@@ -2,7 +2,6 @@ package ru.euphoriadev.vk.util;
 
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.os.Parcel;
 import android.text.TextPaint;
 
 /**
@@ -14,16 +13,6 @@ public class TypefaceSpan extends android.text.style.TypefaceSpan {
     public TypefaceSpan(String family, Typeface type) {
         super(family);
         newType = type;
-    }
-
-    @Override
-    public void updateDrawState(TextPaint ds) {
-        applyCustomTypeFace(ds, newType);
-    }
-
-    @Override
-    public void updateMeasureState(TextPaint paint) {
-        applyCustomTypeFace(paint, newType);
     }
 
     private static void applyCustomTypeFace(Paint paint, Typeface tf) {
@@ -45,5 +34,15 @@ public class TypefaceSpan extends android.text.style.TypefaceSpan {
         }
 
         paint.setTypeface(tf);
+    }
+
+    @Override
+    public void updateDrawState(TextPaint ds) {
+        applyCustomTypeFace(ds, newType);
+    }
+
+    @Override
+    public void updateMeasureState(TextPaint paint) {
+        applyCustomTypeFace(paint, newType);
     }
 }

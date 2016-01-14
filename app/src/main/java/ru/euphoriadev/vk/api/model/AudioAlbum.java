@@ -3,9 +3,10 @@ package ru.euphoriadev.vk.api.model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.Api;
 
 import java.util.ArrayList;
+
+import ru.euphoriadev.vk.api.Api;
 
 /**
  * Created by user on 16.07.15.

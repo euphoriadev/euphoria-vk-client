@@ -1,6 +1,5 @@
 package ru.euphoriadev.vk.http;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

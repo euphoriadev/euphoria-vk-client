@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="horizontal"
-              android:gravity="center_vertical"
               android:layout_width="match_parent"
+              android:layout_height="48dp"
+              android:gravity="center_vertical"
+              android:orientation="horizontal"
               android:paddingLeft="16dp"
-              android:paddingRight="16dp"
-              android:layout_height="48dp">
+              android:paddingRight="16dp">
 
     <ru.euphoriadev.vk.view.CircleImageView
         android:id="@+id/ivNavUserPhoto"
-        android:src="@drawable/camera_b"
         android:layout_width="24dp"
-        android:layout_height="24dp"/>
+        android:layout_height="24dp"
+        android:src="@drawable/camera_b"/>
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:text="Test User Item"
-        android:textSize="14sp"
-        android:typeface="normal"
         android:textColor="?android:textColorPrimary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:textSize="14sp"
+        android:typeface="normal"/>
 
 </LinearLayout>

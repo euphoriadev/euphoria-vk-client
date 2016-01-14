@@ -2,9 +2,10 @@ package ru.euphoriadev.vk.api.model;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.Api;
 
 import java.io.Serializable;
+
+import ru.euphoriadev.vk.api.Api;
 
 public class VKAlbum implements Serializable {
     public long aid;

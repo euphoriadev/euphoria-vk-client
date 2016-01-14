@@ -7,17 +7,24 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
 import com.squareup.picasso.Picasso;
+
 import org.json.JSONException;
-import ru.euphoriadev.vk.api.*;
-import ru.euphoriadev.vk.api.model.VKGroup;
-import ru.euphoriadev.vk.api.model.NewsItem;
-import ru.euphoriadev.vk.api.model.Newsfeed;
-import ru.euphoriadev.vk.util.Account;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+
+import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.KException;
+import ru.euphoriadev.vk.api.model.NewsItem;
+import ru.euphoriadev.vk.api.model.Newsfeed;
+import ru.euphoriadev.vk.api.model.VKGroup;
+import ru.euphoriadev.vk.util.Account;
 
 public class NewsFragment extends Fragment {
 

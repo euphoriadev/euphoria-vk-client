@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import ru.euphoriadev.vk.adapter.GiftItem;
 import ru.euphoriadev.vk.adapter.GiftsAdapter;
 import ru.euphoriadev.vk.api.Api;
@@ -16,9 +20,6 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by user on 24.07.15.

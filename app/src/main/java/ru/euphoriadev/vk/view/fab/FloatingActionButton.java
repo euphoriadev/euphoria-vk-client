@@ -6,7 +6,11 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Outline;
-import android.graphics.drawable.*;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.Build;
 import android.support.annotation.ColorRes;
@@ -25,24 +29,20 @@ import android.view.animation.Interpolator;
 import android.widget.AbsListView;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
+
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import ru.euphoriadev.vk.R;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import ru.euphoriadev.vk.R;
+
 public class FloatingActionButton extends ImageButton {
-    private static final int TRANSLATE_DURATION_MILLIS = 200;
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({TYPE_NORMAL, TYPE_MINI})
-    public @interface TYPE {
-    }
-
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_MINI = 1;
-
+    private static final int TRANSLATE_DURATION_MILLIS = 200;
+    private final Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
     private boolean mVisible;
 
     private int mColorNormal;
@@ -58,8 +58,6 @@ public class FloatingActionButton extends ImageButton {
 
     private boolean mMarginsSet;
 
-    private final Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
-
     public FloatingActionButton(Context context) {
         this(context, null);
     }
@@ -72,6 +70,20 @@ public class FloatingActionButton extends ImageButton {
     public FloatingActionButton(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs);
+    }
+
+    private static int darkenColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.9f;
+        return Color.HSVToColor(hsv);
+    }
+
+    private static int lightenColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 1.1f;
+        return Color.HSVToColor(hsv);
     }
 
     @Override
@@ -214,13 +226,6 @@ public class FloatingActionButton extends ImageButton {
         return marginBottom;
     }
 
-    public void setColorNormal(int color) {
-        if (color != mColorNormal) {
-            mColorNormal = color;
-            updateBackground();
-        }
-    }
-
     public void setColorNormalResId(@ColorRes int colorResId) {
         setColorNormal(getColor(colorResId));
     }
@@ -229,9 +234,9 @@ public class FloatingActionButton extends ImageButton {
         return mColorNormal;
     }
 
-    public void setColorPressed(int color) {
-        if (color != mColorPressed) {
-            mColorPressed = color;
+    public void setColorNormal(int color) {
+        if (color != mColorNormal) {
+            mColorNormal = color;
             updateBackground();
         }
     }
@@ -244,9 +249,9 @@ public class FloatingActionButton extends ImageButton {
         return mColorPressed;
     }
 
-    public void setColorRipple(int color) {
-        if (color != mColorRipple) {
-            mColorRipple = color;
+    public void setColorPressed(int color) {
+        if (color != mColorPressed) {
+            mColorPressed = color;
             updateBackground();
         }
     }
@@ -257,6 +262,13 @@ public class FloatingActionButton extends ImageButton {
 
     public int getColorRipple() {
         return mColorRipple;
+    }
+
+    public void setColorRipple(int color) {
+        if (color != mColorRipple) {
+            mColorRipple = color;
+            updateBackground();
+        }
     }
 
     public void setShadow(boolean shadow) {
@@ -270,16 +282,16 @@ public class FloatingActionButton extends ImageButton {
         return mShadow;
     }
 
+    @TYPE
+    public int getType() {
+        return mType;
+    }
+
     public void setType(@TYPE int type) {
         if (type != mType) {
             mType = type;
             updateBackground();
         }
-    }
-
-    @TYPE
-    public int getType() {
-        return mType;
     }
 
     public boolean isVisible() {
@@ -349,7 +361,7 @@ public class FloatingActionButton extends ImageButton {
 
     public void attachToListView(@NonNull AbsListView listView,
                                  ScrollDirectionListener scrollDirectionListener) {
-        attachToListView(listView, scrollDirectionListener );
+        attachToListView(listView, scrollDirectionListener);
     }
 
     public void attachToRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -414,18 +426,9 @@ public class FloatingActionButton extends ImageButton {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
     }
 
-    private static int darkenColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.9f;
-        return Color.HSVToColor(hsv);
-    }
-
-    private static int lightenColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= 1.1f;
-        return Color.HSVToColor(hsv);
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({TYPE_NORMAL, TYPE_MINI})
+    public @interface TYPE {
     }
 
     private class AbsListViewScrollDetectorImpl extends AbsListViewScrollDetector {

@@ -1,11 +1,12 @@
 package ru.euphoriadev.vk.api.model;
 
 import android.text.TextUtils;
-import org.json.JSONException;
+
 import org.json.JSONObject;
-import ru.euphoriadev.vk.api.Api;
 
 import java.io.Serializable;
+
+import ru.euphoriadev.vk.api.Api;
 
 public class VKAudio implements Serializable {
 
@@ -103,9 +104,6 @@ public class VKAudio implements Serializable {
      */
     public final static class Genre {
 
-        private Genre() {
-        }
-
         public final static int ROCK = 1;
         public final static int POP = 2;
         public final static int RAP_AND_HIPHOP = 3;
@@ -127,5 +125,8 @@ public class VKAudio implements Serializable {
         public final static int SPEECH = 19;
         public final static int ALTERNATIVE = 21;
         public final static int ELECTROPOP_AND_DISCO = 22;
+
+        private Genre() {
+        }
     }
 }

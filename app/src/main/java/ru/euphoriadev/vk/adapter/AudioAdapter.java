@@ -12,14 +12,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.view.ProgressLayout;
-
-import java.util.ArrayList;
 
 /**
  * Created by Igor on 10.06.15.

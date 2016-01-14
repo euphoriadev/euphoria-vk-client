@@ -1,10 +1,10 @@
 package ru.euphoriadev.vk.api.model;
 
-import java.io.Serializable;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.Serializable;
 
 import ru.euphoriadev.vk.api.Api;
 
@@ -31,6 +31,16 @@ public class VKPhoto implements Serializable {
     public int height;//0 means value is unknown
     public String access_key;
     public String user_id; //for group
+
+    public VKPhoto() {
+    }
+
+    public VKPhoto(Long id, String owner_id, String src, String src_big) {
+        this.pid = id;
+        this.owner_id = owner_id;
+        this.src = src;
+        this.src_big = src_big;
+    }
 
     public static VKPhoto parse(JSONObject o) {
         VKPhoto p = new VKPhoto();
@@ -66,16 +76,6 @@ public class VKPhoto implements Serializable {
         p.height = o.optInt("height");
         p.access_key = o.optString("access_key");
         return p;
-    }
-
-    public VKPhoto() {
-    }
-
-    public VKPhoto(Long id, String owner_id, String src, String src_big) {
-        this.pid = id;
-        this.owner_id = owner_id;
-        this.src = src;
-        this.src_big = src_big;
     }
 
     public static VKPhoto parseCounts(JSONObject o) throws NumberFormatException, JSONException {

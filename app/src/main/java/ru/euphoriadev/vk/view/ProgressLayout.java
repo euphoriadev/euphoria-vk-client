@@ -10,9 +10,10 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
-import ru.euphoriadev.vk.R;
 
 import java.io.Serializable;
+
+import ru.euphoriadev.vk.R;
 
 /**
  * Created by user on 06.10.15.
@@ -38,6 +39,28 @@ public class ProgressLayout extends View implements Animatable, Serializable {
     private Handler handlerProgress;
 
     private ProgressLayoutListener progressLayoutListener;
+    private final Runnable mRunnableProgress = new Runnable() {
+        @Override
+        public void run() {
+            if (isPlaying) {
+                if (currentProgress == maxProgress) {
+                    if (progressLayoutListener != null) {
+                        progressLayoutListener.onProgressCompleted();
+                    }
+                    currentProgress = 0;
+                    setCurrentProgress(currentProgress);
+                    stop();
+                } else {
+                    postInvalidate();
+                    currentProgress += 1;
+                    if (progressLayoutListener != null) {
+                        progressLayoutListener.onProgressChanged(currentProgress / 10);
+                    }
+                    handlerProgress.postDelayed(mRunnableProgress, PROGRESS_SECOND_MS / 10);
+                }
+            }
+        }
+    };
 
     public ProgressLayout(Context context) {
         this(context, null);
@@ -131,22 +154,22 @@ public class ProgressLayout extends View implements Animatable, Serializable {
         postInvalidate();
     }
 
+    public int getCurrentProgress() {
+        return this.currentProgress;
+    }
+
     public void setCurrentProgress(int currentProgress) {
         this.currentProgress = currentProgress * 10;
         postInvalidate();
     }
 
-    public int getCurrentProgress() {
-        return this.currentProgress;
+    public int getMaxProgress() {
+        return maxProgress;
     }
 
     public void setMaxProgress(int maxProgress) {
         this.maxProgress = maxProgress * 10;
         postInvalidate();
-    }
-
-    public int getMaxProgress() {
-        return maxProgress;
     }
 
     public void setAutoProgress(boolean isAutoProgress) {
@@ -156,29 +179,6 @@ public class ProgressLayout extends View implements Animatable, Serializable {
     public void setProgressLayoutListener(ProgressLayoutListener progressLayoutListener) {
         this.progressLayoutListener = progressLayoutListener;
     }
-
-    private final Runnable mRunnableProgress = new Runnable() {
-        @Override
-        public void run() {
-            if (isPlaying) {
-                if (currentProgress == maxProgress) {
-                    if (progressLayoutListener != null) {
-                        progressLayoutListener.onProgressCompleted();
-                    }
-                    currentProgress = 0;
-                    setCurrentProgress(currentProgress);
-                    stop();
-                } else {
-                    postInvalidate();
-                    currentProgress += 1;
-                    if (progressLayoutListener != null) {
-                        progressLayoutListener.onProgressChanged(currentProgress / 10);
-                    }
-                    handlerProgress.postDelayed(mRunnableProgress, PROGRESS_SECOND_MS / 10);
-                }
-            }
-        }
-    };
 
     public interface ProgressLayoutListener {
         void onProgressCompleted();

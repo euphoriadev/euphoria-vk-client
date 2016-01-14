@@ -3,13 +3,14 @@ package ru.euphoriadev.vk;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.squareup.picasso.Picasso;
+
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.Counters;
 import ru.euphoriadev.vk.api.model.VKFullUser;

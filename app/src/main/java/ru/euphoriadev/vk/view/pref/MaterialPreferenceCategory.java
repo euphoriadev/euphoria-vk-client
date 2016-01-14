@@ -5,6 +5,7 @@ import android.os.Build;
 import android.preference.PreferenceCategory;
 import android.view.View;
 import android.widget.TextView;
+
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ViewUtil;

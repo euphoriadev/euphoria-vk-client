@@ -6,19 +6,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import ru.euphoriadev.vk.adapter.MessageAdapter;
-import ru.euphoriadev.vk.adapter.MessageItem;
 
 import java.util.ArrayList;
+
+import ru.euphoriadev.vk.adapter.MessageAdapter;
+import ru.euphoriadev.vk.adapter.MessageItem;
 
 /**
  * Created by Igor on 28.09.15.
  */
 public class MaterialsFragment extends Fragment {
 
-    View view;
     public MessageAdapter adapter = null;
+    View view;
     int position = -1;
+
+    public static MaterialsFragment newInstance(int position) {
+        MaterialsFragment fragment = new MaterialsFragment();
+        Bundle arguments = new Bundle();
+        arguments.putInt("position", position);
+        fragment.setArguments(arguments);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,14 +40,6 @@ public class MaterialsFragment extends Fragment {
         position = getArguments().getInt("position");
         listView.setAdapter(adapter);
         return view;
-    }
-
-    public static MaterialsFragment newInstance(int position) {
-        MaterialsFragment fragment = new MaterialsFragment();
-        Bundle arguments = new Bundle();
-        arguments.putInt("position", position);
-        fragment.setArguments(arguments);
-        return fragment;
     }
 
     public final MessageAdapter getAdapter() {

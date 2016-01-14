@@ -1,18 +1,12 @@
 package ru.euphoriadev.vk.view.pref;
 
 import android.content.Context;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.preference.CheckBoxPreference;
-import android.support.v7.widget.AppCompatCheckBox;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
 

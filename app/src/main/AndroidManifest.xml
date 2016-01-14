@@ -2,11 +2,10 @@
 <manifest
     package="ru.euphoriadev.vk"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
     <uses-sdk
-        xmlns:tools="http://schemas.android.com/tools"/>
+        />
 
     <!--
         Version API Name

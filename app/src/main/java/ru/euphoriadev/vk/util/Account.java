@@ -3,10 +3,7 @@ package ru.euphoriadev.vk.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.DatabaseUtils;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.v4.content.SharedPreferencesCompat;
 
 
 public class Account {

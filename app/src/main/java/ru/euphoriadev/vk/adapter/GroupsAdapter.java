@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKGroup;
 import ru.euphoriadev.vk.util.ViewUtil;
-
-import java.util.ArrayList;
 
 /**
  * This is a fork of the LazyList proyect.
@@ -25,20 +27,6 @@ public class GroupsAdapter extends BaseArrayAdapter<VKGroup> {
 
     public GroupsAdapter(Context context, ArrayList<VKGroup> values) {
         super(context, values);
-    }
-
-    private static class ViewHolder {
-        TextView tvTitle;
-        TextView tvStatus;
-        ImageView ivPhoto;
-        ImageView ivSelected;
-
-        public ViewHolder(View view) {
-            tvTitle = (TextView) view.findViewById(R.id.tvGroupTitle);
-            tvStatus = (TextView) view.findViewById(R.id.tvGroupStatus);
-            ivPhoto = (ImageView) view.findViewById(R.id.ivGroupPhoto);
-            ivSelected = (ImageView) view.findViewById(R.id.ivGroupSelected);
-        }
     }
 
     @Override
@@ -106,8 +94,21 @@ public class GroupsAdapter extends BaseArrayAdapter<VKGroup> {
 //        AsyncImageLoader imageLoader = AsyncImageLoader.get(mContext);
 //        imageLoader.displayImage(holder.ivPhoto, group.photo_50);
 
-        
 
         return view;
+    }
+
+    private static class ViewHolder {
+        TextView tvTitle;
+        TextView tvStatus;
+        ImageView ivPhoto;
+        ImageView ivSelected;
+
+        public ViewHolder(View view) {
+            tvTitle = (TextView) view.findViewById(R.id.tvGroupTitle);
+            tvStatus = (TextView) view.findViewById(R.id.tvGroupStatus);
+            ivPhoto = (ImageView) view.findViewById(R.id.ivGroupPhoto);
+            ivSelected = (ImageView) view.findViewById(R.id.ivGroupSelected);
+        }
     }
 }

@@ -5,17 +5,14 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.util.Account;
-
-import java.util.ArrayList;
 
 /**
  * Created by user on 25.04.15.

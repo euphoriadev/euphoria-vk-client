@@ -1,18 +1,17 @@
 package ru.euphoriadev.vk.api;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ru.euphoriadev.vk.helper.FileHelper;
-
 public class Utils {
-    
+
+    private static String pattern_string_profile_id = "^(id)?(\\d{1,10})$";
+    private static Pattern pattern_profile_id = Pattern.compile(pattern_string_profile_id);
+
     public static String extractPattern(String string, String pattern){
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(string);
@@ -55,9 +54,7 @@ public class Utils {
                 e.printStackTrace();
             }
     }
-    
-    private static String pattern_string_profile_id = "^(id)?(\\d{1,10})$";
-    private static Pattern pattern_profile_id = Pattern.compile(pattern_string_profile_id);
+
     public static String parseProfileId(String text) {
         Matcher m = pattern_profile_id.matcher(text);
         if (!m.find())

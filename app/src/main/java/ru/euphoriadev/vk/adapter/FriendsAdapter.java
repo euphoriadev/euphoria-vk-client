@@ -13,13 +13,13 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.UserProfileActivity;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ViewUtil;
-
-import java.util.ArrayList;
 
 /**
  * Created by Igor on 16.07.15.
@@ -98,7 +98,6 @@ public class FriendsAdapter extends BaseAdapter {
                 Intent intent = new Intent(mContext, UserProfileActivity.class);
                 intent.putExtra("user_id", user.user_id);
                 mContext.startActivity(intent);
-                ;
             }
         });
 

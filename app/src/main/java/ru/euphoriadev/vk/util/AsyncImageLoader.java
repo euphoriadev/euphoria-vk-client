@@ -1,32 +1,24 @@
 package ru.euphoriadev.vk.util;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.ColorFilter;
-import android.graphics.Movie;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
-import android.util.LruCache;
 import android.util.SparseArray;
 import android.util.TypedValue;
-import android.view.View;
 import android.widget.ImageView;
-import com.squareup.picasso.Picasso;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,6 +37,8 @@ import ru.euphoriadev.vk.http.HttpClient;
  */
 public class AsyncImageLoader {
 
+    private static final String TAG = "AsyncImageLoader";
+    private static volatile AsyncImageLoader instance;
     private Context context;
     private ExecutorService executor;
     private BitmapDecoder decoder;
@@ -52,11 +46,7 @@ public class AsyncImageLoader {
     private MemoryCache memoryCache;
     private BitmapDisplayer displayer;
     private HttpClient httpClient;
-
     private OnCompleteListener listener;
-
-    private static volatile AsyncImageLoader instance;
-    private static final String TAG = "AsyncImageLoader";
 
     private AsyncImageLoader(Context context) {
         this.context = context;
@@ -67,6 +57,23 @@ public class AsyncImageLoader {
         this.executor = Executors.newFixedThreadPool(2);
         this.httpClient = new DefaultHttpClient();
 
+    }
+
+    /**
+     * Получение экземпляра. SINGLETON.
+     *
+     * @param context
+     * @return
+     */
+    public static AsyncImageLoader get(Context context) {
+        if (instance == null) {
+            synchronized (AsyncImageLoader.class) {
+                if (instance == null) {
+                    instance = new AsyncImageLoader(context);
+                }
+            }
+        }
+        return instance;
     }
 
     public void setListener(OnCompleteListener listener) {
@@ -98,7 +105,7 @@ public class AsyncImageLoader {
                 try {
                     Bitmap dickBitmap = getBitmapFromDiskCache(path);
                     if (dickBitmap != null) {
-                     //   Log.i(TAG, "bitmap from DISK cache via path: " + path);
+                        //   Log.i(TAG, "bitmap from DISK cache via path: " + path);
                         addBitmapToMemoryCache(path, dickBitmap);
                         displayer.display(iv, dickBitmap);
 
@@ -148,7 +155,6 @@ public class AsyncImageLoader {
     public void displayImage(ImageView iv, String path) {
         displayImage(iv, path, 0, 0);
     }
-
 
     public Bitmap loadBitmapSync(String url) {
         HttpURLConnection connection = null;
@@ -226,7 +232,6 @@ public class AsyncImageLoader {
         diskCache.save(path, bitmap);
     }
 
-
     /**
      * Очистка всех ихображений из memory кеша приложения
      */
@@ -254,22 +259,6 @@ public class AsyncImageLoader {
         }).start();
     }
 
-    /**
-     * Получение экземпляра. SINGLETON.
-     * @param context
-     * @return
-     */
-    public static AsyncImageLoader get(Context context) {
-        if (instance == null) {
-            synchronized (AsyncImageLoader.class) {
-                if (instance == null) {
-                    instance = new AsyncImageLoader(context);
-                }
-            }
-        }
-        return instance;
-    }
-
     public void stop() {
         memoryCache.clear();
         executor.shutdown();
@@ -280,6 +269,44 @@ public class AsyncImageLoader {
      */
     public BitmapDecoder getDecoder() {
         return decoder;
+    }
+
+    public interface OnCompleteListener {
+
+        /**
+         * Вызывается при удачной загрузке изображение
+         *
+         * @param view   View, куда было загруженно изображение
+         * @param bitmap собственно само изображение
+         * @param path   ссылка на изображение
+         */
+        void onComplete(ImageView view, Bitmap bitmap, String path);
+    }
+
+    private static class Utils {
+        public static int calculateInSampleSize(
+                BitmapFactory.Options options, int reqWidth, int reqHeight) {
+            // Raw height and width of image
+            final int height = options.outHeight;
+            final int width = options.outWidth;
+            int inSampleSize = 1;
+
+            if (height > reqHeight || width > reqWidth) {
+
+                final int halfHeight = height / 2;
+                final int halfWidth = width / 2;
+
+                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+                // height and width larger than the requested height and width.
+                while ((halfHeight / inSampleSize) > reqHeight
+                        && (halfWidth / inSampleSize) > reqWidth) {
+                    inSampleSize *= 2;
+                }
+
+            }
+
+            return inSampleSize;
+        }
     }
 
     public class BitmapDecoder {
@@ -398,9 +425,8 @@ public class AsyncImageLoader {
      * Собственно сам класс по управление кешом на SD карте
      */
     private class DiskCache {
-        public final Object mLock = new Object();
-
         public static final String CACHE_DIR = ".EuphoriaCache";
+        public final Object mLock = new Object();
         private File cacheDir;
 
         public DiskCache() {
@@ -535,43 +561,6 @@ public class AsyncImageLoader {
             mTotalSize = 0;
             System.gc();
         }
-    }
-
-    private static class Utils {
-        public static int calculateInSampleSize(
-                BitmapFactory.Options options, int reqWidth, int reqHeight) {
-            // Raw height and width of image
-            final int height = options.outHeight;
-            final int width = options.outWidth;
-            int inSampleSize = 1;
-
-            if (height > reqHeight || width > reqWidth) {
-
-                final int halfHeight = height / 2;
-                final int halfWidth = width / 2;
-
-                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-                // height and width larger than the requested height and width.
-                while ((halfHeight / inSampleSize) > reqHeight
-                        && (halfWidth / inSampleSize) > reqWidth) {
-                    inSampleSize *= 2;
-                }
-
-            }
-
-            return inSampleSize;
-        }
-    }
-
-    public interface OnCompleteListener {
-
-        /**
-         * Вызывается при удачной загрузке изображение
-         * @param view View, куда было загруженно изображение
-         * @param bitmap собственно само изображение
-         * @param path ссылка на изображение
-         */
-        void onComplete(ImageView view, Bitmap bitmap, String path);
     }
 
 }

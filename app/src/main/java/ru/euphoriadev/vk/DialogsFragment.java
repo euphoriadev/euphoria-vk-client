@@ -33,18 +33,24 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+
 import ru.euphoriadev.vk.adapter.DialogAdapter;
 import ru.euphoriadev.vk.adapter.DialogItem;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
-import ru.euphoriadev.vk.util.*;
+import ru.euphoriadev.vk.util.Account;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.FileLogger;
+import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.util.ThemeManagerOld;
+import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 
 /**
  * Created by Igor on 10.07.15.
