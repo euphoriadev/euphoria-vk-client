@@ -76,7 +76,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.message_history_activity);
 
-
         String fullName = getIntent().getExtras().getString("fullName");
         uid = getIntent().getExtras().getLong("user_id");
         chat_id = getIntent().getExtras().getLong("chat_id");
@@ -238,12 +237,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
         executor = Executors.newSingleThreadExecutor();
         getMessages(from_saved);
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
         loadWallpaperFromSD();
     }
 
@@ -1092,7 +1085,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
             Picasso.with(this)
                     .load(new File(path))
-                    .fit()
                     .into(ivWallpaper);
         }
     }
@@ -1151,6 +1143,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(false);
             menu.findItem(R.id.menuMessageTranslateAll).setVisible(false);
             menu.findItem(R.id.menuMessageAttach).setVisible(false);
+            menu.findItem(R.id.menuWallpaper).setVisible(false);
 
             menu.findItem(R.id.menuMessageDelete).setVisible(true);
         } else {
@@ -1160,6 +1153,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             menu.findItem(R.id.menuMessageTranslateAll).setVisible(true);
             menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(true);
             menu.findItem(R.id.menuMessageAttach).setVisible(true);
+            menu.findItem(R.id.menuWallpaper).setVisible(true);
 
             menu.findItem(R.id.menuMessageDelete).setVisible(false);
         }

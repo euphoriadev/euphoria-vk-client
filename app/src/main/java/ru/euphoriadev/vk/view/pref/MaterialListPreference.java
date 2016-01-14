@@ -11,7 +11,7 @@ import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
- * Created by user on 03.10.15.
+ * Created by Шпщк on 03.10.15.
  */
 public class MaterialListPreference extends ListPreference {
     protected String summary;
@@ -37,41 +37,10 @@ public class MaterialListPreference extends ListPreference {
 
     @Override
     protected void showDialog(Bundle state) {
-//        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            super.showDialog(state);
-//            return;
-//        }
+        super.showDialog(state);
+        }
 
-//        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-//                .setNegativeButton("Сancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .setSingleChoiceItems(getEntries(), findIndexOfValue(getValue()), new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        if (which >= 0 && getEntryValues() != null) {
-//                            String value = getEntryValues()[which].toString();
-//                            if (callChangeListener(value) && isPersistent())
-//                                setValue(value);
-//                        }
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-    }
 
-//    @Override
-//    public int findIndexOfValue(String value) {
-////        return super.findIndexOfValue(value);
-//        for (int i = 0; i < getEntryValues().length; i++) {
-//            if ()
-//        }
-//    }
 
     @Override
     protected void onBindView(View view) {
@@ -80,7 +49,6 @@ public class MaterialListPreference extends ListPreference {
         TextView summaryView = (TextView) view.findViewById(android.R.id.summary);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-//            TextView titleView = (TextView) view.findViewById(android.R.id.title);
             titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), android.R.attr.textColorPrimary));
         }
 

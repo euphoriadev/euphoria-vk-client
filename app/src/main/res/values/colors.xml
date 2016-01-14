@@ -8,17 +8,16 @@
     <item name="light_blue" type="color">#2196f3</item>
     <item name="white" type="color">#fff</item>
     <item name="bgray" type="color">#ffe6e6e6</item>
+    <item name="background_grey" type="color">#eeeeee</item>
     <item name="black" type="color">#ff000000</item>
 
     <color name="material_blue_500">#5677fc</color>
-
     <item name="translucent_white" type="color">#10ffffff</item>
-
     <item name="dark_black" type="color">#212121</item>
 
     <color name="dark">#3F50B1</color>
     <color name="test">#ff303030</color>
-    <item type="color" name="dark_background">#303030</item>
+    <item name="dark_background" type="color">#303030</item>
 
 
     <color name="ampm_text_color">#ff8c8c8c</color>

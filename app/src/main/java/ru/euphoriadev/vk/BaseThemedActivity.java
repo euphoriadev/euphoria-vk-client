@@ -32,8 +32,9 @@ public class BaseThemedActivity extends AppCompatActivity {
         super.setContentView(layoutResID);
 
         mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(mToolbar);
-
+        if (mToolbar != null) {
+            setSupportActionBar(mToolbar);
+        }
     }
 
     @Override
@@ -41,7 +42,9 @@ public class BaseThemedActivity extends AppCompatActivity {
         super.setContentView(view);
 
         mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(mToolbar);
+        if (mToolbar != null) {
+            setSupportActionBar(mToolbar);
+        }
     }
 
     public Menu getMenu() {
