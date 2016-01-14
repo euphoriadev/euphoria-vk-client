@@ -6,11 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.*;
 import android.preference.PreferenceManager;
@@ -25,7 +22,6 @@ import android.view.*;
 import android.widget.*;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import ru.euphoriadev.vk.adapter.*;
 import ru.euphoriadev.vk.api.Api;
@@ -1205,6 +1201,10 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 break;
 
             case R.id.menuWallpaper: pickImageFromGallery();
+                break;
+
+            case R.id.menuHideShowTime:
+                adapter.toggleStateTime();
                 break;
 
             case android.R.id.home:

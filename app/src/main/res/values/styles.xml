@@ -17,7 +17,7 @@
         <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
 
         <!--<item name="android:colorBackground">@android:color/white</item>-->
-        <item name="android:windowBackground">@color/md_grey_100</item>
+        <item name="android:windowBackground">@color/md_grey_200</item>
         <item name="android:windowContentOverlay">@null</item>
 
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>

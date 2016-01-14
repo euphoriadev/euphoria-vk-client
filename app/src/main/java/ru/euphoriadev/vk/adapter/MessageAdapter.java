@@ -39,6 +39,7 @@ import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleImageView;
@@ -66,6 +67,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     private long uid;
 
     public boolean isScrolling;
+    public boolean mShowTime;
 
     private int colorInMessages;
     private int colorOutMessages;
@@ -324,16 +326,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         holder.tvBody.setMaxWidth(widthDisplay - (widthDisplay / 4));
 //        holder.tvBody.setTextColor(isNightTheme ? primaryDarkColorLight : primaryDarkColorDark);
         holder.tvBody.setTextColor(primaryTextColor);
-        holder.tvDate.setTextColor(secondaryTextColor);
+        holder.tvDate.setTextColor(ThemeManager.getSecondaryTextColor());
 
-//        holder.tvDate.setTextColor(isNightTheme ? secondaryTextColorDark : secondaryTextColorLight);
-//        holder.tvDateOneLine.setTextColor(isNightTheme ? secondaryTextColorDark : secondaryTextColorLight);
-
-//        holder.tvDate.setText(sdf.format(item.message.date * 1000));
-//        Date currentDate = new Date(System.currentTimeMillis());
-//        if ((currentDate.getDate() - item.date.getDate() == 1)) {
-//            holder.tvDate.setText("Вчера в " + sdf.format(item.message.date * 1000));
-//        }
 
         if (TextUtils.isEmpty(item.message.body) && !item.message.emoji && !item.message.attachments.isEmpty()) {
             holder.tvBody.setVisibility(View.GONE);
@@ -356,23 +350,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
             // если сегодня
             sdf.applyPattern("HH:mm"); // 15:57
         }
-//        holder.tvDateOneLine.setText(sdf.format(item.date));
-//        holder.tvDate.setText(sdf.format(item.date));
-//
-//        holder.tvBody.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                // если в тексте больше одной строки
-//                if (holder.tvBody.getLineCount() > 1) {
-        holder.tvDate.setVisibility(View.VISIBLE);
-////                    holder.tvDateOneLine.setVisibility(View.GONE);
-//                } else {
-//                    holder.tvDate.setVisibility(View.GONE);
-////                    holder.tvDateOneLine.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        });
 
+        holder.tvDate.setVisibility(mShowTime ? View.VISIBLE : View.GONE);
 
         switch (item.status) {
             case SENT:
@@ -776,7 +755,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 synchronized (mLock) {
                     VKUser profile = mHelper.getUserFromDB(uid);
                     if (profile == null) {
-                         profile = Api.get().getProfile(uid);
+                        profile = Api.get().getProfile(uid);
                     }
                     if (profile == null) {
                         return;
@@ -860,6 +839,11 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 }
             }
         });
+    }
+
+    public void toggleStateTime() {
+        mShowTime = !mShowTime;
+        notifyDataSetChanged();
     }
 
 

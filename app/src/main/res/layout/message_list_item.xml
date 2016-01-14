@@ -16,19 +16,19 @@
 
     <ImageView
         android:id="@+id/ivMessageSelected"
-        android:layout_gravity="start|center"
-
         android:layout_width="26dp"
         android:layout_height="26dp"
+        android:layout_gravity="start|center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:visibility="gone"
         android:src="@drawable/ic_selected"/>
 
     <LinearLayout
         android:id="@+id/llMessageContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="end"
+        android:gravity="start|center_vertical"
         android:orientation="horizontal">
 
 
@@ -116,35 +116,24 @@
                     tools:text="Text of message"
                     />
 
-                <TextView
-                    android:id="@+id/tvDate_message_one_line"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|right"
-                    android:paddingLeft="4dp"
-                    android:paddingRight="4dp"
-                    android:text="13:25"
-                    android:textColor="@color/black"
-                    android:textSize="13sp"
-                    android:visibility="gone"/>
 
             </LinearLayout>
 
 
-            <TextView
-                android:id="@+id/tvDate_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|left"
-                android:paddingBottom="4dp"
-                android:paddingLeft="5dp"
-                android:paddingRight="6dp"
-                android:text="13:25"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:visibility="visible"/>
         </LinearLayout>
 
+
+        <TextView
+            android:id="@+id/tvDate_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="6dp"
+            android:text="13:25"
+            android:textColor="?android:textColorSecondary"
+            android:textSize="13sp"
+            android:visibility="visible"/>
 
     </LinearLayout>
 

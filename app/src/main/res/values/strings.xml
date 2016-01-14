@@ -31,6 +31,7 @@
         • Возможность установить фон на чат!;\n
         • Выбор радиуса размытие шторки!;\n
         • Немного изменена разметка!;\n
+        • Возможность скрыть время в истории!;\n
         \n
         <u>0.8</u>\n
         • Заметки;\n
@@ -391,4 +392,5 @@
     <string name="set_wallpaper">Установить фон</string>
     <string name="pref_blur_radius">Радиус размытие</string>
     <string name="pref_blur_radius_description">Радиус размытие главной фотографии профиля в боковой шторке</string>
+    <string name="show_and_hide_time">Показать/скрыть время</string>
 </resources>

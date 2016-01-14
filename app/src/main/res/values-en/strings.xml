@@ -162,4 +162,5 @@
     <string name="set_wallpaper">Set wallpaper on chat</string>
     <string name="pref_blur_radius">Blur radius of Drawer Header</string>
     <string name="pref_blur_radius_description">The blur radius of main profile photo in Navigation Drawer Header</string>
+    <string name="show_and_hide_time">Show/hide time</string>
 </resources>
