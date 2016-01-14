@@ -2,7 +2,6 @@
 <LinearLayout
     android:id="@+id/base_container_message"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -21,8 +20,8 @@
         android:layout_gravity="start|center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:visibility="gone"
-        android:src="@drawable/ic_selected"/>
+        android:src="@drawable/ic_selected"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:id="@+id/llMessageContainer"
