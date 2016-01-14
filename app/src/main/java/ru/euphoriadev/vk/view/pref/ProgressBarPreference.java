@@ -10,17 +10,20 @@ import android.widget.SeekBar;
 
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.util.RefreshManager;
+import ru.euphoriadev.vk.util.Refreshable;
 
 /**
  * Created by user on 14.01.16.
  */
-public class ProgressBarPreference extends MaterialPreference {
+public class ProgressBarPreference extends MaterialPreference implements Refreshable {
     AppCompatSeekBar seekBar;
 
     public ProgressBarPreference(Context context) {
         super(context);
 
         seekBar = new AppCompatSeekBar(context);
+        RefreshManager.registerForChangePreferences(this, "making_drawer_header");
     }
 
     @Override
@@ -43,13 +46,17 @@ public class ProgressBarPreference extends MaterialPreference {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getTitle());
-        builder.setMessage(seekBar.getProgress());
+        builder.setMessage(getTitle() + ": " + seekBar.getProgress());
         builder.setView(seekBar);
         builder.setNegativeButton("Cancel", null);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 PrefManager.putInt(getKey(), seekBar.getProgress());
+
+                if (getOnPreferenceChangeListener() != null) {
+                    getOnPreferenceChangeListener().onPreferenceChange(ProgressBarPreference.this, seekBar.getProgress());
+                }
             }
         });
 
@@ -59,7 +66,7 @@ public class ProgressBarPreference extends MaterialPreference {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                dialog.setMessage("Blur radius: " + progress);
+                dialog.setMessage(getTitle() + ": " + progress);
             }
 
             @Override
@@ -72,5 +79,11 @@ public class ProgressBarPreference extends MaterialPreference {
 
             }
         });
+    }
+
+    @Override
+    public void onRefresh(String prefKey) {
+        String value = PrefManager.getString("making_drawer_header");
+        setEnabled(value.equalsIgnoreCase("2"));
     }
 }

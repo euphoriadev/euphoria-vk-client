@@ -185,6 +185,13 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         blurRadiusPreference.setKey("blur_radius");
         blurRadiusPreference.setDefaultValue(20);
         blurRadiusPreference.getSeekBar().setMax(50);
+        blurRadiusPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Toast.makeText(getActivity(), "Please, restart app", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
 
         categoryUI.addPreference(blurRadiusPreference);
 

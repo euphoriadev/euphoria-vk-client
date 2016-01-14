@@ -6,6 +6,9 @@ import android.preference.Preference;
 import android.view.View;
 import android.widget.TextView;
 
+import ru.euphoriadev.vk.util.RefreshManager;
+import ru.euphoriadev.vk.util.Refreshable;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
 
@@ -14,6 +17,9 @@ import ru.euphoriadev.vk.util.ViewUtil;
  */
 public class MaterialPreference extends Preference {
 
+    private TextView titleView;
+    private TextView summaryView;
+
     public MaterialPreference(Context context) {
         super(context);
     }
@@ -21,15 +27,18 @@ public class MaterialPreference extends Preference {
     @Override
     protected void onBindView(View view) {
         super.onBindView(view);
-        TextView titleView = (TextView) view.findViewById(android.R.id.title);
-        TextView summaryView = (TextView) view.findViewById(android.R.id.summary);
+        titleView = (TextView) view.findViewById(android.R.id.title);
+        summaryView = (TextView) view.findViewById(android.R.id.summary);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-//            TextView titleView = (TextView) view.findViewById(android.R.id.title);
-            titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), android.R.attr.textColorPrimary));
+            titleView.setTextColor(isEnabled() ? ThemeManager.getPrimaryTextColor() : ThemeManager.getSecondaryTextColor());
+
+            titleView.setEnabled(isEnabled());
+            summaryView.setEnabled(isEnabled());
         }
 
         ViewUtil.setTypeface(titleView);
         ViewUtil.setTypeface(summaryView);
     }
+
 }
