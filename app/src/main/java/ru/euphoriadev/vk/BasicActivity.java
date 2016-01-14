@@ -90,11 +90,8 @@ public class BasicActivity extends BaseThemedActivity implements
 
         navigationView = (NavigationView) findViewById(R.id.navView);
         navigationView.setNavigationItemSelectedListener(this);
-//        navigationView.setItemIconTintList(ColorStateList.valueOf(ThemeManager.getPrimaryTextColor()));
-//        navigationView.setItemTextColor(ColorStateList.valueOf(ThemeManager.getPrimaryTextColor()));
         navigationView.setCheckedItem(R.id.navMessages);
         applyTypefaces();
-//      applyBadge();
 
         NavigationMenuView navigationMenu = (NavigationMenuView) navigationView.getChildAt(0);
         if (navigationMenu != null) {
@@ -293,10 +290,7 @@ public class BasicActivity extends BaseThemedActivity implements
         }
         // если еще нет, то увеличиваем счетчик
         if (isJoinGroup <= 5) {
-            SharedPreferences.Editor editor = sPrefs.edit();
-            editor.putInt("is_join_group", ++isJoinGroup);
-
-            editor.apply();
+            PrefManager.putInt("is_join_group", ++isJoinGroup);
             return;
         }
         // Просим вступить в группу, после 5х запуска
@@ -310,11 +304,7 @@ public class BasicActivity extends BaseThemedActivity implements
 
                     if (isMemberGroup) {
                         // если мы уже в группе
-                        SharedPreferences.Editor editor = sPrefs.edit();
-                        editor.putInt("is_join_group", -1);
-
-                        if (Build.VERSION.SDK_INT < 16) editor.commit();
-                        else editor.apply();
+                        PrefManager.putInt("isJoinGroup", -1);
                         FileLogger.w("BasicActivity", "IsMemberOfGroup");
                         return;
                     }
@@ -322,38 +312,7 @@ public class BasicActivity extends BaseThemedActivity implements
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(BasicActivity.this);
-                            builder.setTitle(getResources().getString(R.string.join_in_group_ask))
-                                    .setMessage(getString(R.string.join_in_group_ask_description))
-                                    .setPositiveButton("Join", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            ThreadExecutor.execute(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        api.joinGroup(59383198, null, null);
-                                                    } catch (IOException | JSONException | KException e1) {
-                                                        e1.printStackTrace();
-                                                    }
-                                                }
-                                            });
-                                            Toast.makeText(BasicActivity.this, R.string.thank_you, Toast.LENGTH_LONG).show();
-
-                                        }
-                                    })
-                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            SharedPreferences.Editor editor = sPrefs.edit();
-                                            editor.putInt("is_join_group", -1);
-
-                                            if (Build.VERSION.SDK_INT < 16) editor.commit();
-                                            else editor.apply();
-                                        }
-                                    });
-                            final AlertDialog dialog = builder.create();
-                            dialog.show();
+                            showDialogJoinGroup();
                         }
                     });
                 } catch (Exception e) {
@@ -363,8 +322,46 @@ public class BasicActivity extends BaseThemedActivity implements
         });
     }
 
-    private void
-    initDrawerHeader() {
+    private void showDialogJoinGroup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(BasicActivity.this);
+        builder.setTitle(getResources().getString(R.string.join_in_group_ask))
+                .setMessage(getString(R.string.join_in_group_ask_description))
+                .setPositiveButton("Join", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        joinInGroup(59383198);
+                        Toast.makeText(BasicActivity.this, R.string.thank_you, Toast.LENGTH_LONG).show();
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences.Editor editor = sPrefs.edit();
+                        editor.putInt("is_join_group", -1);
+
+                        if (Build.VERSION.SDK_INT < 16) editor.commit();
+                        else editor.apply();
+                    }
+                });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void joinInGroup(final int groupId) {
+        ThreadExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    api.joinGroup(groupId, null, null);
+                } catch (IOException | JSONException | KException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void initDrawerHeader() {
         if (isInitedDrawer) {
             return;
         }
@@ -385,7 +382,6 @@ public class BasicActivity extends BaseThemedActivity implements
             Picasso.with(this)
                     .load(account.photo)
                     .transform(new AndroidUtils.PicassoBlurTransform(16))
-//                    .fit()
                     .into(drawerBackground);
         }
         drawerTitle.setText(account.fullName);
@@ -407,12 +403,13 @@ public class BasicActivity extends BaseThemedActivity implements
         if (currentFragment instanceof GroupsFragment) {
             ((GroupsFragment) currentFragment).onBackPressed();
         }
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (backPressedTime + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
 
-            if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_notify", true)) {
+            if (!PrefManager.getBoolean("enable_notify", true)) {
                 stopService(new Intent(this, LongPollService.class));
             }
             appLoader.getHandler().postDelayed(new Runnable() {
@@ -437,7 +434,6 @@ public class BasicActivity extends BaseThemedActivity implements
 
         System.gc();
     }
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
