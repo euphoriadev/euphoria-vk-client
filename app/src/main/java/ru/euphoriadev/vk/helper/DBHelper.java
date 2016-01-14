@@ -23,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private Context mContext;
 
     private static final String DATABASE_NAME = "euphoria.db";
-    private static final int DATABASE_VERSION = 76;
+    private static final int DATABASE_VERSION = 78;
 
 
     public static final String USERS_TABLE = "users";

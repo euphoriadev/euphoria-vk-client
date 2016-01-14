@@ -37,6 +37,7 @@ public class ThemeManager {
     public static final String PREF_KEY_FORCED_LOCALE = "forced_locale";
     public static final String PREF_KEY_IS_DARK_THEME = "is_dark_theme";
     public static final String PREF_KEY_DRAWER_HEADER = "making_drawer_header";
+    public static final String PREF_KEY_BLUR_RADIUS = "blur_radius";
     public static final String PREF_KEY_MESSAGE_WALLPAPER_PATH = "message_wallpaper_path";
 
     /** Drawer header states **/
@@ -455,9 +456,7 @@ public class ThemeManager {
 
 
     public static void setDarkTheme(boolean newDarkThemeValue) {
-        SharedPreferences.Editor editor = AppLoader.getLoader().getPreferences().edit();
-        editor.putBoolean(PREF_KEY_IS_DARK_THEME, newDarkThemeValue);
-        editor.apply();
+        PrefManager.putBoolean(PREF_KEY_IS_DARK_THEME, newDarkThemeValue);
 
         sIsDarkTheme = newDarkThemeValue;
     }

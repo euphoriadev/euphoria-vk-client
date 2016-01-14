@@ -29,6 +29,7 @@
         <u>0.9</u>\n
         • Open Source!;\n
         • Возможность установить фон на чат!;\n
+        • Выбор радиуса размытие шторки!;\n
         \n
         <u>0.8</u>\n
         • Заметки;\n
@@ -387,4 +388,6 @@
     <string name="delete">Удалить</string>
     <string name="attach">Прикрепить</string>
     <string name="set_wallpaper">Установить фон</string>
+    <string name="pref_blur_radius">Радиус размытие</string>
+    <string name="pref_blur_radius_description">Радиус размытие главной фотографии профиля в боковой шторке</string>
 </resources>

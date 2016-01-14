@@ -381,7 +381,7 @@ public class BasicActivity extends BaseThemedActivity implements
         } else {
             Picasso.with(this)
                     .load(account.photo)
-                    .transform(new AndroidUtils.PicassoBlurTransform(16))
+                    .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(ThemeManager.PREF_KEY_BLUR_RADIUS)))
                     .into(drawerBackground);
         }
         drawerTitle.setText(account.fullName);

@@ -11,7 +11,7 @@ import android.os.Build;
 public class PrefManager {
     /** Default values */
     public static final String DEFAULT_STRING_VALUE = "";
-    public static final int DEFAULT_INT_VALUE = -1;
+    public static final int DEFAULT_INT_VALUE = 0;
     public static final boolean DEFAULT_BOOLEAN_VALUE = false;
 
     /** Preferences for all App */

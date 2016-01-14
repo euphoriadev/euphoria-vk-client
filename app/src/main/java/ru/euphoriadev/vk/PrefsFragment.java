@@ -35,6 +35,7 @@ import ru.euphoriadev.vk.service.EternallOnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AppLoader;
 import ru.euphoriadev.vk.util.FileLogger;
+import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
@@ -47,6 +48,7 @@ import ru.euphoriadev.vk.view.pref.MaterialPreferenceCategory;
 import ru.euphoriadev.vk.view.pref.MaterialSwitchPreference;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerSwatch;
+import ru.euphoriadev.vk.view.pref.ProgressBarPreference;
 
 /**
  * Created by Igor on 28.02.15.
@@ -165,33 +167,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         categoryUI.addPreference(boxColorBubble2);
 
-//        MaterialPreference bubblePreference = new MaterialPreference(getActivity());
-//        bubblePreference.setTitle("Настройка пузыря сообщений");
-//        bubblePreference.setSummary("Нажмите, для изминения настроек");
-//        bubblePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//            @Override
-//            public boolean onPreferenceClick(Preference preference) {
-//                createBubblePreferenceDialog();
-//                return true;
-//            }
-//        });
-//        categoryUI.addPreference(bubblePreference);
-
-//        CheckBoxPreference boxBlurHeaderDrawer = new MaterialCheckBoxPreference(getActivity());
-//        boxBlurHeaderDrawer.setTitle(getActivity().getString(R.string.prefs_blur_header));
-//        boxBlurHeaderDrawer.setDefaultValue(false);
-//        boxBlurHeaderDrawer.setSummary(getActivity().getString(R.string.prefs_blur_header_description));
-//        boxBlurHeaderDrawer.setKey("blur_header_drawer");
-//
-//        categoryUI.addPreference(boxBlurHeaderDrawer);
-//
-//        CheckBoxPreference boxSolidBackgroundDrawer = new MaterialCheckBoxPreference(getActivity());
-//        boxSolidBackgroundDrawer.setTitle("Сплошной фон");
-//        boxSolidBackgroundDrawer.setDefaultValue(false);
-//        boxSolidBackgroundDrawer.setSummary("Использовать сплошной фон темы в заголовке бокового меню (Drawer)");
-//        boxSolidBackgroundDrawer.setKey("solid_background_drawer");
-//
-//        categoryUI.addPreference(boxSolidBackgroundDrawer);
 
         ListPreference listHeaderDrawer = new MaterialListPreference(getActivity());
         listHeaderDrawer.setTitle(getResources().getString(R.string.prefs_drawer));
@@ -203,6 +178,15 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         categoryUI.addPreference(listHeaderDrawer);
 
+        ProgressBarPreference blurRadiusPreference = new ProgressBarPreference(getActivity());
+        blurRadiusPreference.setTitle(R.string.pref_blur_radius);
+        blurRadiusPreference.setSummary(R.string.pref_blur_radius_description);
+        blurRadiusPreference.setEnabled(PrefManager.getString("making_drawer_header").equalsIgnoreCase("2"));
+        blurRadiusPreference.setKey("blur_radius");
+        blurRadiusPreference.setDefaultValue(20);
+        blurRadiusPreference.getSeekBar().setMax(50);
+
+        categoryUI.addPreference(blurRadiusPreference);
 
         CheckBoxPreference boxDivider = new MaterialCheckBoxPreference(getActivity());
         boxDivider.setTitle(getActivity().getString(R.string.prefs_show_divider));
