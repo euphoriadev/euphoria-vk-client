@@ -33,9 +33,7 @@ public class LoginActivity extends Activity {
         //    cookieManager.removeAllCookie();
         String url = Auth.getUrl(Account.API_ID, Auth.getSettings());
         webview.loadUrl(url);
-        webview.clearCache(false);
 
-        webview.destroy();
     }
 
     private void parseUrl(String url) {
@@ -67,6 +65,7 @@ public class LoginActivity extends Activity {
         if (webview != null) {
             webview.removeAllViews();
             webview.destroy();
+            webview.clearCache(true);
             webview = null;
         }
 

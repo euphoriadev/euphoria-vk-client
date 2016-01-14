@@ -130,10 +130,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
                 pickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialogInterface) {
-//                        AlphaAnimation animation = new AlphaAnimation(0.2f, 1.0f);
-//                        animation.setDuration(300);
-
-
                         // почему-то на 4.0,3 вылет с ошибкой
                         TaskStackBuilder.create(getActivity())
                                 .addNextIntent(new Intent(getActivity(), BasicActivity.class))
@@ -574,6 +570,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                 builder.setTitle(getActivity().getString(R.string.update))
                                         .setMessage(getActivity().getString(R.string.found_new_version) + json.optString("version") + "\n" + getActivity().getString(R.string.download_ask))
+                                        .setNegativeButton("Cancel", null)
                                         .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
