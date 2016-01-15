@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
+import android.net.MailTo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.internal.NavigationMenuView;
@@ -16,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,9 +33,11 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
+import ru.euphoriadev.vk.api.VKApi;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
@@ -41,13 +45,15 @@ import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AppLoader;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.util.RefreshManager;
+import ru.euphoriadev.vk.util.Refreshable;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 
 public class BasicActivity extends BaseThemedActivity implements
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener, Refreshable {
 
     private ActionBarDrawerToggle toggle;
     private AppLoader appLoader;
@@ -116,7 +122,15 @@ public class BasicActivity extends BaseThemedActivity implements
             trackStats();
             joinInGroup();
         }
+        RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
         startService(new Intent(this, LongPollService.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        initDrawerHeader();
     }
 
     public Toolbar getToolbar() {
@@ -384,9 +398,11 @@ public class BasicActivity extends BaseThemedActivity implements
             drawerBackground.setImageDrawable(headerDrawable);
 //            drawerBackground.setBackground(headerDrawable);
         } else {
+            drawerBackground.setImageDrawable(null);
             Picasso.with(this)
                     .load(account.photo)
-                    .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(ThemeManager.PREF_KEY_BLUR_RADIUS, 20)))
+                    .placeholder(R.drawable.ic_launcher)
+                    .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(PrefsFragment.KEY_BLUR_RADIUS, 20)))
                     .into(drawerBackground);
         }
         drawerTitle.setText(account.fullName);
@@ -414,7 +430,7 @@ public class BasicActivity extends BaseThemedActivity implements
         } else if (backPressedTime + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
 
-            if (!PrefManager.getBoolean("enable_notify", true)) {
+            if (!PrefManager.getBoolean(PrefsFragment.KEY_ENABLE_NOTIFY, true)) {
                 stopService(new Intent(this, LongPollService.class));
             }
             appLoader.getHandler().postDelayed(new Runnable() {
@@ -422,7 +438,7 @@ public class BasicActivity extends BaseThemedActivity implements
                 public void run() {
                     System.exit(0);
                 }
-            }, 1200);
+            }, 800);
         } else {
             Toast.makeText(this, "Press once again to exit",
                     Toast.LENGTH_SHORT).show();
@@ -438,6 +454,7 @@ public class BasicActivity extends BaseThemedActivity implements
         helper = null;
 
         System.gc();
+        RefreshManager.unregisterForChangePreferences(this);
     }
 
     @Override
@@ -470,4 +487,13 @@ public class BasicActivity extends BaseThemedActivity implements
         return true;
     }
 
+    @Override
+    public void onRefresh(String prefKey) {
+        Log.w("BasicActivity", "onRefresh: " + prefKey);
+        // Change blur radius of NavigationView....
+
+        if (prefKey.equals(PrefsFragment.KEY_BLUR_RADIUS)) {
+            isInitedDrawer = false;
+        }
+    }
 }

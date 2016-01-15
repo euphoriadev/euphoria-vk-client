@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -31,6 +32,8 @@ import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 
 import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.Utils;
+import ru.euphoriadev.vk.http.DefaultHttpClient;
 import ru.euphoriadev.vk.service.EternallOnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
@@ -53,7 +56,35 @@ import ru.euphoriadev.vk.view.pref.ProgressBarPreference;
 /**
  * Created by Igor on 28.02.15.
  */
-public class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+    /** Preference keys */
+    public static final String KEY_IS_NIGHT_MODE = "is_night_theme";
+    public static final String KEY_COLOR_IN_MESSAGES = "color_in_messages";
+    public static final String KEY_COLOR_OUT_MESSAGES = "color_out_messages";
+    public static final String KEY_MAKING_DRAWER_HEADER = "making_drawer_header";
+    public static final String KEY_BLUR_RADIUS = "blur_radius";
+    public static final String KEY_SHOW_DIVIDER = "show_divider";
+    public static final String KEY_USE_TWO_PROFILE = "use_two_profile";
+    public static final String KEY_FORCED_LOCALE = "forced_locale";
+
+    /** Font keys */
+    public static final String KEY_FONT_FAMILY = "font_family";
+    public static final String KEY_TEXT_WEIGHT = "text_weight";
+
+    /** Online status keys */
+    public static final String KEY_ONLINE_STATUS = "online_status";
+    public static final String KEY_HIDE_TYPING = "hide_typing";
+
+    /** Notifications keys */
+    public static final String KEY_ENABLE_NOTIFY = "enable_notify";
+    public static final String KEY_ENABLE_NOTIFY_VIBRATE = "enable_notify_vibrate";
+    public static final String KEY_ENABLE_NOTIFY_LED = "enable_notify_led";
+
+    /** Other keys */
+    public static final String KEY_WRITE_LOG = "write_log";
+    public static final String KEY_RESEND_FAILED_MESSAGES = "resend_failed_msg";
+    public static final String KEY_ENCRYPT_MESSAGES = "encrypt_messages";
+
 
     boolean isSetListView;
     PreferenceScreen rootScreen;
@@ -81,11 +112,12 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         final MaterialSwitchPreference boxNightTheme = new MaterialSwitchPreference(getActivity());
         boxNightTheme.setTitle(getActivity().getString(R.string.prefs_night_theme));
         boxNightTheme.setDefaultValue(true);
-        boxNightTheme.setKey("is_night_theme");
+        boxNightTheme.setKey(KEY_IS_NIGHT_MODE);
         boxNightTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
                 ThemeManager.setDarkTheme((Boolean) o);
+                ThemeManager.updateThemeValues();
                 TaskStackBuilder.create(getActivity())
                         .addNextIntent(new Intent(getActivity(), BasicActivity.class))
                         .addNextIntent(getActivity().getIntent())
@@ -148,7 +180,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         CheckBoxPreference boxColorBubble = new MaterialCheckBoxPreference(getActivity());
         boxColorBubble.setTitle(getActivity().getString(R.string.prefs_color_in_msg));
-        boxColorBubble.setKey("color_in_messages");
+        boxColorBubble.setKey(KEY_COLOR_IN_MESSAGES);
         boxColorBubble.setSummary(getActivity().getString(R.string.prefs_color_in_msg_description));
         boxColorBubble.setDefaultValue(true);
 
@@ -157,7 +189,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         CheckBoxPreference boxColorBubble2 = new MaterialCheckBoxPreference(getActivity());
         boxColorBubble2.setTitle(getActivity().getString(R.string.prefs_color_out_msg));
-        boxColorBubble2.setKey("color_out_messages");
+        boxColorBubble2.setKey(KEY_COLOR_OUT_MESSAGES);
         boxColorBubble2.setSummary(getActivity().getString(R.string.prefs_color_out_msg_description));
         boxColorBubble2.setDefaultValue(false);
 
@@ -167,7 +199,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         ListPreference listHeaderDrawer = new MaterialListPreference(getActivity());
         listHeaderDrawer.setTitle(getResources().getString(R.string.prefs_drawer));
         listHeaderDrawer.setSummary(getResources().getString(R.string.prefs_drawer_description));
-        listHeaderDrawer.setKey("making_drawer_header");
+        listHeaderDrawer.setKey(KEY_MAKING_DRAWER_HEADER);
         listHeaderDrawer.setEntries(R.array.prefs_drawer_header_array);
         listHeaderDrawer.setEntryValues(new CharSequence[]{"0", "1", "2"});
         listHeaderDrawer.setDefaultValue("0");
@@ -177,8 +209,8 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         ProgressBarPreference blurRadiusPreference = new ProgressBarPreference(getActivity());
         blurRadiusPreference.setTitle(R.string.pref_blur_radius);
         blurRadiusPreference.setSummary(R.string.pref_blur_radius_description);
-        blurRadiusPreference.setEnabled(PrefManager.getString("making_drawer_header").equalsIgnoreCase("2"));
-        blurRadiusPreference.setKey("blur_radius");
+        blurRadiusPreference.setEnabled(PrefManager.getString(KEY_MAKING_DRAWER_HEADER).equalsIgnoreCase("2"));
+        blurRadiusPreference.setKey(KEY_BLUR_RADIUS);
         blurRadiusPreference.setDefaultValue(20);
         blurRadiusPreference.getSeekBar().setMax(50);
         blurRadiusPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -195,14 +227,14 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         boxDivider.setTitle(getActivity().getString(R.string.prefs_show_divider));
         boxDivider.setSummary(getActivity().getString(R.string.prefs_show_divider_description));
         boxDivider.setDefaultValue(false);
-        boxDivider.setKey("show_divider");
+        boxDivider.setKey(KEY_SHOW_DIVIDER);
 
 
         categoryUI.addPreference(boxDivider);
 
         CheckBoxPreference boxTwoProfile = new MaterialCheckBoxPreference(getActivity());
         boxTwoProfile.setTitle(getActivity().getString(R.string.prefs_use_second_profile));
-        boxTwoProfile.setKey("use_two_profile");
+        boxTwoProfile.setKey(KEY_USE_TWO_PROFILE);
         boxTwoProfile.setEnabled(false);
         boxTwoProfile.setSummary(getActivity().getString(R.string.prefs_use_second_profile_description));
         boxTwoProfile.setDefaultValue(false);
@@ -215,7 +247,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         listSelectLocale.setSummary(getActivity().getString(R.string.prefs_select_locale_description));
         listSelectLocale.setEntries(new String[]{"Русский", "English", "Дореволюцiонный", "Українська"});
         listSelectLocale.setEntryValues(new CharSequence[]{"ru", "en", "cu", "uk"});
-        listSelectLocale.setKey("forced_locale");
+        listSelectLocale.setKey(KEY_FORCED_LOCALE);
 
         categoryUI.addPreference(listSelectLocale);
 
@@ -224,14 +256,13 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         rootScreen.addPreference(categoryFont);
 
-
         final ListPreference listFontFamily = new MaterialListPreference(getActivity());
         listFontFamily.setTitle(R.string.prefs_font_family);
         listFontFamily.setDefaultValue(String.valueOf(TypefaceManager.FontFamily.ROBOTO));
         listFontFamily.setSummary(getResources().getStringArray(R.array.font_family_array)[TypefaceManager.getFontFamily()]);
         listFontFamily.setEntries(getResources().getStringArray(R.array.font_family_array));
         listFontFamily.setEntryValues(new CharSequence[]{"0", "1", "2", "3"});
-        listFontFamily.setKey(TypefaceManager.PREF_KEY_FONT_FAMILY);
+        listFontFamily.setKey(KEY_FONT_FAMILY);
         listFontFamily.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -249,7 +280,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         listTextWeight.setSummary(getResources().getStringArray(R.array.text_weight_array)[TypefaceManager.getTextWeight()]);
         listTextWeight.setEntries(getResources().getStringArray(R.array.text_weight_array));
         listTextWeight.setEntryValues(new CharSequence[]{"0", "1", "2", "3", "4"});
-        listTextWeight.setKey(TypefaceManager.PREF_KEY_TEXT_WEIGHT);
+        listTextWeight.setKey(KEY_TEXT_WEIGHT);
         listTextWeight.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -261,24 +292,15 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         categoryFont.addPreference(listTextWeight);
 
 
-
         PreferenceCategory categoryOnline = new MaterialPreferenceCategory(getActivity());
         categoryOnline.setTitle(getActivity().getString(R.string.prefs_visiblity));
 
         rootScreen.addPreference(categoryOnline);
 
 
-//        CheckBoxPreference boxOnline = new CheckBoxPreference(getActivity());
-//        boxOnline.setTitle(getActivity().getString(R.string.prefs_offline));
-//        boxOnline.setDefaultValue(true);
-//        boxOnline.setKey("offline");
-//        boxOnline.setSummary(getActivity().getString(R.string.prefs_offline_description));
-
-      //  categoryOnline.addPreference(boxOnline);
-
         MaterialListPreference listOnlineStatus = new MaterialListPreference(getActivity());
         listOnlineStatus.setTitle(getActivity().getString(R.string.prefs_online_status));
-        listOnlineStatus.setKey("online_status");
+        listOnlineStatus.setKey(KEY_ONLINE_STATUS);
         listOnlineStatus.setSummary(getActivity().getString(R.string.prefs_online_statu_description));
         listOnlineStatus.setEntries(R.array.online_status_array);
         listOnlineStatus.setEntryValues(new CharSequence[]{"off", "eternal", "phantom"});
@@ -287,7 +309,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
                 String s = (String) o;
-                FileLogger.w("online_status", s);
+                FileLogger.w(KEY_ONLINE_STATUS, s);
                 getActivity().startService(new Intent(getActivity(), EternallOnlineService.class).putExtra("online_status", (String) o));
                 return true;
             }
@@ -298,7 +320,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         CheckBoxPreference boxTyping = new MaterialCheckBoxPreference(getActivity());
         boxTyping.setTitle(getActivity().getString(R.string.prefs_hide_typing));
         boxTyping.setDefaultValue(false);
-        boxTyping.setKey("hide_typing");
+        boxTyping.setKey(KEY_HIDE_TYPING);
         boxTyping.setSummary(getActivity().getString(R.string.prefs_hide_typing_description));
 
         categoryOnline.addPreference(boxTyping);
@@ -312,17 +334,16 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         boxEnableNotification.setTitle(getActivity().getString(R.string.prefs_notification_enable));
         boxEnableNotification.setSummary(getActivity().getString(R.string.prefs_notification_enable_description));
         boxEnableNotification.setDefaultValue(true);
-        boxEnableNotification.setKey("enable_notify");
+        boxEnableNotification.setKey(KEY_ENABLE_NOTIFY);
 
         categoryNotification.addPreference(boxEnableNotification);
-
 
 
         final CheckBoxPreference boxNotificationVibrate = new MaterialCheckBoxPreference(getActivity());
         boxNotificationVibrate.setTitle(getActivity().getString(R.string.prefs_vibration));
         boxNotificationVibrate.setDefaultValue(true);
         boxNotificationVibrate.setEnabled(boxEnableNotification.getSharedPreferences().getBoolean("enable_notify", true));
-        boxNotificationVibrate.setKey("enable_notify_vibrate");
+        boxNotificationVibrate.setKey(KEY_ENABLE_NOTIFY_VIBRATE);
 
         categoryNotification.addPreference(boxNotificationVibrate);
 
@@ -331,7 +352,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         boxNotificationLED.setTitle(getActivity().getString(R.string.prefs_led_indicator));
         boxNotificationLED.setDefaultValue(true);
         boxNotificationLED.setEnabled(boxEnableNotification.getSharedPreferences().getBoolean("enable_notify", true));
-        boxNotificationLED.setKey("enable_notify_led");
+        boxNotificationLED.setKey(KEY_ENABLE_NOTIFY_LED);
 
         categoryNotification.addPreference(boxNotificationLED);
 
@@ -354,16 +375,11 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         CheckBoxPreference boxEnableLog = new MaterialCheckBoxPreference(getActivity());
         boxEnableLog.setTitle(R.string.prefs_enable_log);
         boxEnableLog.setSummary(R.string.prefs_enable_log_description);
-        boxEnableLog.setKey(AppLoader.KEY_WRITE_LOG);
+        boxEnableLog.setKey(KEY_WRITE_LOG);
         boxEnableLog.setDefaultValue(true);
 
         categoryLog.addPreference(boxEnableLog);
 
-//        Preference prefSendLotToDev = new MaterialPreference(getActivity());
-//        prefSendLotToDev.setTitle("Отправить логи разработчикам");
-//        prefSendLotToDev.setSummary("В случае ошибки вы можете отправить нам логи, для дальнейшего исправления");
-//
-//        categoryLog.addPreference(prefSendLotToDev);
 
 
         Preference preferenceCleanUpLog = new MaterialPreference(getActivity());
@@ -379,18 +395,16 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         categoryLog.addPreference(preferenceCleanUpLog);
 
 
-
         PreferenceCategory categoryOther = new MaterialPreferenceCategory(getActivity());
         categoryOther.setTitle(getActivity().getString(R.string.prefs_other));
 
         rootScreen.addPreference(categoryOther);
 
 
-
         CheckBoxPreference boxSendFailedMsg = new MaterialCheckBoxPreference(getActivity());
         boxSendFailedMsg.setTitle(getActivity().getString(R.string.prefa_unstable_connection));
         boxSendFailedMsg.setSummary(getActivity().getString(R.string.prefa_unstable_connection_description));
-        boxSendFailedMsg.setKey("resend_failed_msg");
+        boxSendFailedMsg.setKey(KEY_RESEND_FAILED_MESSAGES);
         boxSendFailedMsg.setDefaultValue(true);
 
         categoryOther.addPreference(boxSendFailedMsg);
@@ -401,9 +415,9 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         listEncrypt.setSummary(R.string.prefs_message_encryption_description);
         listEncrypt.setEntries(new CharSequence[]{"Base64", "HEX", "MD5", "Text to Binary", "3DES", "String.hashCode"});
         listEncrypt.setEntryValues(new CharSequence[]{"base", "hex", "md5", "binary", "3des", "hashCode"});
-        listEncrypt.setKey("encrypt_messages");
+        listEncrypt.setKey(KEY_ENCRYPT_MESSAGES);
         listEncrypt.setDefaultValue("hex");
-      //  listEncrypt.setValueIndex(1);
+        //  listEncrypt.setValueIndex(1);
 
         categoryOther.addPreference(listEncrypt);
 
@@ -413,18 +427,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         rootScreen.addPreference(categoryAbout);
 
-        Preference gitHubPreference = new MaterialPreference(getActivity());
-        gitHubPreference.setTitle("Open Source");
-        gitHubPreference.setSummary("Посмотреть исходный код проекта на GitHub");
-        gitHubPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/EuphoriaDev/Euphoria-VK-Client"));
-                startActivity(browserIntent);
-                return true;
-            }
-        });
-        categoryAbout.addPreference(gitHubPreference);
 
 
         Preference versionScreen = new MaterialPreference(getActivity());
@@ -461,7 +463,18 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         categoryAbout.addPreference(changelogSceen);
 
-
+        Preference gitHubPreference = new MaterialPreference(getActivity());
+        gitHubPreference.setTitle("Open Source");
+        gitHubPreference.setSummary("Посмотреть исходный код проекта на GitHub");
+        gitHubPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/EuphoriaDev/Euphoria-VK-Client"));
+                startActivity(browserIntent);
+                return true;
+            }
+        });
+        categoryAbout.addPreference(gitHubPreference);
 
         Preference groupScreen = new MaterialPreference(getActivity());
         groupScreen.setTitle("TimeVK/Euphoria for Android");
@@ -529,32 +542,13 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     }
 
     private JSONObject loadJsonFromSite(String url) {
-        BufferedReader reader;
-        HttpURLConnection connection;
-        StringBuilder builder;
-        JSONObject result = null;
-
         try {
-            connection = (HttpURLConnection) new java.net.URL(url).openConnection();
-            connection.setUseCaches(false);
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.defaultCharset()));
-            builder = new StringBuilder();
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-
-            connection.disconnect();
-            reader.close();
-
-            result = new JSONObject(builder.toString().trim());
-        } catch (Exception e) {
+            return new JSONObject(new DefaultHttpClient().execute(url).toString());
+        } catch (JSONException e) {
             e.printStackTrace();
         }
-        return result;
+        return null;
     }
-
 
 
     private void checkUpdate() {
@@ -563,6 +557,15 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             public void run() {
                 try {
                     final JSONObject json = loadJsonFromSite("http://timeteam.3dn.ru/timevk_up.txt");
+                    if (json == null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AndroidUtils.showToast(getActivity(), R.string.check_internet, true);
+                            }
+                        });
+                        return;
+                    }
                     if (BuildConfig.VERSION_CODE < json.optInt("version_code")) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override

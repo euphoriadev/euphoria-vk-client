@@ -366,7 +366,7 @@ public class ThemeManager {
     }
 
     /**
-     * Cached themes values
+     * Cached theme values
      */
     private static String sLocale;
     private static String sMessageWallpaperPath;
@@ -424,7 +424,7 @@ public class ThemeManager {
                 ((ViewGroup) decorView).addView(view);
             }
 
-            KeyboardUtil keyboardUtil = new KeyboardUtil(context, context.findViewById(android.R.id.content));
+//            KeyboardUtil keyboardUtil = new KeyboardUtil(context, context.findViewById(android.R.id.content));
         }
     }
 

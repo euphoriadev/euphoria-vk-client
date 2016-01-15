@@ -50,8 +50,8 @@ public class RefreshManager implements SharedPreferences.OnSharedPreferenceChang
      */
     public static void registerForChangePreferences(Refreshable object, String prefKey) {
         RefreshItem item = new RefreshItem(prefKey, object);
-        if (!sRefreshables.equals(item)) {
-            sRefreshables.add(new RefreshItem(prefKey, object));
+        if (!sRefreshables.contains(item)) {
+            sRefreshables.add(item);
         }
     }
 

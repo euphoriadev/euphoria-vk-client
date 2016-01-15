@@ -140,9 +140,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             }
         });
 
-        if (!ThemeManager.isDarkTheme()) {
-            ViewUtil.setFilter(fabSend, Color.BLACK);
-        }
+        ViewUtil.setFilter(fabSend, ThemeManager.getPrimaryTextColorOnAccent(this));
 
         etMessageText.getBackground().setColorFilter(ThemeManager.isDarkTheme() ? Color.parseColor("#424242") : Color.WHITE, PorterDuff.Mode.MULTIPLY);
 

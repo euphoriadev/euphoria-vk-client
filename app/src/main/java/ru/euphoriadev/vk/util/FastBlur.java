@@ -35,7 +35,7 @@ import android.graphics.Bitmap;
 public class FastBlur {
 
     /**
-     * Blur bitmap in ui thread
+     * Blur bitmap
      *
      * @param sentBitmap target image
      * @param radius

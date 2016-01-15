@@ -172,47 +172,6 @@ public class YandexTranslator {
     }
 
 
-//    private JSONObject sendRequest(String url) {
-//        BufferedInputStream is = null;
-//        HttpURLConnection connection = null;
-//        try {
-//            connection = (HttpURLConnection) new URL(url).openConnection();
-////            connection.connect();
-//            connection.setConnectTimeout(30000);
-//            connection.setReadTimeout(30000);
-//            connection.setRequestMethod("GET");
-//            connection.setUseCaches(false);
-//            connection.setDoInput(true);
-//
-//            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-//                // error
-//                return null;
-//            }
-//
-//            is = new BufferedInputStream(connection.getInputStream());
-//            String stream = AndroidUtils.convertStreamToString(is);
-//            if (stream != null) {
-//                Log.i(TAG, stream);
-//                return new JSONObject(stream);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (is != null) {
-//                try {
-//                    is.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            if (connection != null) {
-//                connection.disconnect();
-//                connection = null;
-//            }
-//        }
-//        return null;
-//    }
-
 
     public interface OnCompleteListener {
         /**

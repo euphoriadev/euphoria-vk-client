@@ -11,7 +11,7 @@ import ru.euphoriadev.vk.adapter.MessageItem;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 /**
  * Created by user on 10.06.15.
@@ -23,16 +23,16 @@ public class ForwardMessagesActivity extends BaseThemedActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ThemeManagerOld.get(this).setBasicTheme();
         super.onCreate(savedInstanceState);
 
         lvForwardMessages = new ListView(this);
+        lvForwardMessages.setPadding(0, AndroidUtils.getStatusBarHeight(this), 0, 0);
         lvForwardMessages.setDividerHeight(0);
         setContentView(lvForwardMessages);
 
         api = Api.get();
-
         getForwardMessages();
+
     }
 
     private void getForwardMessages() {

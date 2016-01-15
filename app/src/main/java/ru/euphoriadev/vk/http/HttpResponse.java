@@ -25,7 +25,6 @@ public class HttpResponse {
 
     @Override
     public String toString() {
-        Log.w("HttpTextClient", result.toString());
         return result.toString();
     }
 

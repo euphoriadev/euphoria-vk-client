@@ -146,8 +146,8 @@ public class ProfileActivity extends BaseThemedActivity {
 
     public class AvatarImageBehavior extends CoordinatorLayout.Behavior<CircleImageView> {
 
-        private final static float MIN_AVATAR_PERCENTAGE_SIZE   = 0.3f;
-        private final static int EXTRA_FINAL_AVATAR_PADDING     = 80;
+        private final static float MIN_AVATAR_PERCENTAGE_SIZE = 0.3f;
+        private final static int EXTRA_FINAL_AVATAR_PADDING = 80;
 
         private final static String TAG = "behavior";
         private final Context mContext;
@@ -162,6 +162,7 @@ public class ProfileActivity extends BaseThemedActivity {
         private int finalHeight;
         private int mStartHeight;
         private int mFinalXPosition;
+
         public AvatarImageBehavior(Context context, AttributeSet attrs) {
             mContext = context;
             init();
@@ -190,10 +191,10 @@ public class ProfileActivity extends BaseThemedActivity {
             float expandedPercentageFactor = dependency.getY() / maxScrollDistance;
 
             float distanceYToSubtract = ((mStartYPosition - mFinalYPosition)
-                    * (1f - expandedPercentageFactor)) + (child.getHeight()/2);
+                    * (1f - expandedPercentageFactor)) + (child.getHeight() / 2);
 
             float distanceXToSubtract = ((mStartXPosition - mFinalXPosition)
-                    * (1f - expandedPercentageFactor)) + (child.getWidth()/2);
+                    * (1f - expandedPercentageFactor)) + (child.getWidth() / 2);
 
             float heightToSubtract = ((mStartHeight - finalHeight) * (1f - expandedPercentageFactor));
 
@@ -214,7 +215,7 @@ public class ProfileActivity extends BaseThemedActivity {
                 mStartYPosition = (int) (child.getY() + (child.getHeight() / 2));
 
             if (mFinalYPosition == 0)
-                mFinalYPosition = (dependency.getHeight() /2);
+                mFinalYPosition = (dependency.getHeight() / 2);
 
             if (mStartHeight == 0)
                 mStartHeight = child.getHeight();
@@ -229,7 +230,7 @@ public class ProfileActivity extends BaseThemedActivity {
                 mFinalXPosition = mContext.getResources().getDimensionPixelOffset(R.dimen.abc_action_bar_content_inset_material) + (finalHeight / 2);
 
             if (mStartToolbarPosition == 0)
-                mStartToolbarPosition = dependency.getY() + (dependency.getHeight()/2);
+                mStartToolbarPosition = dependency.getY() + (dependency.getHeight() / 2);
         }
 
         public int getStatusBarHeight() {

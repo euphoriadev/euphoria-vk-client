@@ -6,6 +6,8 @@ import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
+import ru.euphoriadev.vk.PrefsFragment;
+
 /**
  * Created by Igor on 21.12.15.
  * <p/>
@@ -18,8 +20,8 @@ public class TypefaceManager {
     private static final SparseArray<Typeface> sTypefaceCache = new SparseArray<>();
 
     /** Preferences key for fonts */
-    public static final String PREF_KEY_FONT_FAMILY = "font_family";
-    public static final String PREF_KEY_TEXT_WEIGHT = "text_weight";
+    public static final String PREF_KEY_FONT_FAMILY = PrefsFragment.KEY_FONT_FAMILY;
+    public static final String PREF_KEY_TEXT_WEIGHT = PrefsFragment.KEY_TEXT_WEIGHT;
 
     /** Default Roboto fonts */
     public static final String ROBOTO_TINT = "Roboto-Thin.ttf";

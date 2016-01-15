@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ru.euphoriadev.vk.PrefsFragment;
 import ru.euphoriadev.vk.R;
 
 /**
@@ -26,40 +27,12 @@ public class AppLoader extends Application {
     public static final String TAG = "AppLoader";
     public static final String APP_DIR = "Euphoria";
 
-    /** Default font */
-    public static final String SYSTEM_FONT = "Default";
-
-    /** Fonts **/
-    public static final String ROBOTO_LIGHT = "Roboto-Light.ttf";
-    public static final String ROBOTO_REGULAR = "Roboto-Regular.ttf";
-    public static final String DROID_REGULAR = "DroidSans.ttf";
-    public static final String DROID_BOLD = "DroidSans-Bold.ttf";
-
-    /** Preferences key **/
-    public static final String KEY_IS_NIGHT_THEME = "is_night_theme";
-    public static final String KEY_COLOUR_THEME = "colour_theme";
-    public static final String KEY_COLOR_IN_MESSAGES = "color_in_messages";
-    public static final String KEY_COLOR_OUT_MESSAGES = "color_out_messages";
-    public static final String KEY_SHOW_DIVIDER = "show_divider";
-    public static final String KEY_USE_TWO_PROFILE = "use_two_profile";
-    public static final String KEY_FORCED_LOCALE = "forced_locale";
-    public static final String KEY_FONT = "font";
-    public static final String KEY_ONLINE_STATUS = "online_status";
-    public static final String KEY_HIDE_TYPING = "hide_typing";
-    public static final String KEY_ENABLE_NOTIFY = "enable_notify";
-    public static final String KEY_ENABLE_NOTIFY_VIBRATE = "enable_notify_vibrate";
-    public static final String KEY_ENABLE_NOTIFY_LED = "enable_notify_led";
-    public static final String KEY_RFM = "resend_failed_msg";
-    public static final String KEY_ENCRYPT_MESSAGES = "encrypt_messages";
-    public static final String KEY_WRITE_LOG = "write_log";
-    public static final String KEY_MAKING_DRAWER_HEADER = "making_drawer_header";
     public static volatile Context appContext;
     /** Cached important preferences */
     public boolean isDarkTheme;
     public boolean writeLog;
     public String themeName;
     public String forcedLocale;
-    public String fontName;
     public String makingDrawerHeader;
     private SharedPreferences sPrefs;
     private ExecutorService mExecutor;
@@ -98,7 +71,6 @@ public class AppLoader extends Application {
      * @param withLocale true if you want to change language
      */
     public void applyTheme(Activity activity, boolean withLocale, boolean drawingStatusBar) {
-        updatePreferenceColor();
         ThemeManager.applyTheme(activity, drawingStatusBar);
 //        int styleId = 0;
 //        switch (themeName.toUpperCase()) {
@@ -210,17 +182,10 @@ public class AppLoader extends Application {
      * Обновление настроек
      */
     public void updatePreferences() {
-        isDarkTheme = sPrefs.getBoolean(KEY_IS_NIGHT_THEME, true);
-        themeName = sPrefs.getString(KEY_COLOUR_THEME, "Red");
-        forcedLocale = sPrefs.getString(KEY_FORCED_LOCALE, Locale.getDefault().getLanguage());
-        fontName = sPrefs.getString(KEY_FONT, ROBOTO_REGULAR);
-        writeLog = sPrefs.getBoolean(KEY_WRITE_LOG, true);
-        makingDrawerHeader = sPrefs.getString(KEY_MAKING_DRAWER_HEADER, "Default");
-    }
-
-    public void updatePreferenceColor() {
-        isDarkTheme = sPrefs.getBoolean(KEY_IS_NIGHT_THEME, true);
-        themeName = sPrefs.getString(KEY_COLOUR_THEME, "Red");
+        isDarkTheme = sPrefs.getBoolean(PrefsFragment.KEY_IS_NIGHT_MODE, true);
+        forcedLocale = sPrefs.getString(PrefsFragment.KEY_FORCED_LOCALE, Locale.getDefault().getLanguage());
+        writeLog = sPrefs.getBoolean(PrefsFragment.KEY_WRITE_LOG, true);
+        makingDrawerHeader = sPrefs.getString(PrefsFragment.KEY_MAKING_DRAWER_HEADER, "Default");
     }
 
     /**

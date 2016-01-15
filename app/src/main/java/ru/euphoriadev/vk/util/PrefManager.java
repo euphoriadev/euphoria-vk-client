@@ -9,14 +9,21 @@ import android.os.Build;
  * Simple updater of Preferences
  */
 public class PrefManager {
-    /** Default values */
+    /**
+     * Default values
+     */
     public static final String DEFAULT_STRING_VALUE = "";
     public static final int DEFAULT_INT_VALUE = 0;
+    public static final long DEFAULT_LONG_VALUE = 0;
     public static final boolean DEFAULT_BOOLEAN_VALUE = false;
 
-    /** Preferences for all App */
+    /**
+     * Preferences for all App
+     */
     private static final SharedPreferences sPreferences = AppLoader.getLoader().getPreferences();
-    /** Editor for change values of Preference */
+    /**
+     * Editor for change values of Preference
+     */
     private static final SharedPreferences.Editor sEditor = sPreferences.edit();
 
 
@@ -106,6 +113,27 @@ public class PrefManager {
     }
 
     /**
+     * Retrieve an long value from the preferences.
+     *
+     * @param key the name of the preference to retrieve.
+     * @return the preference value if it exists, or defValue.
+     */
+    public static long getLong(String key) {
+        return getLong(key, DEFAULT_LONG_VALUE);
+    }
+
+    /**
+     * Retrieve an long value from the preferences.
+     *
+     * @param key      the name of the preference to retrieve.
+     * @param defValue value to return if this preference does not exist.
+     * @return the preference value if it exists, or defValue.
+     */
+    public static long getLong(String key, long defValue) {
+        return sPreferences.getLong(key, defValue);
+    }
+
+    /**
      * Retrieve a boolean value from the preferences.
      *
      * @param key      the name of the preference to retrieve.
@@ -125,6 +153,16 @@ public class PrefManager {
      */
     public static boolean getBoolean(String key) {
         return getBoolean(key, DEFAULT_BOOLEAN_VALUE);
+    }
+
+    /**
+     * Remove value from the preferences on key and apply
+     *
+     * @param key the name of the preference to remove
+     */
+    public static void remove(String key) {
+        sEditor.remove(key);
+        apply();
     }
 
     /**

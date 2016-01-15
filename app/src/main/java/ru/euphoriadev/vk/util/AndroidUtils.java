@@ -40,6 +40,13 @@ public class AndroidUtils {
         Toast.makeText(c, text, duration).show();
     }
 
+    public static void showToast(Context c, int redId, boolean longLength) {
+        int duration = longLength ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
+        Toast.makeText(c, redId, duration).show();
+    }
+
+
+
     // Нужно добавить строчку в manifest:
     // <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     public static boolean isInternetConnection(Context c) {
@@ -184,7 +191,7 @@ public class AndroidUtils {
 
             //status bar height
             statusBarView.getLayoutParams().height = getStatusBarHeight(activity);
-            statusBarView.setBackgroundColor(ThemeManager.darkenColor(ThemeManager.getThemeColor(activity)));
+            statusBarView.setBackgroundColor(ThemeManager.getThemeColorDark(activity));
         } else {
             statusBarView.setVisibility(View.GONE);
         }

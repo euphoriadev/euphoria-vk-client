@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSeekBar;
+import android.view.ViewGroup;
 import android.widget.SeekBar;
 
+import ru.euphoriadev.vk.PrefsFragment;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
@@ -21,7 +23,7 @@ public class ProgressBarPreference extends MaterialPreference implements Refresh
         super(context);
 
         seekBar = new AppCompatSeekBar(context);
-        RefreshManager.registerForChangePreferences(this, "making_drawer_header");
+        RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
     }
 
     @Override
@@ -55,6 +57,14 @@ public class ProgressBarPreference extends MaterialPreference implements Refresh
                 if (getOnPreferenceChangeListener() != null) {
                     getOnPreferenceChangeListener().onPreferenceChange(ProgressBarPreference.this, seekBar.getProgress());
                 }
+                dialog.dismiss();
+
+            }
+        });
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                ((ViewGroup) seekBar.getParent()).removeAllViews();
             }
         });
 
@@ -81,7 +91,7 @@ public class ProgressBarPreference extends MaterialPreference implements Refresh
 
     @Override
     public void onRefresh(String prefKey) {
-        String value = PrefManager.getString("making_drawer_header");
+        String value = PrefManager.getString(PrefsFragment.KEY_MAKING_DRAWER_HEADER);
         setEnabled(value.equalsIgnoreCase("2"));
     }
 }
