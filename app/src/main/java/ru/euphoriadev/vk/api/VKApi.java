@@ -1,12 +1,14 @@
 package ru.euphoriadev.vk.api;
 
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.TreeMap;
@@ -177,20 +179,163 @@ public class VKApi {
      * http://vk.com/dev/users
      */
     public static class VKUsers {
+
+        /**
+         * http://vk.com/dev/users.get
+         */
+        public VKMethodSetter get() {
+            return new VKMethodSetter(new VKRequest("users.get", new VKParams()));
+        }
+
+        /**
+         * http://vk.com/dev/users.search
+         */
+        public VKMethodSetter search() {
+            return new VKMethodSetter(new VKRequest("users.search", new VKParams()));
+        }
+
+    }
+
+    /**
+     * Method setter for {@link VKRequest}
+     */
+    public static class VKMethodSetter {
         private VKRequest request;
 
-        public VKUsers get() {
-            request = new VKRequest("users.get", new VKParams());
+        /**
+         * Create new VKMethodSetter
+         *
+         * @param request the request which set params
+         */
+        public VKMethodSetter(VKRequest request) {
+            this.request = request;
+        }
+
+        /** Setters for users.get */
+
+        /**
+         * User IDs or screen names (screen_name). By default, current user ID.
+         */
+        public VKMethodSetter userIds(Collection<Integer> uids) {
+            this.request.params.put("user_ids", VKUtil.arrayToString(uids));
             return this;
         }
 
-        public VKUsers userIds(ArrayList<Integer> ids) {
-            request.params.put("user_ids", VKUtil.arrayToString(ids));
+        public VKMethodSetter userId(int userId) {
+            Arrays.asList(new int[]{userId});
             return this;
         }
 
+        /**
+         * Profile fields
+         */
+        public VKMethodSetter fields(String fields) {
+            this.request.params.put("fields", fields);
+            return this;
+        }
+
+        /**
+         * Case for declension of user name and surname:
+         * nom — nominative (default)
+         * gen — genitive
+         * dat — dative
+         * acc — accusative
+         * ins — instrumental
+         * abl — prepositional
+         */
+        public VKMethodSetter nameCase(String nameCase) {
+            this.request.params.put("name_case", nameCase);
+            return this;
+        }
+
+
+        /** Setters for users.search */
+
+        /**
+         * Search query string (e.g., Vasya Babich).
+         */
+        public VKMethodSetter q(String q) {
+            this.request.params.put("q", q);
+            return this;
+        }
+
+        /**
+         * Sort order:
+         * 1 — by date registered
+         * 0 — by rating
+         */
+        public VKMethodSetter sort(int sortOrder) {
+            this.request.params.put("sort", sortOrder);
+            return this;
+        }
+
+        /**
+         * Offset needed to return a specific subset of users
+         */
+        public VKMethodSetter offset(int offset) {
+            this.request.params.put("offset", offset);
+            return this;
+        }
+
+        /**
+         * Number of users to return. Max value 1 000
+         */
+        public VKMethodSetter count(int count) {
+            this.request.params.put("count", count);
+            return this;
+        }
+
+        /**
+         * sex
+         * 1 — female
+         * 2 — male
+         * 0 — any (default
+         */
+        public VKMethodSetter sex(int sex) {
+            this.request.params.put("sex", sex);
+            return this;
+        }
+
+        /**
+         * Relationship status:
+         * 1 — Not married
+         * 2 — In a relationship
+         * 3 — Engaged
+         * 4 — Married
+         * 5 — It's complicated
+         * 6 — Actively searching
+         * 7 — In love
+         */
+        public VKMethodSetter status(int status) {
+            this.request.params.put("status", status);
+            return this;
+        }
+
+        /**
+         * Minimum age
+         */
+        public VKMethodSetter ageFrom(int minAge) {
+            this.request.params.put("age_from", minAge);
+            return this;
+        }
+
+        /**
+         * Maximum age
+         */
+        public VKMethodSetter ageTo(int maxAge) {
+            this.request.params.put("age_to", maxAge);
+            return this;
+        }
+
+        /**
+         * Execute request and convert to {@link String}
+         */
         public String execute() {
-            return request.execute();
+            return this.request.execute();
+        }
+
+        public void execute(VKOnResponseListener listener) {
+            new VKAsyncRequestTask(listener).execute(request);
         }
     }
 
@@ -344,6 +489,38 @@ public class VKApi {
                 buffer.append(',');
             }
             return buffer.toString();
+        }
+    }
+
+    /**
+     * Task for Async execute
+     *
+     * @see AsyncTask
+     * @see VKOnResponseListener
+     */
+    public static class VKAsyncRequestTask extends AsyncTask<VKRequest, Void, String> {
+        private VKOnResponseListener listener;
+
+        public VKAsyncRequestTask(VKOnResponseListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected String doInBackground(VKRequest... params) {
+            return params[0].execute();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            if (listener != null && result != null) {
+                try {
+                    listener.onResponse(new JSONObject(result));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
