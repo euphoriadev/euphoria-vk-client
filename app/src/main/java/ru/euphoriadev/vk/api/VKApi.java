@@ -258,6 +258,12 @@ public class VKApi {
      */
     public static class VKMessages {
 
+        /**
+         * http://vk.com/dev/messages.getDialogs
+         */
+        public VKMethodSetter getDialogs() {
+            return new VKMethodSetter(new VKRequest(("messages.getDialogs"), new VKParams()));
+        }
     }
 
     /**
@@ -575,6 +581,18 @@ public class VKApi {
         }
 
 
+        /** Setters for messages.getDialogs */
+
+        /**
+         * true - to return only conversations which have unread messages
+         * false - returns all messages
+         *
+         * By default is false
+         */
+        public VKMethodSetter unread(boolean unread) {
+            this.request.params.put("unread", unread);
+            return this;
+        }
 
         /**
          * Execute request and convert to {@link String}
@@ -583,6 +601,11 @@ public class VKApi {
             return this.request.execute();
         }
 
+        /**
+         * ASYNC (in new Thread) Execute request and convert to {@link String}
+         * @param listener callback for a successful.
+         *                 Called in main (UI) thread
+         */
         public void execute(VKOnResponseListener listener) {
             new VKAsyncRequestTask(listener).execute(request);
         }
@@ -785,11 +808,11 @@ public class VKApi {
         /** Commons */
         public static final String USER_ID = "user_id";
         public static final String USER_IDS = "user_ids";
+        public static final String OWNER_ID = "owner_id";
         public static final String FIELDS = "fields";
         public static final String SORT = "sort";
         public static final String OFFSET = "offset";
         public static final String COUNT = "count";
-        public static final String OWNER_ID = "owner_id";
 
         /** Auth */
         public static final String VERSION = "v";
@@ -813,7 +836,7 @@ public class VKApi {
         /** Get subscriptions */
         public static final String EXTENDED = "extended";
 
-        /** Search users */
+        /** Search */
         public static final String Q = "q";
         public static final String CITY = "city";
         public static final String COUNTRY = "country";
