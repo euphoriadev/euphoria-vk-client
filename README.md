@@ -7,8 +7,11 @@ Euphoria is app for social network Vkontakte on Android with a focus on speed. W
 - 20 Themes;
 - Encrypter for messages;
 - Mode RFM (Resend Failed Messages);
-- Eternal or phantom online
+- Eternal or phantom online. And offline
+- Not reader messages
+- Hide tipyng user
 - Fast speed of work
+- Statistics messages
 - Completely free
 
 # API, used libraries
