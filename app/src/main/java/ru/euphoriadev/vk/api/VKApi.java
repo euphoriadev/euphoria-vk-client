@@ -23,6 +23,7 @@ import ru.euphoriadev.vk.http.HttpPostRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.view.CircleImageView;
 
 /**
  * Created by Igor on 15.01.16.
@@ -72,13 +73,12 @@ public class VKApi {
         return new VKUsers();
     }
 
+    public static VKMessages messages() {
+        return new VKMessages();
+    }
 
     public static VKMethodSetter createCustom(String methodName) {
         return new VKMethodSetter(new VKRequest(methodName, new VKParams()));
-    }
-
-    public static VKMessages messages() {
-        return new VKMessages();
     }
 
     /**
