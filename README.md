@@ -28,3 +28,4 @@ Also, you can contact us by email: igmorozkin@gmail.com or psyx.off@gmail.com
 Recently the app learned how to write logs on SD. If you experience a crash, please send the logs to us.
 
 
+
