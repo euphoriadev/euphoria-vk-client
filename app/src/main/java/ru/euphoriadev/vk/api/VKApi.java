@@ -194,7 +194,46 @@ public class VKApi {
             return new VKMethodSetter(new VKRequest("users.search", new VKParams()));
         }
 
+        /**
+         * http://vk.com/dev/users.isAppUser
+         */
+        public VKMethodSetter isAppUser() {
+            return new VKMethodSetter(new VKRequest(("users.isAppUser"), new VKParams()));
+        }
+
+        /**
+         * http://vk.com/dev/users.getSubscriptions
+         */
+        public VKMethodSetter getSubscriptions() {
+            return new VKMethodSetter(new VKRequest(("users.getSubscriptions"), new VKParams()));
+        }
+
+        /**
+         * http://vk.com/dev/users.getFollowers
+         */
+        public VKMethodSetter getFollowers() {
+            return new VKMethodSetter(new VKRequest(("users.getFollowers"), new VKParams()));
+        }
+
+        /**
+         * http://vk.com/dev/users.report
+         */
+        public VKMethodSetter report() {
+            return new VKMethodSetter(new VKRequest(("users.report"), new VKParams()));
+        }
+
+        /**
+         * http://vk.com/dev/users.getNearby
+         */
+        public VKMethodSetter getNearby() {
+            return new VKMethodSetter(new VKRequest(("users.getNearby"), new VKParams()));
+        }
+
+
+
     }
+
+
 
     /**
      * Method setter for {@link VKRequest}
@@ -249,7 +288,7 @@ public class VKApi {
         }
 
 
-        /** Setters for users.search */
+        /** Setters for users.search. NOT FULL */
 
         /**
          * Search query string (e.g., Vasya Babich).
@@ -286,7 +325,55 @@ public class VKApi {
         }
 
         /**
-         * sex
+         * City ID
+         */
+        public VKMethodSetter city(int cityId) {
+            this.request.params.put("city", cityId);
+            return this;
+        }
+
+        /**
+         * Country ID
+         */
+        public VKMethodSetter country(int countryId) {
+            this.request.params.put("country", countryId);
+            return this;
+        }
+
+        /**
+         * City name in a string
+         */
+        public VKMethodSetter hometown(int hometown) {
+            this.request.params.put("hometown", hometown);
+            return this;
+        }
+
+        /**
+         * ID of the country where the user graduated
+         */
+        public VKMethodSetter universityCountry(int countryId) {
+            this.request.params.put("university_country", countryId);
+            return this;
+        }
+
+        /**
+         * ID of the institution of higher education
+         */
+        public VKMethodSetter university(int universityId) {
+            this.request.params.put("university", universityId);
+            return this;
+        }
+
+        /**
+         * Year of graduation from an institution of higher education
+         */
+        public VKMethodSetter universityYear(int year) {
+            this.request.params.put("university_year", year);
+            return this;
+        }
+
+        /**
+         * Sex of user
          * 1 — female
          * 2 — male
          * 0 — any (default
@@ -326,6 +413,143 @@ public class VKApi {
             this.request.params.put("age_to", maxAge);
             return this;
         }
+
+        /**
+         * Day of birth
+         */
+        public VKMethodSetter birthDay(int day) {
+            this.request.params.put("birth_day", day);
+            return this;
+        }
+
+        /**
+         * Month of birth
+         */
+        public VKMethodSetter birthMonth(int month) {
+            this.request.params.put("birth_month", month);
+            return this;
+        }
+
+        /**
+         * Year of birth
+         */
+        public VKMethodSetter birthYear(int year) {
+            this.request.params.put("birth_year", year);
+            return this;
+        }
+
+        /**
+         * Online status
+         *
+         * true — online only
+         * false — all users
+         */
+        public VKMethodSetter online(boolean online) {
+            this.request.params.put("online", online);
+            return this;
+        }
+
+        /**
+         * Has photo
+         *
+         * 1 — with photo only
+         * 0 — all users
+         */
+        public VKMethodSetter hasPhoto(boolean hasPhoto) {
+            this.request.params.put("has_photo", hasPhoto);
+            return this;
+        }
+
+
+        /** Setters for users.getSubscriptions */
+
+        /**
+         * false — to return separate lists of users and communities (default)
+         * true — to return a combined list of users and communities
+         */
+        public VKMethodSetter extended(boolean extended) {
+            this.request.params.put("extended", extended);
+            return this;
+        }
+
+        /** Setters for users.report */
+
+        /**
+         * Type of complaint:
+         * porn – pornography
+         * spam – spamming
+         * insult – abusive behavior
+         * advertisment – disruptive advertisements
+         */
+        public VKMethodSetter type(String type) {
+            this.request.params.put("type", type);
+            return this;
+        }
+
+        /**
+         * Comment describing the complaint
+         */
+        public VKMethodSetter comment(String comment) {
+            this.request.params.put("comment", comment);
+            return this;
+        }
+
+
+        /**
+         * Setters for users.report users.getNearby
+         */
+
+        /**
+         * Geographic latitude of the place a user is located,
+         * in degrees (from -90 to 90)
+         */
+        public VKMethodSetter latitude(float latitude) {
+            this.request.params.put("latitude", latitude);
+            return this;
+        }
+
+        /**
+         * Geographic longitude of the place a user is located,
+         * in degrees (from -90 to 90)
+         */
+        public VKMethodSetter longitude(float latitude) {
+            this.request.params.put("latitude", latitude);
+            return this;
+        }
+
+        /**
+         * Current location accuracy in meters
+         */
+        public VKMethodSetter accuracy(int accuracy) {
+            this.request.params.put("accuracy", accuracy);
+            return this;
+        }
+
+        /**
+         * Time when a user disappears from location search results, in seconds
+         * Default 7 200
+         */
+        public VKMethodSetter timeout(int timeout) {
+            this.request.params.put("timeout", timeout);
+            return this;
+        }
+
+        /**
+         * Search zone radius type (1 to 4)
+         * <p/>
+         * 1 – 300 m;
+         * 2 – 2400 m;
+         * 3 – 18 km;
+         * 4 – 150 km.
+         *
+         * By default 1
+         */
+        public VKMethodSetter radius(int radius) {
+            this.request.params.put("radius", radius);
+            return this;
+        }
+
+
 
         /**
          * Execute request and convert to {@link String}
@@ -446,6 +670,14 @@ public class VKApi {
 
         public void put(String paramName, boolean paramValue) {
             put(paramName, paramValue ? "1" : "0");
+        }
+
+        public void put(String paramName, float paramValue) {
+            put(paramName, String.valueOf(paramValue));
+        }
+
+        public void put(String paramName, double paramValue) {
+            put(paramName, String.valueOf(paramValue));
         }
 
         /**
