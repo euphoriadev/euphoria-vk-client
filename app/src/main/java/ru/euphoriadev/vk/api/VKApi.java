@@ -84,7 +84,10 @@ public class VKApi {
         this.mClient = new DefaultHttpClient();
     }
 
-
+    /**
+     * Account it store the necessary data to run the query on behalf of user
+     * such as the token, email, api id and user id
+     */
     public static class VKAccount {
         public static final String ACCESS_TOKEN = "access_token";
         public static final String USER_ID = "user_id";
@@ -183,7 +186,7 @@ public class VKApi {
 
     /**
      * Api methods for users
-     * <p/>
+     *
      * http://vk.com/dev/users
      */
     public static class VKUsers {
@@ -249,8 +252,6 @@ public class VKApi {
     public static class VKMessages {
 
     }
-
-
 
     /**
      * Method setter for {@link VKRequest}
@@ -580,6 +581,9 @@ public class VKApi {
         }
     }
 
+    /**
+     * Class for execution and configuration API-requests
+     */
     public static class VKRequest {
 
         /**
