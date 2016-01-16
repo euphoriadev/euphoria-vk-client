@@ -15,8 +15,10 @@ import java.util.TreeMap;
 
 import ru.euphoriadev.vk.http.DefaultHttpClient;
 import ru.euphoriadev.vk.http.HttpBaseRequest;
+import ru.euphoriadev.vk.http.HttpClient;
 import ru.euphoriadev.vk.http.HttpGetRequest;
 import ru.euphoriadev.vk.http.HttpPostRequest;
+import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.PrefManager;
 
@@ -33,6 +35,7 @@ public class VKApi {
     protected static volatile VKApi sInstante;
 
     private VKAccount mAccount;
+    private HttpClient mClient;
 
     /**
      * Init VKApi to send requests
@@ -67,6 +70,10 @@ public class VKApi {
         return new VKUsers();
     }
 
+    public static VKMessages messages() {
+        return new VKMessages();
+    }
+
     /**
      * Private Constructor, Нou don't have use it
      *
@@ -74,6 +81,7 @@ public class VKApi {
      */
     private VKApi(VKAccount account) {
         this.mAccount = account;
+        this.mClient = new DefaultHttpClient();
     }
 
 
@@ -86,12 +94,12 @@ public class VKApi {
         /**
          * String token for use in request parameters
          */
-        public String accessToken = null;
+        public String accessToken;
 
         /**
          * String current email of user
          */
-        public String email = null;
+        public String email;
 
         /**
          * Current user id for this token
@@ -230,6 +238,15 @@ public class VKApi {
         }
 
 
+
+    }
+
+    /**
+     * Api methods for messages
+     *
+     * http://vk.com/dev/messages
+     */
+    public static class VKMessages {
 
     }
 
@@ -578,7 +595,7 @@ public class VKApi {
         /**
          * Sets current system language as default for API data
          */
-        public boolean useSystemLanguage;
+        public boolean useSystemLanguage = true;
 
         /**
          * Specify listener for current request
@@ -651,7 +668,11 @@ public class VKApi {
                 request = new HttpGetRequest(url);
             }
 
-            return new DefaultHttpClient().execute(request).toString();
+            HttpResponse response = getInstance().mClient.execute(request);
+            if (response != null) {
+                return response.toString();
+            }
+            return null;
         }
     }
 
