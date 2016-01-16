@@ -902,7 +902,7 @@ public class VKApi {
 
     }
 
-        /**
+    /**
      * Task for Async execute
      *
      * @see AsyncTask

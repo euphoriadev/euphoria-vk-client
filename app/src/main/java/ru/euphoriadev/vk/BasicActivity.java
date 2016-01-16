@@ -33,6 +33,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
@@ -124,13 +126,8 @@ public class BasicActivity extends BaseThemedActivity implements
         RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
         startService(new Intent(this, LongPollService.class));
 
-        VKApi.init(VKApi.VKAccount.from(account));
-        VKApi.users().search().q("Pavel Durov").execute(new VKApi.VKOnResponseListener() {
-            @Override
-            public void onResponse(JSONObject responseJson) {
-                Log.w(VKApi.TAG, responseJson.toString());
-            }
-        });
+        VKApi.createCustom("docs.get").count(20).execute();
+
     }
 
     @Override
