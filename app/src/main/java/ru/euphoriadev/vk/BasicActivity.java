@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
-import android.net.MailTo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.internal.NavigationMenuView;
@@ -31,9 +30,9 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
@@ -124,6 +123,14 @@ public class BasicActivity extends BaseThemedActivity implements
         }
         RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
         startService(new Intent(this, LongPollService.class));
+
+        VKApi.init(VKApi.VKAccount.from(account));
+        VKApi.users().search().q("Pavel Durov").execute(new VKApi.VKOnResponseListener() {
+            @Override
+            public void onResponse(JSONObject responseJson) {
+                Log.w(VKApi.TAG, responseJson.toString());
+            }
+        });
     }
 
     @Override

@@ -279,7 +279,7 @@ public class VKApi {
         }
 
         public VKMethodSetter userId(int userId) {
-            Arrays.asList(new int[]{userId});
+            Arrays.asList(new int[] { userId} );
             return this;
         }
 
@@ -736,7 +736,7 @@ public class VKApi {
          * Convert items to {@link String}
          */
         static <T> String arrayToString(Collection<T> items) {
-            if (items == null) {
+            if (isEmpry(items)) {
                 return null;
             }
 
@@ -746,6 +746,16 @@ public class VKApi {
                 buffer.append(',');
             }
             return buffer.toString();
+        }
+
+        /**
+         * Returns true if the collection is null or empty
+         *
+         * @param list the collection to be examined
+         * @return true of list is null or empty
+         */
+        static boolean isEmpry(Collection list) {
+            return list == null || list.isEmpty();
         }
     }
 
@@ -792,6 +802,5 @@ public class VKApi {
          */
         void onResponse(JSONObject responseJson);
     }
-
 
 }
