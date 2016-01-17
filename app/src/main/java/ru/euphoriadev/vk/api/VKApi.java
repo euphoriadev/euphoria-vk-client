@@ -561,7 +561,7 @@ public class VKApi {
          * Current location accuracy in meters
          */
         public VKMethodSetter accuracy(int accuracy) {
-            this.request.params.put(VKConst.ACАCURACY, accuracy);
+            this.request.params.put(VKConst.ACCURACY, accuracy);
             return this;
         }
 
@@ -852,7 +852,7 @@ public class VKApi {
         /** Get nearby users */
         public static final String LATITUDE = "latitude";
         public static final String LONGITUDE = "longitude";
-        public static final String ACАCURACY = "accuracy";
+        public static final String ACCURACY = "accuracy";
         public static final String TIMEOUT = "timeout";
         public static final String RADIUS = "timeout";
 
