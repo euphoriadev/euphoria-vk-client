@@ -74,6 +74,7 @@ public class DefaultHttpClient implements HttpClient {
             return new HttpResponse(request, is, responseCode, connection.getResponseMessage());
         } catch (Exception e) {
             e.printStackTrace();
+
         } finally {
             if (connection != null) {
                 connection.disconnect();

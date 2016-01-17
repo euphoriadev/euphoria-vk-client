@@ -8,11 +8,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.TreeMap;
 
@@ -27,6 +26,7 @@ import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
  * Created by Igor on 15.01.16.
@@ -71,6 +71,16 @@ public class VKApi {
     }
 
     /**
+     * Private constructor, Нou don't have use it
+     *
+     * @see #init(VKAccount)
+     */
+    private VKApi(VKAccount account) {
+        this.mAccount = account;
+        this.mClient = new DefaultHttpClient();
+    }
+
+    /**
      * Get initialized VKApi
      *
      * @return vk api
@@ -102,14 +112,15 @@ public class VKApi {
 
     /**
      * Direct authorization with Official client vk
+     * see http://vk.com/dev/auth_direct
      */
     public static void authorization(String login, String password, final VKOnResponseListener listener) {
         String client_secret = "hHbZxrka2uZ6jB1inYsH";
         String client_id = "2274003";
 
-        String url = "https://oauth.vk.com/token";
+        final String url = "https://oauth.vk.com/token";
 
-        HttpParams params = new HttpParams();
+        final HttpParams params = new HttpParams();
         params.addParam("grant_type", "password");
         params.addParam("client_id", client_id);
         params.addParam("client_secret", client_secret);
@@ -118,14 +129,22 @@ public class VKApi {
         params.addParam("scope", VKScope.getAllPermissions());
         params.addParam("v", API_VERSION);
 
-        getInstance().mClient.execute(new HttpGetRequest(url, params), new HttpClient.OnResponseListener() {
+        ThreadExecutor.execute(new Runnable() {
             @Override
-            public void onResponse(HttpClient client, HttpResponse response) {
-                if (listener != null && response != null) {
-                    try {
-                        listener.onResponse(new JSONObject(response.toString()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            public void run() {
+                HttpResponse response = getInstance().mClient.execute(new HttpGetRequest(url, params));
+                try {
+                    JSONObject json = new JSONObject(response.toString());
+                    VKUtil.checkErrors(url, json);
+                    if (listener != null) {
+                        listener.onResponse(json);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (VKException e) {
+                    e.printStackTrace();
+                    if (listener != null) {
+                        listener.onError(e);
                     }
                 }
             }
@@ -140,15 +159,6 @@ public class VKApi {
         return new VKMethodSetter(new VKRequest(methodName, new VKParams()));
     }
 
-    /**
-     * Private constructor, Нou don't have use it
-     *
-     * @see #init(VKAccount)
-     */
-    private VKApi(VKAccount account) {
-        this.mAccount = account;
-        this.mClient = new DefaultHttpClient();
-    }
 
     /**
      * Account it store the necessary data to run the query on behalf of user
@@ -260,50 +270,50 @@ public class VKApi {
         /**
          * http://vk.com/dev/users.get
          */
-        public VKMethodSetter get() {
-            return new VKMethodSetter(new VKRequest("users.get", new VKParams()));
+        public VKUserMethodSetter get() {
+            return new VKUserMethodSetter(new VKRequest("users.get", new VKParams()));
         }
 
         /**
          * http://vk.com/dev/users.search
          */
-        public VKMethodSetter search() {
-            return new VKMethodSetter(new VKRequest("users.search", new VKParams()));
+        public VKUserSearchMethodSetter search() {
+            return new VKUserSearchMethodSetter(new VKRequest("users.search", new VKParams()));
         }
 
         /**
          * http://vk.com/dev/users.isAppUser
          */
-        public VKMethodSetter isAppUser() {
-            return new VKMethodSetter(new VKRequest(("users.isAppUser"), new VKParams()));
+        public VKUserMethodSetter isAppUser() {
+            return new VKUserMethodSetter(new VKRequest(("users.isAppUser"), new VKParams()));
         }
 
         /**
          * http://vk.com/dev/users.getSubscriptions
          */
-        public VKMethodSetter getSubscriptions() {
-            return new VKMethodSetter(new VKRequest(("users.getSubscriptions"), new VKParams()));
+        public VKUserMethodSetter getSubscriptions() {
+            return new VKUserMethodSetter(new VKRequest(("users.getSubscriptions"), new VKParams()));
         }
 
         /**
          * http://vk.com/dev/users.getFollowers
          */
-        public VKMethodSetter getFollowers() {
-            return new VKMethodSetter(new VKRequest(("users.getFollowers"), new VKParams()));
+        public VKUserMethodSetter getFollowers() {
+            return new VKUserMethodSetter(new VKRequest(("users.getFollowers"), new VKParams()));
         }
 
         /**
          * http://vk.com/dev/users.report
          */
-        public VKMethodSetter report() {
-            return new VKMethodSetter(new VKRequest(("users.report"), new VKParams()));
+        public VKUserMethodSetter report() {
+            return new VKUserMethodSetter(new VKRequest(("users.report"), new VKParams()));
         }
 
         /**
          * http://vk.com/dev/users.getNearby
          */
-        public VKMethodSetter getNearby() {
-            return new VKMethodSetter(new VKRequest(("users.getNearby"), new VKParams()));
+        public VKUserMethodSetter getNearby() {
+            return new VKUserMethodSetter(new VKRequest(("users.getNearby"), new VKParams()));
         }
 
     }
@@ -316,18 +326,25 @@ public class VKApi {
     public static class VKMessages {
 
         /**
+         * http://vk.com/dev/messages.get
+         */
+        public VKMessageMethodSetter get() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.get"), new VKParams()));
+        }
+
+        /**
          * http://vk.com/dev/messages.getDialogs
          */
-        public VKMethodSetter getDialogs() {
-            return new VKMethodSetter(new VKRequest(("messages.getDialogs"), new VKParams()));
+        public VKMessageMethodSetter getDialogs() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getDialogs"), new VKParams()));
         }
     }
 
     /**
-     * Method setter for {@link VKRequest}
+     * Common setters, e.g. fields, user_ids, offset
      */
     public static class VKMethodSetter {
-        private VKRequest request;
+        protected VKRequest request;
 
         /**
          * Create new VKMethodSetter
@@ -338,8 +355,6 @@ public class VKApi {
             this.request = request;
         }
 
-        /** Setters for users.get */
-
         /**
          * User IDs or screen names (screen_name). By default, current user ID.
          */
@@ -348,8 +363,24 @@ public class VKApi {
             return this;
         }
 
+        public VKMethodSetter userIds(int userId) {
+            userIds(Collections.singletonList(userId));
+            return this;
+        }
+
+        /**
+         * User ID. By default, the current user ID
+         */
         public VKMethodSetter userId(int userId) {
-            Arrays.asList(new int[] { userId} );
+            this.request.params.put(VKConst.USER_ID, userId);
+            return this;
+        }
+
+        /**
+         * ID of the user or community, e.g. audios.get
+         */
+        public VKMethodSetter ownerId(int ownerId) {
+            this.request.params.put(VKConst.OWNER_ID, ownerId);
             return this;
         }
 
@@ -362,50 +393,7 @@ public class VKApi {
         }
 
         /**
-         * Case for declension of user name and surname:
-         * nom — nominative (default)
-         * gen — genitive
-         * dat — dative
-         * acc — accusative
-         * ins — instrumental
-         * abl — prepositional
-         */
-        public VKMethodSetter nameCase(String nameCase) {
-            this.request.params.put(VKConst.NAME_CASE, nameCase);
-            return this;
-        }
-
-
-        /** Setters for users.search. NOT FULL */
-
-        /**
-         * Search query string (e.g., Vasya Babich).
-         */
-        public VKMethodSetter q(String q) {
-            this.request.params.put(VKConst.Q, q);
-            return this;
-        }
-
-        /**
-         * Sort order:
-         * 1 — by date registered
-         * 0 — by rating
-         */
-        public VKMethodSetter sort(int sortOrder) {
-            this.request.params.put(VKConst.SORT, sortOrder);
-            return this;
-        }
-
-        /**
-         * Offset needed to return a specific subset of users
-         */
-        public VKMethodSetter offset(int offset) {
-            this.request.params.put(VKConst.OFFSET, offset);
-            return this;
-        }
-
-        /**
-         * Number of users to return. Max value 1 000
+         * Number of users/messages/audios... to return
          */
         public VKMethodSetter count(int count) {
             this.request.params.put(VKConst.COUNT, count);
@@ -413,239 +401,18 @@ public class VKApi {
         }
 
         /**
-         * City ID
+         * Sort order
          */
-        public VKMethodSetter city(int cityId) {
-            this.request.params.put(VKConst.CITY, cityId);
+        public VKMethodSetter sort(int sortOrder) {
+            this.request.params.put(VKConst.SORT, sortOrder);
             return this;
         }
 
         /**
-         * Country ID
+         * Offset needed to return a specific subset
          */
-        public VKMethodSetter country(int countryId) {
-            this.request.params.put(VKConst.COUNTRY, countryId);
-            return this;
-        }
-
-        /**
-         * City name in a string
-         */
-        public VKMethodSetter hometown(int hometown) {
-            this.request.params.put(VKConst.HOMETOWN, hometown);
-            return this;
-        }
-
-        /**
-         * ID of the country where the user graduated
-         */
-        public VKMethodSetter universityCountry(int countryId) {
-            this.request.params.put(VKConst.UNIVERSITY_COUNTRY, countryId);
-            return this;
-        }
-
-        /**
-         * ID of the institution of higher education
-         */
-        public VKMethodSetter university(int universityId) {
-            this.request.params.put(VKConst.UNIVERSITY, universityId);
-            return this;
-        }
-
-        /**
-         * Year of graduation from an institution of higher education
-         */
-        public VKMethodSetter universityYear(int year) {
-            this.request.params.put(VKConst.UNIVERSITY_YEAR, year);
-            return this;
-        }
-
-        /**
-         * Sex of user
-         * 1 — female
-         * 2 — male
-         * 0 — any (default
-         */
-        public VKMethodSetter sex(int sex) {
-            this.request.params.put(VKConst.SEX, sex);
-            return this;
-        }
-
-        /**
-         * Relationship status:
-         * 1 — Not married
-         * 2 — In a relationship
-         * 3 — Engaged
-         * 4 — Married
-         * 5 — It's complicated
-         * 6 — Actively searching
-         * 7 — In love
-         */
-        public VKMethodSetter status(int status) {
-            this.request.params.put(VKConst.STATUS, status);
-            return this;
-        }
-
-        /**
-         * Minimum age
-         */
-        public VKMethodSetter ageFrom(int minAge) {
-            this.request.params.put(VKConst.AGE_FROM, minAge);
-            return this;
-        }
-
-        /**
-         * Maximum age
-         */
-        public VKMethodSetter ageTo(int maxAge) {
-            this.request.params.put(VKConst.AGE_TO, maxAge);
-            return this;
-        }
-
-        /**
-         * Day of birth
-         */
-        public VKMethodSetter birthDay(int day) {
-            this.request.params.put(VKConst.BIRTH_DAY, day);
-            return this;
-        }
-
-        /**
-         * Month of birth
-         */
-        public VKMethodSetter birthMonth(int month) {
-            this.request.params.put(VKConst.BIRTH_MONTH, month);
-            return this;
-        }
-
-        /**
-         * Year of birth
-         */
-        public VKMethodSetter birthYear(int year) {
-            this.request.params.put(VKConst.BIRTH_YEAR, year);
-            return this;
-        }
-
-        /**
-         * Online status
-         * <p/>
-         * true — online only
-         * false — all users
-         */
-        public VKMethodSetter online(boolean online) {
-            this.request.params.put(VKConst.ONLINE, online);
-            return this;
-        }
-
-        /**
-         * Has photo
-         * <p/>
-         * 1 — with photo only
-         * 0 — all users
-         */
-        public VKMethodSetter hasPhoto(boolean hasPhoto) {
-            this.request.params.put(VKConst.HAS_PHOTO, hasPhoto);
-            return this;
-        }
-
-
-        /** Setters for users.getSubscriptions */
-
-        /**
-         * false — to return separate lists of users and communities (default)
-         * true — to return a combined list of users and communities
-         */
-        public VKMethodSetter extended(boolean extended) {
-            this.request.params.put(VKConst.EXTENDED, extended);
-            return this;
-        }
-
-        /** Setters for users.report */
-
-        /**
-         * Type of complaint:
-         * porn – pornography
-         * spam – spamming
-         * insult – abusive behavior
-         * advertisment – disruptive advertisements
-         */
-        public VKMethodSetter type(String type) {
-            this.request.params.put(VKConst.TYPE, type);
-            return this;
-        }
-
-        /**
-         * Comment describing the complaint
-         */
-        public VKMethodSetter comment(String comment) {
-            this.request.params.put(VKConst.COMMENT, comment);
-            return this;
-        }
-
-
-        /** Setters for users.getNearby */
-
-        /**
-         * Geographic latitude of the place a user is located,
-         * in degrees (from -90 to 90)
-         */
-        public VKMethodSetter latitude(float latitude) {
-            this.request.params.put(VKConst.LATITUDE, latitude);
-            return this;
-        }
-
-        /**
-         * Geographic longitude of the place a user is located,
-         * in degrees (from -90 to 90)
-         */
-        public VKMethodSetter longitude(float longitude) {
-            this.request.params.put(VKConst.LONGITUDE, longitude);
-            return this;
-        }
-
-        /**
-         * Current location accuracy in meters
-         */
-        public VKMethodSetter accuracy(int accuracy) {
-            this.request.params.put(VKConst.ACCURACY, accuracy);
-            return this;
-        }
-
-        /**
-         * Time when a user disappears from location search results, in seconds
-         * Default 7 200
-         */
-        public VKMethodSetter timeout(int timeout) {
-            this.request.params.put(VKConst.TIMEOUT, timeout);
-            return this;
-        }
-
-        /**
-         * Search zone radius type (1 to 4)
-         * <p/>
-         * 1 – 300 m;
-         * 2 – 2400 m;
-         * 3 – 18 km;
-         * 4 – 150 km.
-         * <p/>
-         * By default 1
-         */
-        public VKMethodSetter radius(int radius) {
-            this.request.params.put(VKConst.RADIUS, radius);
-            return this;
-        }
-
-
-        /** Setters for messages.getDialogs */
-
-        /**
-         * true - to return only conversations which have unread messages
-         * false - returns all messages
-         * <p/>
-         * By default is false
-         */
-        public VKMethodSetter unread(boolean unread) {
-            this.request.params.put(VKConst.UNREAD, unread);
+        public VKMethodSetter offset(int offset) {
+            this.request.params.put(VKConst.OFFSET, offset);
             return this;
         }
 
@@ -665,7 +432,428 @@ public class VKApi {
         public void execute(VKOnResponseListener listener) {
             new VKAsyncRequestTask(listener).execute(request);
         }
+
     }
+
+    /**
+     * Method setter for users.search
+     */
+    public static class VKUserMethodSetter extends VKMethodSetter {
+
+        /**
+         * Create new VKMethodSetter
+         *
+         * @param request the request which set params
+         */
+        public VKUserMethodSetter(VKRequest request) {
+            super(request);
+        }
+
+        /** Setters for users.get */
+
+        /**
+         * Case for declension of user name and surname:
+         * nom — nominative (default)
+         * gen — genitive
+         * dat — dative
+         * acc — accusative
+         * ins — instrumental
+         * abl — prepositional
+         */
+        public VKUserMethodSetter nameCase(String nameCase) {
+            this.request.params.put(VKConst.NAME_CASE, nameCase);
+            return this;
+        }
+
+
+        /** Setters for users.getSubscriptions */
+
+        /**
+         * false — to return separate lists of users and communities (default)
+         * true — to return a combined list of users and communities
+         */
+        public VKUserMethodSetter extended(boolean extended) {
+            this.request.params.put(VKConst.EXTENDED, extended);
+            return this;
+        }
+
+        /** Setters for users.report */
+
+        /**
+         * Type of complaint:
+         * porn – pornography
+         * spam – spamming
+         * insult – abusive behavior
+         * advertisment – disruptive advertisements
+         */
+        public VKUserMethodSetter type(String type) {
+            this.request.params.put(VKConst.TYPE, type);
+            return this;
+        }
+
+        /**
+         * Comment describing the complaint
+         */
+        public VKUserMethodSetter comment(String comment) {
+            this.request.params.put(VKConst.COMMENT, comment);
+            return this;
+        }
+
+
+        /** Setters for users.getNearby */
+
+        /**
+         * Geographic latitude of the place a user is located,
+         * in degrees (from -90 to 90)
+         */
+        public VKUserMethodSetter latitude(float latitude) {
+            this.request.params.put(VKConst.LATITUDE, latitude);
+            return this;
+        }
+
+        /**
+         * Geographic longitude of the place a user is located,
+         * in degrees (from -90 to 90)
+         */
+        public VKUserMethodSetter longitude(float longitude) {
+            this.request.params.put(VKConst.LONGITUDE, longitude);
+            return this;
+        }
+
+        /**
+         * Current location accuracy in meters
+         */
+        public VKUserMethodSetter accuracy(int accuracy) {
+            this.request.params.put(VKConst.ACCURACY, accuracy);
+            return this;
+        }
+
+        /**
+         * Time when a user disappears from location search results, in seconds
+         * Default 7 200
+         */
+        public VKUserMethodSetter timeout(int timeout) {
+            this.request.params.put(VKConst.TIMEOUT, timeout);
+            return this;
+        }
+
+        /**
+         * Search zone radius type (1 to 4)
+         * <p/>
+         * 1 – 300 m;
+         * 2 – 2400 m;
+         * 3 – 18 km;
+         * 4 – 150 km.
+         * <p/>
+         * By default 1
+         */
+        public VKUserMethodSetter radius(int radius) {
+            this.request.params.put(VKConst.RADIUS, radius);
+            return this;
+        }
+
+    }
+
+    /**
+     * Method setter for {@link VKRequest}
+     */
+    public static class VKUserSearchMethodSetter extends VKUserMethodSetter {
+        /**
+         * Create new VKMethodSetter
+         *
+         * @param request the request which set params
+         */
+        public VKUserSearchMethodSetter(VKRequest request) {
+            super(request);
+        }
+
+        /** Setters for users.search. NOT FULL */
+
+        /**
+         * Search query string (e.g., Vasya Babich).
+         */
+        public VKUserSearchMethodSetter q(String q) {
+            this.request.params.put(VKConst.Q, q);
+            return this;
+        }
+
+        /**
+         * Sort order:
+         * 1 — by date registered
+         * 0 — by rating
+         */
+        public VKUserSearchMethodSetter sort(int sortOrder) {
+            this.request.params.put(VKConst.SORT, sortOrder);
+            return this;
+        }
+
+        /**
+         * Offset needed to return a specific subset of users
+         */
+        public VKUserSearchMethodSetter offset(int offset) {
+            this.request.params.put(VKConst.OFFSET, offset);
+            return this;
+        }
+
+        /**
+         * Number of users to return. Max value 1 000
+         */
+        public VKUserSearchMethodSetter count(int count) {
+            this.request.params.put(VKConst.COUNT, count);
+            return this;
+        }
+
+        /**
+         * City ID
+         */
+        public VKUserSearchMethodSetter city(int cityId) {
+            this.request.params.put(VKConst.CITY, cityId);
+            return this;
+        }
+
+        /**
+         * Country ID
+         */
+        public VKUserSearchMethodSetter country(int countryId) {
+            this.request.params.put(VKConst.COUNTRY, countryId);
+            return this;
+        }
+
+        /**
+         * City name in a string
+         */
+        public VKUserSearchMethodSetter hometown(int hometown) {
+            this.request.params.put(VKConst.HOMETOWN, hometown);
+            return this;
+        }
+
+        /**
+         * ID of the country where the user graduated
+         */
+        public VKUserSearchMethodSetter universityCountry(int countryId) {
+            this.request.params.put(VKConst.UNIVERSITY_COUNTRY, countryId);
+            return this;
+        }
+
+        /**
+         * ID of the institution of higher education
+         */
+        public VKUserSearchMethodSetter university(int universityId) {
+            this.request.params.put(VKConst.UNIVERSITY, universityId);
+            return this;
+        }
+
+        /**
+         * Year of graduation from an institution of higher education
+         */
+        public VKUserSearchMethodSetter universityYear(int year) {
+            this.request.params.put(VKConst.UNIVERSITY_YEAR, year);
+            return this;
+        }
+
+        /**
+         * Sex of user
+         * 1 — female
+         * 2 — male
+         * 0 — any (default
+         */
+        public VKUserSearchMethodSetter sex(int sex) {
+            this.request.params.put(VKConst.SEX, sex);
+            return this;
+        }
+
+        /**
+         * Relationship status:
+         * 1 — Not married
+         * 2 — In a relationship
+         * 3 — Engaged
+         * 4 — Married
+         * 5 — It's complicated
+         * 6 — Actively searching
+         * 7 — In love
+         */
+        public VKUserSearchMethodSetter status(int status) {
+            this.request.params.put(VKConst.STATUS, status);
+            return this;
+        }
+
+        /**
+         * Minimum age
+         */
+        public VKUserSearchMethodSetter ageFrom(int minAge) {
+            this.request.params.put(VKConst.AGE_FROM, minAge);
+            return this;
+        }
+
+        /**
+         * Maximum age
+         */
+        public VKUserSearchMethodSetter ageTo(int maxAge) {
+            this.request.params.put(VKConst.AGE_TO, maxAge);
+            return this;
+        }
+
+        /**
+         * Day of birth
+         */
+        public VKUserSearchMethodSetter birthDay(int day) {
+            this.request.params.put(VKConst.BIRTH_DAY, day);
+            return this;
+        }
+
+        /**
+         * Month of birth
+         */
+        public VKUserSearchMethodSetter birthMonth(int month) {
+            this.request.params.put(VKConst.BIRTH_MONTH, month);
+            return this;
+        }
+
+        /**
+         * Year of birth
+         */
+        public VKUserSearchMethodSetter birthYear(int year) {
+            this.request.params.put(VKConst.BIRTH_YEAR, year);
+            return this;
+        }
+
+        /**
+         * Online status
+         * <p/>
+         * true — online only
+         * false — all users
+         */
+        public VKUserSearchMethodSetter online(boolean online) {
+            this.request.params.put(VKConst.ONLINE, online);
+            return this;
+        }
+
+        /**
+         * Has photo
+         * <p/>
+         * 1 — with photo only
+         * 0 — all users
+         */
+        public VKUserSearchMethodSetter hasPhoto(boolean hasPhoto) {
+            this.request.params.put(VKConst.HAS_PHOTO, hasPhoto);
+            return this;
+        }
+
+    }
+
+    /**
+     * Method setter for messages
+     */
+    public static class VKMessageMethodSetter extends VKMethodSetter {
+
+        /**
+         * Create new VKMethodSetter
+         *
+         * @param request the request which set params
+         */
+        public VKMessageMethodSetter(VKRequest request) {
+            super(request);
+        }
+
+        /** Setters for messages.get */
+
+        /**
+         * false — to return incoming messages (default)
+         * true — to return outgoing messages
+         */
+        public VKMessageMethodSetter out(boolean out) {
+            this.request.params.put(VKConst.COUNT, out);
+            return this;
+        }
+
+        /**
+         * Maximum time since a message was sent, in seconds.
+         * To return messages without a time limitation, set as 0.
+         */
+        public VKMessageMethodSetter timeOffset(int timeOffset) {
+            this.request.params.put(VKConst.TIME_OFFSET, timeOffset);
+            return this;
+        }
+
+        /**
+         * Filter to apply:
+         * 1 — unread only
+         * 2 — not from the chat
+         * 4 — messages from friends
+         * 4 — messages from friends
+         * 8 - important messages
+         * <p/>
+         * If the 4 flag is set, the 1 and 2 flags are not considered
+         */
+        public VKMessageMethodSetter filters(int filters) {
+            this.request.params.put(VKConst.FIELDS, filters);
+            return this;
+        }
+
+        /**
+         * Number of characters after which to truncate a previewed message.
+         * To preview the full message, specify 0.
+         */
+        public VKMessageMethodSetter previewLength(int previewLength) {
+            this.request.params.put(VKConst.PREVIEW_LENGTH, previewLength);
+            return this;
+        }
+
+        /**
+         * ID of the message received before the message,
+         * that will be returned last (provided that no more than count messages
+         * were received before it; otherwise offset parameter shall be used).
+         */
+        public VKMessageMethodSetter lastMessageId(int lastMessageId) {
+            this.request.params.put(VKConst.LAST_MESSAGE_ID, lastMessageId);
+            return this;
+        }
+
+
+        /** Setters for messages.getDialogs */
+
+        /**
+         * true - to return only conversations which have unread messages
+         * false - returns all messages
+         * <p/>
+         * By default is false
+         */
+        public VKMessageMethodSetter unread(boolean unread) {
+            this.request.params.put(VKConst.UNREAD, unread);
+            return this;
+        }
+
+        /** Setters for messages.getById */
+
+        /**
+         * Message IDs
+         */
+        public VKMessageMethodSetter messageIds(ArrayList<Integer> ids) {
+            this.request.params.put(VKConst.MESSAGE_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * Message IDs
+         */
+        public VKMessageMethodSetter messageIds(int... ids) {
+            this.request.params.put(VKConst.MESSAGE_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /** Setters for messages.search */
+
+        /**
+         * Search query string
+         */
+        public VKMessageMethodSetter q(String query) {
+            this.request.params.put(VKConst.Q, query);
+            return this;
+        }
+
+
+    }
+
 
     /**
      * Class for execution and configuration API-requests
@@ -838,6 +1026,20 @@ public class VKApi {
             return buffer.toString();
         }
 
+        @SafeVarargs
+        static <T> String arrayToString(T... array) {
+            if (array.length == 0) {
+                return null;
+            }
+
+            StringBuilder buffer = new StringBuilder(32);
+            for (Object item : array) {
+                buffer.append(item);
+                buffer.append(',');
+            }
+            return buffer.toString();
+        }
+
         /**
          * Returns true if the collection is null or empty
          *
@@ -932,6 +1134,7 @@ public class VKApi {
         public static final String NAME_CASE = "name_case";
 
         /** Messages */
+        public static final String MESSAGE_IDS = "message_ids";
         public static final String OUT = "out";
         public static final String TIME_OFFSET = "time_offset";
         public static final String FILTERS = "filters";
