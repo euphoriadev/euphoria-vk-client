@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
@@ -1106,6 +1107,66 @@ public class VKApi {
         public static final int ALBUM_IS_FULL = 300;
         public static final int ACTION_DENIED = 500;
 
+    }
+
+    /**
+     * Scope constants used for authorization, see http://vk.com/dev/permissions
+     */
+    public static class VKScope {
+        public static final String NOTIFY = "notify";
+        public static final String FRIENDS = "friends";
+        public static final String PHOTOS = "photos";
+        public static final String AUDIO = "audio";
+        public static final String VIDEO = "video";
+        public static final String DOCS = "docs";
+        public static final String NOTES = "notes";
+        public static final String PAGES = "pages";
+        public static final String STATUS = "status";
+        public static final String WALL = "wall";
+        public static final String GROUPS = "groups";
+        public static final String MESSAGES = "messages";
+        public static final String NOTIFICATIONS = "notifications";
+        public static final String STATS = "stats";
+        public static final String ADS = "ads";
+        public static final String OFFLINE = "offline";
+        public static final String EMAIL = "email";
+        public static final String NOHTTPS = "nohttps";
+        public static final String DIRECT = "direct";
+
+        /**
+         * Converts integer value of permissions into {@link ArrayList} of constants
+         *
+         * @param permissionsValue integer permissions value
+         * @return ArrayList contains string constants of permissions (scope)
+         */
+        public static ArrayList<String> parseVkPermissionsFromInteger(int permissionsValue) {
+            ArrayList<String> res = new ArrayList<String>();
+            if ((permissionsValue & 1) > 0) res.add(NOTIFY);
+            if ((permissionsValue & 2) > 0) res.add(FRIENDS);
+            if ((permissionsValue & 4) > 0) res.add(PHOTOS);
+            if ((permissionsValue & 8) > 0) res.add(AUDIO);
+            if ((permissionsValue & 16) > 0) res.add(VIDEO);
+            if ((permissionsValue & 128) > 0) res.add(PAGES);
+            if ((permissionsValue & 1024) > 0) res.add(STATUS);
+            if ((permissionsValue & 2048) > 0) res.add(NOTES);
+            if ((permissionsValue & 4096) > 0) res.add(MESSAGES);
+            if ((permissionsValue & 8192) > 0) res.add(WALL);
+            if ((permissionsValue & 32768) > 0) res.add(ADS);
+            if ((permissionsValue & 65536) > 0) res.add(OFFLINE);
+            if ((permissionsValue & 131072) > 0) res.add(DOCS);
+            if ((permissionsValue & 262144) > 0) res.add(GROUPS);
+            if ((permissionsValue & 524288) > 0) res.add(NOTIFICATIONS);
+            if ((permissionsValue & 1048576) > 0) res.add(STATS);
+            if ((permissionsValue & 4194304) > 0) res.add(EMAIL);
+            return res;
+        }
+
+        /**
+         * Gets permissions as String
+         */
+        public static String getAllPermissions() {
+            return "notify, friends, photos, audio, video, docs, notes, pages, status, wall, groups, messages, notifications, email, offline";
+        }
     }
 
     /**
