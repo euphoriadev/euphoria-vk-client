@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import ru.euphoriadev.vk.http.DefaultHttpClient;
 import ru.euphoriadev.vk.http.HttpBaseRequest;
 import ru.euphoriadev.vk.http.HttpClient;
 import ru.euphoriadev.vk.http.HttpGetRequest;
+import ru.euphoriadev.vk.http.HttpParams;
 import ru.euphoriadev.vk.http.HttpPostRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.util.Account;
@@ -98,6 +100,37 @@ public class VKApi {
         return new VKMessages();
     }
 
+    /**
+     * Direct authorization with Official client vk
+     */
+    public static void authorization(String login, String password, final VKOnResponseListener listener) {
+        String client_secret = "hHbZxrka2uZ6jB1inYsH";
+        String client_id = "2274003";
+
+        String url = "https://oauth.vk.com/token";
+
+        HttpParams params = new HttpParams();
+        params.addParam("grant_type", "password");
+        params.addParam("client_id", client_id);
+        params.addParam("client_secret", client_secret);
+        params.addParam("username", login);
+        params.addParam("password", password);
+        params.addParam("scope", VKScope.getAllPermissions());
+        params.addParam("v", API_VERSION);
+
+        getInstance().mClient.execute(new HttpGetRequest(url, params), new HttpClient.OnResponseListener() {
+            @Override
+            public void onResponse(HttpClient client, HttpResponse response) {
+                if (listener != null && response != null) {
+                    try {
+                        listener.onResponse(new JSONObject(response.toString()));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
     /**
      * Create custom method setter with method name
      *
@@ -826,10 +859,12 @@ public class VKApi {
                 int errorCode = errorJson.optInt("error_cde");
 
                 VKException exception = new VKException(url, errorMessage, errorCode);
+                // Captcha needed
                 if (errorCode == 14) {
                     exception.captchaSid = errorJson.optString("captcha_sid");
                     exception.captchaImg = errorJson.optString("captcha_img");
                 }
+                // Validation required
                 if (errorCode == 17) {
                     exception.redirectUri = errorJson.optString("redirect_uri");
                 }
@@ -1072,6 +1107,7 @@ public class VKApi {
     }
 
     /**
+     * Numeric status codes of errors
      * See website http://vk.com/dev/errors
      */
     public static class VKErrorCodes {
@@ -1162,7 +1198,7 @@ public class VKApi {
         }
 
         /**
-         * Gets permissions as String
+         * Gets all permissions as String
          */
         public static String getAllPermissions() {
             return "notify, friends, photos, audio, video, docs, notes, pages, status, wall, groups, messages, notifications, email, offline";
