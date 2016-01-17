@@ -23,13 +23,26 @@ import ru.euphoriadev.vk.http.HttpPostRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.PrefManager;
-import ru.euphoriadev.vk.view.CircleImageView;
 
 /**
  * Created by Igor on 15.01.16.
  * <p/>
  * Simple VK Library for execute request
+ * <p/>
+ *
+ * Example to init api and execute users.get request:
+ * <pre>
+ *      VKApi.init(VKApi.VKAccount.from(account));
+ *      String response = VKApi.users()
+ *               .get()
+ *               .userId(1)
+ *               .fields("photo_50, nickname")
+ *               .execute();
+ *
+ *      // return users in json object
+ * </pre>
  */
+
 public class VKApi {
     public static final String TAG = "Euphoria.VKApi";
     public static final String BASE_URL = "https://api.vk.com/method/";
@@ -193,7 +206,7 @@ public class VKApi {
 
     /**
      * Api methods for users
-     *
+     * <p/>
      * http://vk.com/dev/users
      */
     public static class VKUsers {
@@ -247,13 +260,11 @@ public class VKApi {
             return new VKMethodSetter(new VKRequest(("users.getNearby"), new VKParams()));
         }
 
-
-
     }
 
     /**
      * Api methods for messages
-     *
+     * <p/>
      * http://vk.com/dev/messages
      */
     public static class VKMessages {
@@ -287,7 +298,7 @@ public class VKApi {
          * User IDs or screen names (screen_name). By default, current user ID.
          */
         public VKMethodSetter userIds(Collection<Integer> uids) {
-            this.request.params.put("user_ids", VKUtil.arrayToString(uids));
+            this.request.params.put(VKConst.USER_IDS, VKUtil.arrayToString(uids));
             return this;
         }
 
@@ -300,7 +311,7 @@ public class VKApi {
          * Profile fields
          */
         public VKMethodSetter fields(String fields) {
-            this.request.params.put("fields", fields);
+            this.request.params.put(VKConst.FIELDS, fields);
             return this;
         }
 
@@ -314,7 +325,7 @@ public class VKApi {
          * abl — prepositional
          */
         public VKMethodSetter nameCase(String nameCase) {
-            this.request.params.put("name_case", nameCase);
+            this.request.params.put(VKConst.NAME_CASE, nameCase);
             return this;
         }
 
@@ -325,7 +336,7 @@ public class VKApi {
          * Search query string (e.g., Vasya Babich).
          */
         public VKMethodSetter q(String q) {
-            this.request.params.put("q", q);
+            this.request.params.put(VKConst.Q, q);
             return this;
         }
 
@@ -335,7 +346,7 @@ public class VKApi {
          * 0 — by rating
          */
         public VKMethodSetter sort(int sortOrder) {
-            this.request.params.put("sort", sortOrder);
+            this.request.params.put(VKConst.SORT, sortOrder);
             return this;
         }
 
@@ -343,7 +354,7 @@ public class VKApi {
          * Offset needed to return a specific subset of users
          */
         public VKMethodSetter offset(int offset) {
-            this.request.params.put("offset", offset);
+            this.request.params.put(VKConst.OFFSET, offset);
             return this;
         }
 
@@ -351,7 +362,7 @@ public class VKApi {
          * Number of users to return. Max value 1 000
          */
         public VKMethodSetter count(int count) {
-            this.request.params.put("count", count);
+            this.request.params.put(VKConst.COUNT, count);
             return this;
         }
 
@@ -359,7 +370,7 @@ public class VKApi {
          * City ID
          */
         public VKMethodSetter city(int cityId) {
-            this.request.params.put("city", cityId);
+            this.request.params.put(VKConst.CITY, cityId);
             return this;
         }
 
@@ -367,7 +378,7 @@ public class VKApi {
          * Country ID
          */
         public VKMethodSetter country(int countryId) {
-            this.request.params.put("country", countryId);
+            this.request.params.put(VKConst.COUNTRY, countryId);
             return this;
         }
 
@@ -375,7 +386,7 @@ public class VKApi {
          * City name in a string
          */
         public VKMethodSetter hometown(int hometown) {
-            this.request.params.put("hometown", hometown);
+            this.request.params.put(VKConst.HOMETOWN, hometown);
             return this;
         }
 
@@ -383,7 +394,7 @@ public class VKApi {
          * ID of the country where the user graduated
          */
         public VKMethodSetter universityCountry(int countryId) {
-            this.request.params.put("university_country", countryId);
+            this.request.params.put(VKConst.UNIVERSITY_COUNTRY, countryId);
             return this;
         }
 
@@ -391,7 +402,7 @@ public class VKApi {
          * ID of the institution of higher education
          */
         public VKMethodSetter university(int universityId) {
-            this.request.params.put("university", universityId);
+            this.request.params.put(VKConst.UNIVERSITY, universityId);
             return this;
         }
 
@@ -399,7 +410,7 @@ public class VKApi {
          * Year of graduation from an institution of higher education
          */
         public VKMethodSetter universityYear(int year) {
-            this.request.params.put("university_year", year);
+            this.request.params.put(VKConst.UNIVERSITY_YEAR, year);
             return this;
         }
 
@@ -410,7 +421,7 @@ public class VKApi {
          * 0 — any (default
          */
         public VKMethodSetter sex(int sex) {
-            this.request.params.put("sex", sex);
+            this.request.params.put(VKConst.SEX, sex);
             return this;
         }
 
@@ -425,7 +436,7 @@ public class VKApi {
          * 7 — In love
          */
         public VKMethodSetter status(int status) {
-            this.request.params.put("status", status);
+            this.request.params.put(VKConst.STATUS, status);
             return this;
         }
 
@@ -433,7 +444,7 @@ public class VKApi {
          * Minimum age
          */
         public VKMethodSetter ageFrom(int minAge) {
-            this.request.params.put("age_from", minAge);
+            this.request.params.put(VKConst.AGE_FROM, minAge);
             return this;
         }
 
@@ -441,7 +452,7 @@ public class VKApi {
          * Maximum age
          */
         public VKMethodSetter ageTo(int maxAge) {
-            this.request.params.put("age_to", maxAge);
+            this.request.params.put(VKConst.AGE_TO, maxAge);
             return this;
         }
 
@@ -449,7 +460,7 @@ public class VKApi {
          * Day of birth
          */
         public VKMethodSetter birthDay(int day) {
-            this.request.params.put("birth_day", day);
+            this.request.params.put(VKConst.BIRTH_DAY, day);
             return this;
         }
 
@@ -457,7 +468,7 @@ public class VKApi {
          * Month of birth
          */
         public VKMethodSetter birthMonth(int month) {
-            this.request.params.put("birth_month", month);
+            this.request.params.put(VKConst.BIRTH_MONTH, month);
             return this;
         }
 
@@ -465,29 +476,29 @@ public class VKApi {
          * Year of birth
          */
         public VKMethodSetter birthYear(int year) {
-            this.request.params.put("birth_year", year);
+            this.request.params.put(VKConst.BIRTH_YEAR, year);
             return this;
         }
 
         /**
          * Online status
-         *
+         * <p/>
          * true — online only
          * false — all users
          */
         public VKMethodSetter online(boolean online) {
-            this.request.params.put("online", online);
+            this.request.params.put(VKConst.ONLINE, online);
             return this;
         }
 
         /**
          * Has photo
-         *
+         * <p/>
          * 1 — with photo only
          * 0 — all users
          */
         public VKMethodSetter hasPhoto(boolean hasPhoto) {
-            this.request.params.put("has_photo", hasPhoto);
+            this.request.params.put(VKConst.HAS_PHOTO, hasPhoto);
             return this;
         }
 
@@ -499,7 +510,7 @@ public class VKApi {
          * true — to return a combined list of users and communities
          */
         public VKMethodSetter extended(boolean extended) {
-            this.request.params.put("extended", extended);
+            this.request.params.put(VKConst.EXTENDED, extended);
             return this;
         }
 
@@ -513,7 +524,7 @@ public class VKApi {
          * advertisment – disruptive advertisements
          */
         public VKMethodSetter type(String type) {
-            this.request.params.put("type", type);
+            this.request.params.put(VKConst.TYPE, type);
             return this;
         }
 
@@ -521,21 +532,19 @@ public class VKApi {
          * Comment describing the complaint
          */
         public VKMethodSetter comment(String comment) {
-            this.request.params.put("comment", comment);
+            this.request.params.put(VKConst.COMMENT, comment);
             return this;
         }
 
 
-        /**
-         * Setters for users.report users.getNearby
-         */
+        /** Setters for users.getNearby */
 
         /**
          * Geographic latitude of the place a user is located,
          * in degrees (from -90 to 90)
          */
         public VKMethodSetter latitude(float latitude) {
-            this.request.params.put("latitude", latitude);
+            this.request.params.put(VKConst.LATITUDE, latitude);
             return this;
         }
 
@@ -543,8 +552,8 @@ public class VKApi {
          * Geographic longitude of the place a user is located,
          * in degrees (from -90 to 90)
          */
-        public VKMethodSetter longitude(float latitude) {
-            this.request.params.put("latitude", latitude);
+        public VKMethodSetter longitude(float longitude) {
+            this.request.params.put(VKConst.LONGITUDE, longitude);
             return this;
         }
 
@@ -552,7 +561,7 @@ public class VKApi {
          * Current location accuracy in meters
          */
         public VKMethodSetter accuracy(int accuracy) {
-            this.request.params.put("accuracy", accuracy);
+            this.request.params.put(VKConst.ACАCURACY, accuracy);
             return this;
         }
 
@@ -561,7 +570,7 @@ public class VKApi {
          * Default 7 200
          */
         public VKMethodSetter timeout(int timeout) {
-            this.request.params.put("timeout", timeout);
+            this.request.params.put(VKConst.TIMEOUT, timeout);
             return this;
         }
 
@@ -572,11 +581,11 @@ public class VKApi {
          * 2 – 2400 m;
          * 3 – 18 km;
          * 4 – 150 km.
-         *
+         * <p/>
          * By default 1
          */
         public VKMethodSetter radius(int radius) {
-            this.request.params.put("radius", radius);
+            this.request.params.put(VKConst.RADIUS, radius);
             return this;
         }
 
@@ -586,11 +595,11 @@ public class VKApi {
         /**
          * true - to return only conversations which have unread messages
          * false - returns all messages
-         *
+         * <p/>
          * By default is false
          */
         public VKMethodSetter unread(boolean unread) {
-            this.request.params.put("unread", unread);
+            this.request.params.put(VKConst.UNREAD, unread);
             return this;
         }
 
@@ -603,6 +612,7 @@ public class VKApi {
 
         /**
          * ASYNC (in new Thread) Execute request and convert to {@link String}
+         *
          * @param listener callback for a successful.
          *                 Called in main (UI) thread
          */
@@ -798,13 +808,12 @@ public class VKApi {
             return VKUser.parseUsers(jsonUsers);
         }
 
-
     }
 
     /**
      * Constants for api. List is not full
      */
-    public class VKApiConst {
+    public class VKConst {
         /** Commons */
         public static final String USER_ID = "user_id";
         public static final String USER_IDS = "user_ids";
@@ -835,6 +844,17 @@ public class VKApi {
 
         /** Get subscriptions */
         public static final String EXTENDED = "extended";
+
+        /** Report users */
+        public static final String TYPE = "type";
+        public static final String COMMENT = "comment";
+
+        /** Get nearby users */
+        public static final String LATITUDE = "latitude";
+        public static final String LONGITUDE = "longitude";
+        public static final String ACАCURACY = "accuracy";
+        public static final String TIMEOUT = "timeout";
+        public static final String RADIUS = "timeout";
 
         /** Search */
         public static final String Q = "q";
@@ -897,7 +917,9 @@ public class VKApi {
         public static final String FEED_TYPE = "feed_type";
         public static final String FEED = "feed";
 
-        /** Videos */
+        /**
+         * Videos
+         */
         public static final String ADULT = "adult";
 
     }
