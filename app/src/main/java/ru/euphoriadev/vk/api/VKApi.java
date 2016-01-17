@@ -22,6 +22,7 @@ import ru.euphoriadev.vk.http.HttpGetRequest;
 import ru.euphoriadev.vk.http.HttpPostRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.util.Account;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.PrefManager;
 
 /**
@@ -82,20 +83,31 @@ public class VKApi {
         return mAccount;
     }
 
+    /**
+     * Methods for users
+     */
     public static VKUsers users() {
         return new VKUsers();
     }
 
+    /**
+     * Methods for messages
+     */
     public static VKMessages messages() {
         return new VKMessages();
     }
 
+    /**
+     * Create custom method setter with method name
+     *
+     * @param methodName the name of method e.g. docs.get, audio.getById
+     */
     public static VKMethodSetter createCustom(String methodName) {
         return new VKMethodSetter(new VKRequest(methodName, new VKParams()));
     }
 
     /**
-     * Private Constructor, Нou don't have use it
+     * Private constructor, Нou don't have use it
      *
      * @see #init(VKAccount)
      */
@@ -604,9 +616,9 @@ public class VKApi {
         }
 
         /**
-         * Execute request and convert to {@link String}
+         * Execute request and convert to {@link JSONObject}
          */
-        public String execute() {
+        public JSONObject execute() {
             return this.request.execute();
         }
 
@@ -702,7 +714,7 @@ public class VKApi {
             return BASE_URL + methodName + "?" + args;
         }
 
-        public String execute() {
+        public JSONObject execute() {
             String url = getSignedUrl();
             HttpBaseRequest request;
 
@@ -714,7 +726,11 @@ public class VKApi {
 
             HttpResponse response = getInstance().mClient.execute(request);
             if (response != null) {
-                return response.toString();
+                try {
+                    return new JSONObject(response.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             return null;
         }
@@ -776,7 +792,7 @@ public class VKApi {
          * Convert items to {@link String}
          */
         static <T> String arrayToString(Collection<T> items) {
-            if (isEmpry(items)) {
+            if (isEmpty(items)) {
                 return null;
             }
 
@@ -794,9 +810,55 @@ public class VKApi {
          * @param list the collection to be examined
          * @return true of list is null or empty
          */
-        static boolean isEmpry(Collection list) {
+        static boolean isEmpty(Collection list) {
             return list == null || list.isEmpty();
         }
+
+        public static void checkErrors(String url, JSONObject source) throws VKException {
+            if (source == null) {
+                return;
+            }
+
+            if (source.has("error")) {
+                JSONObject errorJson = source.optJSONObject("error");
+                String errorMessage = errorJson.optString("error_msg");
+                int errorCode = errorJson.optInt("error_cde");
+
+                VKException exception = new VKException(url, errorMessage, errorCode);
+                if (errorCode == 14) {
+                    exception.captchaSid = errorJson.optString("captcha_sid");
+                    exception.captchaImg = errorJson.optString("captcha_img");
+                }
+                if (errorCode == 17) {
+                    exception.redirectUri = errorJson.optString("redirect_uri");
+                }
+
+                throw exception;
+            }
+            // probably, if use execute method, http://vk.com/dev/execute
+            if (source.has("execute_errors")) {
+                JSONArray errorsArray = source.optJSONArray("execute_errors");
+                if (errorsArray.length() <= 0) {
+                    return;
+                }
+
+                // only first error is processed if there are multiple
+                JSONObject errorJson = errorsArray.optJSONObject(0);
+                String errorMessage = errorJson.optString("error_msg");
+                int errorCode = errorJson.optInt("error_code");
+
+                VKException exception = new VKException(url, errorMessage, errorCode);
+                if (errorCode == 14) {
+                    exception.captchaSid = errorJson.optString("captcha_sid");
+                    exception.captchaImg = errorJson.optString("captcha_img");
+                }
+                if (errorCode == 17) {
+                    exception.redirectUri = errorJson.optString("redirect_uri");
+                }
+                throw exception;
+            }
+        }
+
     }
 
     /**
@@ -917,9 +979,7 @@ public class VKApi {
         public static final String FEED_TYPE = "feed_type";
         public static final String FEED = "feed";
 
-        /**
-         * Videos
-         */
+        /** Videos */
         public static final String ADULT = "adult";
 
     }
@@ -930,7 +990,7 @@ public class VKApi {
      * @see AsyncTask
      * @see VKOnResponseListener
      */
-    public static class VKAsyncRequestTask extends AsyncTask<VKRequest, Void, String> {
+    public static class VKAsyncRequestTask extends AsyncTask<VKRequest, Void, JSONObject> {
         private VKOnResponseListener listener;
 
         public VKAsyncRequestTask(VKOnResponseListener listener) {
@@ -938,22 +998,114 @@ public class VKApi {
         }
 
         @Override
-        protected String doInBackground(VKRequest... params) {
-            return params[0].execute();
+        protected JSONObject doInBackground(final VKRequest... params) {
+            final JSONObject response = params[0].execute();
+            checkError(params[0], response);
+            return response;
+        }
+
+        private void checkError(final VKRequest request, final JSONObject json) {
+            AndroidUtils.runOnUi(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        VKUtil.checkErrors(request.getSignedUrl(), json);
+                    } catch (VKException e) {
+                        e.printStackTrace();
+
+                        if (listener != null) {
+                            listener.onError(e);
+                        }
+                    }
+                }
+            });
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(JSONObject result) {
             super.onPostExecute(result);
 
             if (listener != null && result != null) {
-                try {
-                    listener.onResponse(new JSONObject(result));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                listener.onResponse(result);
             }
         }
+    }
+
+    /**
+     * Thrown when server vk could not handle the request
+     * see website to get description of error codes: http://vk.com/dev/errors
+     */
+    public static class VKException extends Exception {
+        public String url;
+        public String errorMessage;
+        public int errorCode;
+
+        /**
+         * Captcha ID,
+         * see http://vk.com/dev/captcha_error */
+        public String captchaSid;
+        /**
+         * Link to image, you want to show the user,
+         * that he typed text from this image
+         *
+         * see http://vk.com/dev/captcha_error
+         */
+        public String captchaImg;
+
+        /**
+         * In some cases, Vkontakte requires passing a validation procedure of the user,
+         * resulting in since version 5.0 API
+         * (for older versions will be prompted captcha_error)
+         * any request to API the following error is returned
+         *
+         * see http://vk.com/dev/need_validation
+         */
+        public String redirectUri;
+
+        public VKException(String url, String errorMessage, int errorCode) {
+            super(errorMessage);
+            this.url = url;
+            this.errorMessage = errorMessage;
+            this.errorCode = errorCode;
+        }
+    }
+
+    /**
+     * See website http://vk.com/dev/errors
+     */
+    public static class VKErrorCodes {
+        private VKErrorCodes() {
+            // empty
+        }
+
+        public static final int UNKNOWN_ERROR = 1;
+        public static final int APP_OFF = 2;
+        public static final int UNKNOWN_METHOD = 3;
+        public static final int INVALID_SIGNATURE = 4;
+        public static final int USER_AUTHORIZATION_FAILED = 5;
+        public static final int TOO_MANY_REQUESTS_PER_SECOND = 6;
+        public static final int NO_RIGHTS = 7;
+        public static final int BAD_REQUEST = 8;
+        public static final int TOO_MANY_SIMILAR_ACTIONS = 9;
+        public static final int INTERNAL_SERVER_ERROR = 10;
+        public static final int CAPTCHA_NEEDED = 14;
+        public static final int ACCESS_DENIED = 15;
+        public static final int REQUIRES_REQUESTS_OVER_HTTPS = 16;
+        public static final int VALIDATION_REQUIRED = 17;
+        public static final int ACTION_PROHIBITED = 20;
+        public static final int ACTION_ALLOWED_ONLY_FOR_STANDALONE = 21;
+        public static final int METHOD_OFF = 23;
+        public static final int CONFIRMATION_REQUIRED = 24;
+        public static final int PARAMETER_IS_NOT_SPECIFIED = 100;
+        public static final int INCORRECT_APP_ID = 101;
+        public static final int INCORRECT_USER_ID = 113;
+        public static final int INCORRECT_TIMESTAMP = 150;
+        public static final int ACCESS_TO_ALBUM_DENIED = 200;
+        public static final int ACCESS_TO_AUDIO_DENIED = 201;
+        public static final int ACCESS_TO_GROUP_DENIED = 203;
+        public static final int ALBUM_IS_FULL = 300;
+        public static final int ACTION_DENIED = 500;
+
     }
 
     /**
@@ -966,6 +1118,12 @@ public class VKApi {
          * @param responseJson json object from response
          */
         void onResponse(JSONObject responseJson);
+
+        /**
+         * Called when an error occurs on the server side
+         * Visit website to get description of error codes: http://vk.com/dev/errors
+         */
+        void onError(VKException exception);
     }
 
 }

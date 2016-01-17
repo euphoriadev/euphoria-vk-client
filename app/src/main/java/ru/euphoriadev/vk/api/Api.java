@@ -225,7 +225,7 @@ public class Api {
             JSONArray errors = root.getJSONArray("execute_errors");
             if (errors.length() == 0)
                 return;
-            //only first error is processed if there are multiple
+            // only first error is processed if there are multiple
             JSONObject error = errors.getJSONObject(0);
             int code = error.getInt("error_code");
             String message = error.getString("error_msg");

@@ -281,6 +281,10 @@ public class AndroidUtils {
         return count;
     }
 
+    public static void runOnUi(Runnable runnable) {
+        AppLoader.getLoader().getHandler().post(runnable);
+    }
+
 
     public static class PicassoBlurTransform implements Transformation {
         public int radius;

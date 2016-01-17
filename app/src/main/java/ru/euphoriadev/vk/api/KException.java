@@ -4,7 +4,7 @@ package ru.euphoriadev.vk.api;
 public class KException extends Exception {
     KException(int code, String message, String url) {
         super(message);
-        error_code = code;
+        this.error_code = code;
         this.url = url;
     }
 

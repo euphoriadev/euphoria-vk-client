@@ -126,7 +126,7 @@ public class BasicActivity extends BaseThemedActivity implements
         RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
         startService(new Intent(this, LongPollService.class));
 
-        VKApi.createCustom("docs.get").count(20).execute();
+        VKApi.init(VKApi.VKAccount.from(account));
 
     }
 
