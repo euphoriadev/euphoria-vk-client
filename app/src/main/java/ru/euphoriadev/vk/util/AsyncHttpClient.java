@@ -22,7 +22,7 @@ import java.util.zip.GZIPInputStream;
 /**
  * Created by Igor on 18.01.16.
  * <p/>
- * A Default HTTP client
+ * A Async HTTP client
  * It can be used to send requests to server with {@link HttpURLConnection}
  * Supports all standard protocols (HTTP, HTTPS, other...).
  */
@@ -30,6 +30,7 @@ public class AsyncHttpClient implements Closeable {
     public static final String TAG = "AsyncHttpClient";
     public static final int DEFAULT_THREADS_SIZE = 1;
     private Context mContent;
+    private int mThreadsSize;
     private ExecutorService mExecutor;
 
     /**
@@ -48,8 +49,11 @@ public class AsyncHttpClient implements Closeable {
      * @param threadsCount a fixed number of threads pool executor
      */
     public AsyncHttpClient(Context context, int threadsCount) {
+        if (threadsCount <= 0) {
+            threadsCount = DEFAULT_THREADS_SIZE;
+        }
         this.mContent = context;
-        this.mExecutor = Executors.newFixedThreadPool(threadsCount);
+        this.mThreadsSize = threadsCount;
     }
 
     /**
@@ -99,6 +103,7 @@ public class AsyncHttpClient implements Closeable {
         return null;
     }
 
+
     /**
      * Execute ASYNC HTTP request,
      * listener must be called from the main (UI) Thread.
@@ -107,6 +112,9 @@ public class AsyncHttpClient implements Closeable {
      * @param listener callback for async successfully execute
      */
     public void execute(final HttpRequest request, final HttpRequest.OnResponseListener listener) {
+        if (mExecutor == null) {
+            mExecutor = Executors.newFixedThreadPool(mThreadsSize);
+        }
         mExecutor.execute(new Runnable() {
             @Override
             public void run() {

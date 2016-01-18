@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.util.LogWriter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -33,6 +34,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,6 +43,7 @@ import java.util.HashMap;
 import ru.euphoriadev.vk.adapter.DialogAdapter;
 import ru.euphoriadev.vk.adapter.DialogItem;
 import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.VKApi;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
@@ -476,6 +480,20 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
     private void loadDialogs(final boolean onlyUpdate) {
+        VKApi.init(VKApi.VKAccount.from(account));
+        VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
+            @Override
+            public void onResponse(JSONObject responseJson) {
+                        ((BaseThemedActivity) getActivity())
+                        .getSupportActionBar()
+                        .setSubtitle(activity.getString(R.string.dialogs_number) + responseJson.optJSONObject("response").optInt("count"));
+            }
+
+            @Override
+            public void onError(VKApi.VKException exception) {
+
+            }
+        });
 //        if (!AndroidUtils.isInternetConnection(getActivity())) {
 //            Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), R.string.check_internet, Snackbar.LENGTH_LONG).show();
 //        }

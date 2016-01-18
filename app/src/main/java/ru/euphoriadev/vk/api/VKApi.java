@@ -16,15 +16,9 @@ import java.util.Locale;
 import java.util.TreeMap;
 
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.http.DefaultHttpClient;
-import ru.euphoriadev.vk.http.HttpBaseRequest;
-import ru.euphoriadev.vk.http.HttpClient;
-import ru.euphoriadev.vk.http.HttpGetRequest;
-import ru.euphoriadev.vk.http.HttpParams;
-import ru.euphoriadev.vk.http.HttpPostRequest;
-import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
@@ -55,7 +49,7 @@ public class VKApi {
     protected static volatile VKApi sInstante;
 
     private VKAccount mAccount;
-    private HttpClient mClient;
+    private AsyncHttpClient mClient;
 
     /**
      * Init VKApi to send requests
@@ -77,7 +71,7 @@ public class VKApi {
      */
     private VKApi(VKAccount account) {
         this.mAccount = account;
-        this.mClient = new DefaultHttpClient();
+        this.mClient = new AsyncHttpClient(null);
     }
 
     /**
@@ -120,7 +114,7 @@ public class VKApi {
 
         final String url = "https://oauth.vk.com/token";
 
-        final HttpParams params = new HttpParams();
+        final AsyncHttpClient.HttpParams params = new AsyncHttpClient.HttpParams();
         params.addParam("grant_type", "password");
         params.addParam("client_id", client_id);
         params.addParam("client_secret", client_secret);
@@ -132,20 +126,20 @@ public class VKApi {
         ThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                HttpResponse response = getInstance().mClient.execute(new HttpGetRequest(url, params));
                 try {
-                    JSONObject json = new JSONObject(response.toString());
+                    AsyncHttpClient.HttpResponse response = getInstance().mClient.execute(new AsyncHttpClient.HttpRequest(url, "GET", params));
+                    JSONObject json = response.getContentAsJson();
                     VKUtil.checkErrors(url, json);
                     if (listener != null) {
                         listener.onResponse(json);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 } catch (VKException e) {
                     e.printStackTrace();
                     if (listener != null) {
                         listener.onError(e);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -921,21 +915,22 @@ public class VKApi {
 
         public JSONObject execute() {
             String url = getSignedUrl();
-            HttpBaseRequest request;
+            AsyncHttpClient.HttpRequest request;
 
-            if (isPost) {
-                request = new HttpPostRequest(url, params.toString());
-            } else {
-                request = new HttpGetRequest(url);
-            }
+            request = new AsyncHttpClient.HttpRequest(url, isPost ? "POST" : "GET", null);
 
-            HttpResponse response = getInstance().mClient.execute(request);
-            if (response != null) {
-                try {
-                    return new JSONObject(response.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            AsyncHttpClient.HttpResponse response = null;
+            try {
+                response = getInstance().mClient.execute(request);
+                if (response != null) {
+                    try {
+                        return new JSONObject(response.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } catch (AsyncHttpClient.HttpResponseException e) {
+                e.printStackTrace();
             }
             return null;
         }

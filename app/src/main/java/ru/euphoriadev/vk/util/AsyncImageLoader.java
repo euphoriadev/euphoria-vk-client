@@ -22,8 +22,6 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import ru.euphoriadev.vk.http.DefaultHttpClient;
-import ru.euphoriadev.vk.http.HttpClient;
 
 /**
  * Created by Igor on 27.07.15.
@@ -45,7 +43,7 @@ public class AsyncImageLoader {
     private DiskCache diskCache;
     private MemoryCache memoryCache;
     private BitmapDisplayer displayer;
-    private HttpClient httpClient;
+    private AsyncHttpClient httpClient;
     private OnCompleteListener listener;
 
     private AsyncImageLoader(Context context) {
@@ -55,7 +53,7 @@ public class AsyncImageLoader {
         this.memoryCache = new MemoryCache((int) (Runtime.getRuntime().maxMemory() / 4));
         this.diskCache = new DiskCache();
         this.executor = Executors.newFixedThreadPool(2);
-        this.httpClient = new DefaultHttpClient();
+        this.httpClient = new AsyncHttpClient(null);
 
     }
 

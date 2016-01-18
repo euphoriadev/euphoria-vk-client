@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import java.io.Closeable;
 import java.io.IOException;
 
-import ru.euphoriadev.vk.http.DefaultHttpClient;
 
 
 /**

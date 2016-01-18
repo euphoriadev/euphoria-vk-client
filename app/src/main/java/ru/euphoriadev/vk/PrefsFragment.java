@@ -33,11 +33,11 @@ import java.nio.charset.Charset;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.Utils;
-import ru.euphoriadev.vk.http.DefaultHttpClient;
 import ru.euphoriadev.vk.service.EternallOnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AppLoader;
+import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
@@ -543,8 +543,8 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
     private JSONObject loadJsonFromSite(String url) {
         try {
-            return new JSONObject(new DefaultHttpClient().execute(url).toString());
-        } catch (JSONException e) {
+            return new AsyncHttpClient(getActivity()).execute(new AsyncHttpClient.HttpRequest(url)).getContentAsJson();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
