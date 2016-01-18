@@ -44,6 +44,7 @@ import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AppLoader;
+import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
@@ -126,7 +127,18 @@ public class BasicActivity extends BaseThemedActivity implements
         RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
         startService(new Intent(this, LongPollService.class));
 
-        VKApi.init(VKApi.VKAccount.from(account));
+//        VKApi.init(VKApi.VKAccount.from(account));
+//        VKApi.authorization("89672465439", "Psy6727277PS", new VKApi.VKOnResponseListener() {
+//            @Override
+//            public void onResponse(JSONObject responseJson) {
+//                Log.w(VKApi.TAG, responseJson.toString());
+//            }
+//
+//            @Override
+//            public void onError(VKApi.VKException exception) {
+//                Log.w(VKApi.TAG, exception.errorMessage);
+//            }
+//        });
 
     }
 

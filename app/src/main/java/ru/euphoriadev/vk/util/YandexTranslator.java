@@ -2,32 +2,32 @@ package ru.euphoriadev.vk.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 import ru.euphoriadev.vk.http.DefaultHttpClient;
-import ru.euphoriadev.vk.http.HttpClient;
-import ru.euphoriadev.vk.http.HttpGetRequest;
-import ru.euphoriadev.vk.http.HttpParams;
-import ru.euphoriadev.vk.http.HttpResponse;
 
 
 /**
  * Created by Igor on 11.11.15.
  */
-public class YandexTranslator {
+public class YandexTranslator implements Closeable {
     public static final String TAG = "YandexTranslator";
     /**
      * Бесплатный ключ, необходимый осуществления переводов
      */
     private final String apiKey = "trnsl.1.1.20151111T152603Z.2776f2b27e3ca850.db06c544a222c5278777f8c8968629dcf4836182";
-    HttpClient client;
+    AsyncHttpClient client;
     private Context context;
 
     public YandexTranslator(Context context) {
         this.context = context;
-        this.client = new DefaultHttpClient();
+        this.client = new AsyncHttpClient(context);
     }
 
     /**
@@ -40,31 +40,20 @@ public class YandexTranslator {
      * @return Переведенный текст
      */
     public String translate(String message, String languageFrom, String languageTo) {
-//        String s = "https://translate.yandex.net/api/v1.5/tr.json/translate?" +
-//                "key=" + apiKey +
-//                "&text=" + message +
-//                "&lang=" +
-//                (languageFrom.equals(Language.AUTO_DETECT.toString()) ?
-//                        languageTo : languageFrom + "-" + languageTo);
-//        JSONObject request = sendRequest(s);
-//        if (request != null) {
-//            return request.optJSONArray("text").optString(0);
-//        }
 
-        HttpParams params = new HttpParams();
+        AsyncHttpClient.HttpParams params = new AsyncHttpClient.HttpParams();
         params.addParam("key", apiKey);
         params.addParam("text", message);
         params.addParam("lang", (languageFrom.equals(Language.AUTO_DETECT.toString()) ? languageTo : languageFrom + "-" + languageTo));
 
-        HttpGetRequest request = new HttpGetRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", params);
-        HttpResponse response = client.execute(request);
-
+        AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
         try {
-            return new JSONObject(response.toString()).optJSONArray("text").optString(0);
-        } catch (JSONException e) {
+            AsyncHttpClient.HttpResponse response = client.execute(request);
+            return response.getContentAsJson().optJSONArray("text").optString(0);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return "";
+        return "[error]";
     }
 
     /**
@@ -76,21 +65,32 @@ public class YandexTranslator {
      * @param listener
      */
     public void translateAsync(final String message, final String languageFrom, final String languageTo, final OnCompleteListener listener) {
-        new Thread(new Runnable() {
+        AsyncHttpClient.HttpParams params = new AsyncHttpClient.HttpParams();
+        params.addParam("key", apiKey);
+        params.addParam("text", message);
+        params.addParam("lang", (languageFrom.equals(Language.AUTO_DETECT.toString()) ? languageTo : languageFrom + "-" + languageTo));
+
+        final AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
+        client.execute(request, new AsyncHttpClient.HttpRequest.OnResponseListener() {
             @Override
-            public void run() {
-                final String translateMessage = translate(message, languageFrom, languageTo);
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (listener == null) {
-                            return;
-                        }
-                        listener.onCompleteTranslate(YandexTranslator.this, translateMessage);
-                    }
-                });
+            public void onResponse(AsyncHttpClient client, AsyncHttpClient.HttpResponse response) {
+                if (listener != null) {
+                    listener.onCompleteTranslate(YandexTranslator.this, response.getContentAsJson().optJSONArray("text").optString(0));
+                }
             }
-        }).start();
+
+            @Override
+            public void onError(AsyncHttpClient client, AsyncHttpClient.HttpResponseException exception) {
+            }
+        });
+    }
+
+    @Override
+    public void close() {
+        if (client != null) {
+            client.close();
+            client = null;
+        }
     }
 
     public enum Language {

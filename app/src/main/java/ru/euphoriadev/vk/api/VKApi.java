@@ -588,22 +588,6 @@ public class VKApi {
         }
 
         /**
-         * Offset needed to return a specific subset of users
-         */
-        public VKUserSearchMethodSetter offset(int offset) {
-            this.request.params.put(VKConst.OFFSET, offset);
-            return this;
-        }
-
-        /**
-         * Number of users to return. Max value 1 000
-         */
-        public VKUserSearchMethodSetter count(int count) {
-            this.request.params.put(VKConst.COUNT, count);
-            return this;
-        }
-
-        /**
          * City ID
          */
         public VKUserSearchMethodSetter city(int cityId) {
@@ -850,7 +834,6 @@ public class VKApi {
             this.request.params.put(VKConst.Q, query);
             return this;
         }
-
 
     }
 

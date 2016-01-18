@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 
 public class ThreadExecutor {
     /** Thread pool Executor with 2 fixed threads */
-    private static final Executor EXECUTOR = Executors.newFixedThreadPool(2);
+    private static final Executor EXECUTOR = Executors.newFixedThreadPool(3);
 
     /**
      * Execute runnable with {@link Executor}

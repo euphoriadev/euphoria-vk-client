@@ -1036,7 +1036,17 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                             YandexTranslator.Language.AUTO_DETECT.toString(),
                             languageTo);
 
-                    if (text != null) {
+                    if (text.equals("[error]")) {
+                        // error. stopping translate
+                        forceClose = true;
+                        AndroidUtils.runOnUi(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MessageHistoryActivity.this, R.string.check_internet, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                    if (!TextUtils.isEmpty(text)) {
                         item.message.body = text;
                     }
                     count++;
@@ -1049,6 +1059,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     });
                     translateAttachMessages(item.message, translator, languageTo);
                 }
+                translator.close();
 
                 runOnUiThread(new Runnable() {
                     @Override
