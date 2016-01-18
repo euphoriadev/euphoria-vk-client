@@ -27,7 +27,7 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
  * <p/>
  * Simple VK Library for execute request
  * <p/>
- *
+ * <p/>
  * Example to init api and execute users.get request:
  * <pre>
  *      VKApi.init(VKApi.VKAccount.from(account));
@@ -105,6 +105,35 @@ public class VKApi {
     }
 
     /**
+     * Execute request
+     * A universal method for calling a sequence of other methods,
+     * while saving and filtering interim results
+     *
+     * TODO: Inside the code may contain no more than 25 references to API methods
+     * See http://vk.com/dev/execute
+     *
+     * @param code the code algorithm in VKScript
+     */
+    public static JSONObject execute(String code) {
+        VKRequest request = new VKRequest("execute");
+        request.params.put(VKConst.CODE, code);
+        return request.execute();
+    }
+
+    /**
+     * Execute request ASYNC
+     *
+     * @param code     the code algorithm in VKScript
+     * @param listener callback for a successful.
+     *                 Called in main (UI) thread
+     */
+    public static void execute(String code, VKOnResponseListener listener) {
+        VKRequest request = new VKRequest("execute");
+        request.params.put(VKConst.CODE, code);
+        new VKAsyncRequestTask(listener).execute(request);
+    }
+
+    /**
      * Direct authorization with Official client vk
      * see http://vk.com/dev/auth_direct
      */
@@ -144,6 +173,7 @@ public class VKApi {
             }
         });
     }
+
     /**
      * Create custom method setter with method name
      *
@@ -869,7 +899,7 @@ public class VKApi {
          * @param methodName API-method name, e.g. audio.get
          */
         public VKRequest(String methodName) {
-            this(methodName, null);
+            this(methodName, new VKParams());
         }
 
         /**
@@ -913,6 +943,9 @@ public class VKApi {
             return BASE_URL + methodName + "?" + args;
         }
 
+        /**
+         * Execute request and convert to {@link JSONObject}
+         */
         public JSONObject execute() {
             String url = getSignedUrl();
             AsyncHttpClient.HttpRequest request;
@@ -1199,6 +1232,9 @@ public class VKApi {
         /** Videos */
         public static final String ADULT = "adult";
 
+        /** Others */
+        public static final String CODE = "code";
+
     }
 
     /**
@@ -1259,12 +1295,13 @@ public class VKApi {
 
         /**
          * Captcha ID,
-         * see http://vk.com/dev/captcha_error */
+         * see http://vk.com/dev/captcha_error
+         */
         public String captchaSid;
         /**
          * Link to image, you want to show the user,
          * that he typed text from this image
-         *
+         * <p/>
          * see http://vk.com/dev/captcha_error
          */
         public String captchaImg;
@@ -1274,7 +1311,7 @@ public class VKApi {
          * resulting in since version 5.0 API
          * (for older versions will be prompted captcha_error)
          * any request to API the following error is returned
-         *
+         * <p/>
          * see http://vk.com/dev/need_validation
          */
         public String redirectUri;
