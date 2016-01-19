@@ -110,7 +110,7 @@ public class VKApi {
      * while saving and filtering interim results
      *
      * TODO: Inside the code may contain no more than 25 references to API methods
-     * See http://vk.com/dev/execute
+     * Read more: http://vk.com/dev/execute
      *
      * @param code the code algorithm in VKScript
      */
@@ -134,8 +134,8 @@ public class VKApi {
     }
 
     /**
-     * Direct authorization with Official client vk
-     * see http://vk.com/dev/auth_direct
+     * Direct authorization with Official client vk.
+     * Read more: http://vk.com/dev/auth_direct
      */
     public static void authorization(String login, String password, final VKOnResponseListener listener) {
         String client_secret = "hHbZxrka2uZ6jB1inYsH";
@@ -287,7 +287,7 @@ public class VKApi {
     /**
      * Api methods for users
      * <p/>
-     * http://vk.com/dev/users
+     * see http://vk.com/dev/users
      */
     public static class VKUsers {
 
@@ -350,6 +350,8 @@ public class VKApi {
     public static class VKMessages {
 
         /**
+         * Returns a list of the current user's incoming or outgoing private messages
+         * <p/>
          * http://vk.com/dev/messages.get
          */
         public VKMessageMethodSetter get() {
@@ -357,11 +359,110 @@ public class VKApi {
         }
 
         /**
+         * Returns the list of dialogs of the current user
+         * <p/>
          * http://vk.com/dev/messages.getDialogs
          */
         public VKMessageMethodSetter getDialogs() {
             return new VKMessageMethodSetter(new VKRequest(("messages.getDialogs"), new VKParams()));
         }
+
+        /**
+         * Returns messages by their IDs
+         * <p/>
+         * http://vk.com/dev/messages.getById
+         */
+        public VKMessageMethodSetter getById() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getById"), new VKParams()));
+        }
+
+        /**
+         * Returns a list of the current user's private messages,
+         * that match search criteria
+         * <p/>
+         * http://vk.com/dev/messages.search
+         */
+        public VKMessageMethodSetter search() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.search"), new VKParams()));
+        }
+
+        /**
+         * Returns a list of the current user's private messages,
+         * that match search criteria
+         * <p/>
+         * http://vk.com/dev/messages.getHistory
+         */
+        public VKMessageMethodSetter getHistory() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getHistory"), new VKParams()));
+        }
+
+        /**
+         * Sends a message
+         * <p/>
+         * http://vk.com/dev/messages.send
+         */
+        public VKMessageMethodSetter send() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.send"), new VKParams()));
+        }
+
+        /**
+         * Deletes one or more messages
+         * <p/>
+         * http://vk.com/dev/messages.delete
+         */
+        public VKMessageMethodSetter delete() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.delete"), new VKParams()));
+        }
+
+        /**
+         * Deletes all private messages in a conversation
+         * NOTE: If the number of messages exceeds the maximum,
+         * the method shall be called several times
+         * <p/>
+         * http://vk.com/dev/messages.deleteDialog
+         */
+        public VKMessageMethodSetter deleteDialog() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.deleteDialog"), new VKParams()));
+        }
+
+        /**
+         * Restores a deleted message
+         * <p/>
+         * http://vk.com/dev/messages.restore
+         */
+        public VKMessageMethodSetter restore() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.restore"), new VKParams()));
+        }
+
+        /**
+         * Marks messages as read
+         * <p/>
+         * http://vk.com/dev/messages.markAsRead
+         */
+        public VKMessageMethodSetter markAsRead() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.markAsRead"), new VKParams()));
+        }
+
+        /**
+         * Marks messages as new (unread)
+         * (This method is deprecated and may be disabled soon, please avoid using it)
+         * <p/>
+         * http://vk.com/dev/messages.markAsNew
+         */
+        @Deprecated
+        public VKMessageMethodSetter markAsNew() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.markAsNew"), new VKParams()));
+        }
+
+        /**
+         * Marks and unmarks messages as important (starred)
+         * <p/>
+         * http://vk.com/dev/messages.markAsImportant
+         */
+        public VKMessageMethodSetter markAsImportant() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.markAsImportant"), new VKParams()));
+        }
+
     }
 
     /**
@@ -859,6 +960,152 @@ public class VKApi {
             return this;
         }
 
+        /** Setters for messages.getHistory */
+
+        /**
+         * if the value is > 0, then this message ID,
+         * starting from which history of correspondence,
+         * if the passed value is -1, then value
+         * of offset is added number of unread messages at the end of the dialog).
+         */
+        public VKMessageMethodSetter startMessageId(int startMessageId) {
+            this.request.params.put(VKConst.START_MESSAGE_ID, startMessageId);
+            return this;
+        }
+
+        /**
+         * Destination ID
+         * <p/>
+         * For group chat: 2000000000 + ID of conversation.
+         * For community: -community ID
+         *
+         * TODO: accessible for versions from 5.38
+         */
+        public VKMessageMethodSetter peerId(int peerId) {
+            this.request.params.put(VKConst.PEER_ID, peerId);
+            return this;
+        }
+
+        /**
+         * Sort order:
+         * 1 — return messages in chronological order.
+         * 0 — return messages in reverse chronological order
+         */
+        public VKMessageMethodSetter rev(int rev) {
+            this.request.params.put(VKConst.REV, rev);
+            return this;
+        }
+
+
+        /** Setters for messages.send */
+
+        /**
+         * User's short address (for example, durov)
+         */
+        public VKMessageMethodSetter domain(String domain) {
+            this.request.params.put(VKConst.DOMAIN, domain);
+            return this;
+        }
+
+        /**
+         * ID of conversation the message will relate to
+         */
+        public VKMessageMethodSetter chatId(int chatId) {
+            this.request.params.put(VKConst.CHAT_ID, chatId);
+            return this;
+        }
+
+        /**
+         * (Required if attachments is not set.) Text of the message
+         */
+        public VKMessageMethodSetter message(String message) {
+            this.request.params.put(VKConst.MESSAGE, message);
+            return this;
+        }
+
+        /**
+         * Unique ID used to prevent re-sending of the same message
+         * (Not necessarily)
+         */
+        public VKMessageMethodSetter guid(int guid) {
+            this.request.params.put(VKConst.GUID, guid);
+            return this;
+        }
+
+        /**
+         * Geographical latitude of a check-in, in degrees (from -90 to 90).
+         */
+        public VKMessageMethodSetter lat(double lat) {
+            this.request.params.put(VKConst.LAT, lat);
+            return this;
+        }
+
+        /**
+         * Geographical longitude of a check-in, in degrees (from -180 to 180).
+         */
+        public VKMessageMethodSetter longitude(long longitude) {
+            this.request.params.put(VKConst.LONG, longitude);
+            return this;
+        }
+
+        /**
+         * (Required if message is not set.)
+         * List of objects attached to the message, separated by commas
+         */
+        @SafeVarargs
+        public final VKMessageMethodSetter attachment(Collection<String>... attachments) {
+            this.request.params.put(VKConst.ATTACHMENT, VKUtil.arrayToString(attachments));
+            return this;
+        }
+
+        /**
+         * (Required if message is not set.)
+         * List of objects attached to the message, separated by commas
+         */
+        public final VKMessageMethodSetter forwardMessages(Collection<String> ids) {
+            this.request.params.put(VKConst.FORWARD_MESSAGES, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * (Required if message is not set.)
+         * List of objects attached to the message, separated by commas
+         */
+        public final VKMessageMethodSetter forwardMessages(int... ids) {
+            this.request.params.put(VKConst.FORWARD_MESSAGES, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * Sticker ID
+         */
+        public final VKMessageMethodSetter stickerId(int stickerId) {
+            this.request.params.put(VKConst.STICKER_ID, stickerId);
+            return this;
+        }
+
+        /** Setters for messages.restore */
+
+        /**
+         * ID of a previously-deleted message to restore
+         */
+        public final VKMessageMethodSetter messageId(int messageId) {
+            this.request.params.put(VKConst.MESSAGE_ID, messageId);
+            return this;
+        }
+
+
+        /** Setters for messages.markAsImportant */
+
+        /**
+         * Sets flag to important message:
+         * false — to remove the star
+         * true — to add a star (mark as important)
+         */
+        public final VKMessageMethodSetter important(boolean important) {
+            this.request.params.put(VKConst.IMPORTANT, important);
+            return this;
+        }
     }
 
 
@@ -1146,6 +1393,8 @@ public class VKApi {
 
         /** Messages */
         public static final String MESSAGE_IDS = "message_ids";
+        public static final String MESSAGE_ID = "message_id";
+        public static final String IMPORTANT = "important";
         public static final String OUT = "out";
         public static final String TIME_OFFSET = "time_offset";
         public static final String FILTERS = "filters";
@@ -1153,6 +1402,13 @@ public class VKApi {
         public static final String START_MESSAGE_ID = "start_message_id";
         public static final String PREVIEW_LENGTH = "preview_length";
         public static final String UNREAD = "unread";
+        public static final String PEER_ID = "peer_id";
+        public static final String DOMAIN = "domain";
+        public static final String CHAT_ID = "chat_id";
+        public static final String GUID = "guid";
+        public static final String ATTACHMENT = "attachment";
+        public static final String FORWARD_MESSAGES = "forward_messages";
+        public static final String STICKER_ID = "sticker_id";
 
         /** Get subscriptions */
         public static final String EXTENDED = "extended";
@@ -1360,6 +1616,10 @@ public class VKApi {
         public static final int ACCESS_TO_GROUP_DENIED = 203;
         public static final int ALBUM_IS_FULL = 300;
         public static final int ACTION_DENIED = 500;
+
+        /** Message errors */
+        public static final int CANNOT_SEND_MESSAGE_BLACK_LIST = 900;
+        public static final int CANNOT_SEND_MESSAGE_GROUP = 901;
 
     }
 
