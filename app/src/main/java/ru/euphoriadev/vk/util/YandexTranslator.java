@@ -1,15 +1,8 @@
 package ru.euphoriadev.vk.util;
 
-import android.app.Activity;
 import android.content.Context;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.Closeable;
-import java.io.IOException;
-
 
 
 /**
@@ -79,7 +72,7 @@ public class YandexTranslator implements Closeable {
             }
 
             @Override
-            public void onError(AsyncHttpClient client, AsyncHttpClient.HttpResponseException exception) {
+            public void onError(AsyncHttpClient client, AsyncHttpClient.HttpResponseCodeException exception) {
             }
         });
     }

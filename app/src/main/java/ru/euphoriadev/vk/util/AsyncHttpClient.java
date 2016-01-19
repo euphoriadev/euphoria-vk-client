@@ -1,6 +1,7 @@
 package ru.euphoriadev.vk.util;
 
 import android.content.Context;
+import android.net.http.HttpResponseCache;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -10,7 +11,10 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -61,9 +65,9 @@ public class AsyncHttpClient implements Closeable {
      *
      * @param request the request that should be sent to http server
      * @return response
-     * @throws HttpResponseException when responseCode return not HTTP_OK
+     * @throws HttpResponseCodeException when responseCode return not HTTP_OK
      */
-    public HttpResponse execute(HttpRequest request) throws HttpResponseException {
+    public HttpResponse execute(HttpRequest request) throws HttpResponseCodeException {
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) new URL(request.params == null ? request.url : request.params.join(request.url)).openConnection();
@@ -77,17 +81,18 @@ public class AsyncHttpClient implements Closeable {
                 connection.setRequestProperty("Accept-Encoding", "gzip");
             }
             connection.setRequestProperty("User-Agent", HttpRequest.DEFAULT_USER_AGENT);
-
             if (request.isPost()) {
                 connection.getOutputStream().write(request.params.toString().getBytes("UTF-8"));
             }
 
-            String responseMessage = connection.getResponseMessage();
             int responseCode = connection.getResponseCode();
+            String responseMessage = connection.getResponseMessage();
+
+            Log.i(TAG, "response code: " + responseCode);
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 // error...
                 Log.e(TAG, "Server returned response code: " + responseCode);
-                throw new HttpResponseException(responseMessage, responseCode);
+                throw new HttpResponseCodeException(responseMessage, responseCode);
             }
 
             InputStream is = connection.getInputStream();
@@ -96,11 +101,14 @@ public class AsyncHttpClient implements Closeable {
                 is = new GZIPInputStream(is);
             }
             return new HttpResponse(request, is, responseMessage, responseCode);
-
-        } catch (Exception e) {
+            // MalformedURLException | ConnectException | UnsupportedEncodingException | ProtocolException | HttpResponseCodeException
+        } catch (IOException e) {
             e.printStackTrace();
+
+            if (e instanceof HttpResponseCodeException) {
+                throw (HttpResponseCodeException) e;
+            } else throw new HttpResponseCodeException(e.getMessage(), HttpResponseCodeException.NETWORK_ERROR);
         }
-        return null;
     }
 
 
@@ -128,7 +136,7 @@ public class AsyncHttpClient implements Closeable {
                             }
                         }
                     });
-                } catch (HttpResponseException e) {
+                } catch (HttpResponseCodeException e) {
                     e.printStackTrace();
                     if (listener != null) {
                         listener.onError(AsyncHttpClient.this, e);
@@ -208,7 +216,7 @@ public class AsyncHttpClient implements Closeable {
              * @param client    the client which execute request
              * @param exception the information about error
              */
-            void onError(AsyncHttpClient client, HttpResponseException exception);
+            void onError(AsyncHttpClient client, HttpResponseCodeException exception);
         }
     }
 
@@ -334,11 +342,12 @@ public class AsyncHttpClient implements Closeable {
      * Thrown when response return not
      * {@link java.net.HttpURLConnection#HTTP_OK}
      */
-    public static class HttpResponseException extends IOException {
+    public static class HttpResponseCodeException extends IOException {
+        public static final int NETWORK_ERROR = -100;
         public String responseMessage;
         public int responseCode;
 
-        public HttpResponseException(String responseMessage, int responseCode) {
+        public HttpResponseCodeException(String responseMessage, int responseCode) {
             super(responseMessage);
             this.responseMessage = responseMessage;
             this.responseCode = responseCode;

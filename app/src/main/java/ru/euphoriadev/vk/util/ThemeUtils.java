@@ -9,6 +9,7 @@ import android.util.TypedValue;
 
 /**
  * Created by Igor on 27.11.15.
+ * Class copied from Support Compat Library
  */
 public class ThemeUtils {
 

@@ -514,7 +514,27 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             }
         });
 
-        categoryAbout.addItemFromInflater(groupScreen);
+        categoryAbout.addPreference(groupScreen);
+
+        if (BuildConfig.DEBUG) {
+            PreferenceCategory debugCategory = new MaterialPreferenceCategory(getActivity());
+            debugCategory.setTitle("For developers");
+
+            rootScreen.addPreference(debugCategory);
+
+
+            Preference debugPreference = new MaterialPreference(getActivity());
+            debugPreference.setTitle("Debug Activity");
+            debugPreference.setSummary("Open a TestActivity.class");
+            debugPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    startActivity(new Intent(getActivity(), TestActivity.class));
+                    return true;
+                }
+            });
+            debugCategory.addPreference(debugPreference);
+        }
 
     }
 

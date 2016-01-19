@@ -1209,7 +1209,7 @@ public class VKApi {
                         e.printStackTrace();
                     }
                 }
-            } catch (AsyncHttpClient.HttpResponseException e) {
+            } catch (AsyncHttpClient.HttpResponseCodeException e) {
                 e.printStackTrace();
             }
             return null;
