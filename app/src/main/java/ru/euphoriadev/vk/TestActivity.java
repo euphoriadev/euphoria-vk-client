@@ -3,10 +3,14 @@ package ru.euphoriadev.vk;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AsyncHttpClient;
@@ -63,7 +67,42 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonClient);
 
+        AppCompatButton buttonInterrupted = new AppCompatButton(this);
+        buttonInterrupted.setText("Interrupted main thread");
+        buttonInterrupted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvResult.append("Stopping main thread...\n");
+                try {
+                    Thread.currentThread().join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        rootLayout.addView(buttonInterrupted);
 
+        AppCompatButton buttonException = new AppCompatButton(this);
+        buttonException.setText("Throws exception");
+        buttonException.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvResult.setText("Throws exception!\n");
+                throw new RuntimeException("Test exception! Throws DebugActivity");
+            }
+        });
+        rootLayout.addView(buttonException);
+
+        AppCompatButton buttonGC = new AppCompatButton(this);
+        buttonGC.setText("Force Garbage Collector");
+        buttonGC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvResult.setText("Garbage Collector\n");
+                System.gc();
+            }
+        });
+        rootLayout.addView(buttonGC);
 
         AppCompatButton buttonClear = new AppCompatButton(this);
         buttonClear.setText("Clear text");
@@ -81,11 +120,11 @@ public class TestActivity extends BaseThemedActivity {
             @Override
             public void run() {
                 AsyncHttpClient client = new AsyncHttpClient(TestActivity.this);
-                AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest("https://www.google.com/test/1");
+                AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest("https://www.google.com/");
 
                 try {
                     final AsyncHttpClient.HttpResponse response = client.execute(request);
-                    response.release();
+                    Log.w(AsyncHttpClient.TAG, response.getContentAsString());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

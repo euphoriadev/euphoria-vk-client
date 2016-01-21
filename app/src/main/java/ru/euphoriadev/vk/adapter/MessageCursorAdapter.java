@@ -21,13 +21,13 @@ public class MessageCursorAdapter extends MessageAdapter {
     private VKMessage mMessage;
     private VKUser mUser;
     private String mSql;
-    private long chat_id;
+    private int chat_id;
 
-    public MessageCursorAdapter(Context context, ArrayList<MessageItem> messages, long uid, long chat_id) {
+    public MessageCursorAdapter(Context context, ArrayList<MessageItem> messages, int uid, int chat_id) {
         super(context, messages, uid, chat_id);
     }
 
-    public MessageCursorAdapter(Context context, Cursor cursor, String sql, long chat_id, long user_id) {
+    public MessageCursorAdapter(Context context, Cursor cursor, String sql, int chat_id, int user_id) {
         this(context, null, user_id, chat_id);
 
         this.mCursor = cursor;

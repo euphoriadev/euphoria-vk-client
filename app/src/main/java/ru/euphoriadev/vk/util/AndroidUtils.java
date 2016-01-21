@@ -27,6 +27,11 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Transformation;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.TeeInputStream;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -211,6 +216,31 @@ public class AndroidUtils {
             return ru.euphoriadev.vk.api.Utils.convertStreamToString(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static InputStream clone(InputStream input) {
+        if (input == null) {
+            return null;
+        }
+        ByteArrayOutputStream output = null;
+        try {
+            output = new ByteArrayOutputStream(1024);
+            IOUtils.copy(input, output);
+            return new ByteArrayInputStream(output.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (output != null) {
+                try {
+                    output.flush();
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                output = null;
+            }
         }
         return null;
     }

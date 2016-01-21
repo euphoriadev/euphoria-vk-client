@@ -75,7 +75,6 @@ public class AudioListFragment extends Fragment implements SwipeRefreshLayout.On
                     if (audios == null) {
                         audios = new ArrayList<>(200);
                     }
-
                     if (database == null || !database.isOpen()) {
                         database = DBHelper.get(getActivity()).getWritableDatabase();
                     }

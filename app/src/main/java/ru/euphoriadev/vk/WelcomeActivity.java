@@ -80,7 +80,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
             //авторизовались успешно
             account.access_token = data.getStringExtra("token");
-            account.user_id = data.getLongExtra("user_id", 0);
+            account.user_id = data.getIntExtra("user_id", 0);
             //      account.save();
             // Создаем  API
             api = Api.init(account);
@@ -92,7 +92,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                     try {
                         api.setOffline();
 
-                        ArrayList<Long> userIds = new ArrayList<Long>();
+                        ArrayList<Integer> userIds = new ArrayList<>();
                         userIds.add(account.user_id);
 
                         ArrayList<VKFullUser> profiles = api.getProfilesFull(userIds, null, "status, photo_100", null, null, null);
@@ -232,7 +232,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
                     account = new Account(WelcomeActivity.this);
                     account.access_token = accessToken;
-                    account.user_id = Long.parseLong(idOrScreenName);
+                    account.user_id = Integer.parseInt(idOrScreenName);
 
                     final VKUser vkUser = api.getProfile(account.user_id);
                     account.fullName = vkUser.toString();

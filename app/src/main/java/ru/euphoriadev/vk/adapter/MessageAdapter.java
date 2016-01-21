@@ -748,7 +748,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         }
     }
 
-    private void addUserToDatabase(final long uid, final OnVKUserLoaded l) {
+    private void addUserToDatabase(final int uid, final OnVKUserLoaded l) {
         ThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -803,7 +803,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 //                        // TODO: однако у меня такого не было, но это вполне может случится
 //                        return;
 //                    }
-                    ArrayList<Long> mids = new ArrayList<>(1);
+                    ArrayList<Integer> mids = new ArrayList<>(1);
                     mids.add(message.mid);
 
                     final VKMessage newMessage = Api.get().getMessagesById(mids).get(0);

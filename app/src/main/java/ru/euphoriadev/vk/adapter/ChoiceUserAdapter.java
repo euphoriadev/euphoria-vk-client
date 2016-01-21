@@ -22,7 +22,7 @@ import ru.euphoriadev.vk.util.ThemeManagerOld;
  * Created by Igor on 01.11.15.
  */
 public class ChoiceUserAdapter extends BaseAdapter implements View.OnClickListener {
-    public ArrayList<Long> checkedUsers;
+    public ArrayList<Integer> checkedUsers;
     int primaryTextColor;
     int secondaryTextColor;
     private LayoutInflater inflater;

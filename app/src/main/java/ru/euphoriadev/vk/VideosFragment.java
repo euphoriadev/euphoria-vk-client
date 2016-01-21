@@ -54,7 +54,7 @@ public class VideosFragment extends android.support.v4.app.Fragment {
                         return;
                     }
 
-                    HashMap<Long, VKUser> mapUsers = new HashMap<Long, VKUser>();
+                    HashMap<Integer, VKUser> mapUsers = new HashMap<>();
                     for (int i = 0; i < vkVideos.size(); i++) {
 
                         final VKVideo video = vkVideos.get(i);

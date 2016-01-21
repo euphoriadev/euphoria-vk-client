@@ -78,8 +78,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     private ExecutorService executor;
 
     private Api api;
-    private long uid;
-    private long chat_id;
+    private int uid;
+    private int chat_id;
     private long lastTypeNotification;
     private boolean forceClose;
     private boolean hideTyping;
@@ -93,8 +93,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         setContentView(R.layout.message_history_activity);
 
         String fullName = getIntent().getExtras().getString("fullName");
-        uid = getIntent().getExtras().getLong("user_id");
-        chat_id = getIntent().getExtras().getLong("chat_id");
+        uid = getIntent().getExtras().getInt("user_id");
+        chat_id = getIntent().getExtras().getInt("chat_id");
         long users_count = getIntent().getExtras().getLong("users_count");
         boolean isOnline = getIntent().getExtras().getBoolean("online");
         boolean from_saved = getIntent().getExtras().getBoolean("from_saved", false);
@@ -619,7 +619,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     ArrayList<VKMessage> vkMessages = api.getMessagesHistory(uid, chat_id, 0, 30);
 
                     // если чат, то обновляем юзеров
-                    HashMap<Long, VKUser> mapUsers = null;
+                    HashMap<Integer, VKUser> mapUsers = null;
                     if (chat_id != 0) {
                         mapUsers = new HashMap<>();
                         for (VKMessage message : vkMessages) {
@@ -728,7 +728,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             public void run() {
                 try {
                     ArrayList<VKFullUser> chatUsers = api.getChatUsers(chat_id, "photo_50");
-                    HashMap<Long, VKFullUser> mapInvitedBy = new HashMap<>();
+                    HashMap<Integer, VKFullUser> mapInvitedBy = new HashMap<>();
                     for (VKFullUser u : chatUsers) {
                         mapInvitedBy.put(u.invited_by, null);
                     }
@@ -780,7 +780,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 //                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
                 try {
                     VKUser emptyUser = VKUser.EMPTY_USER;
-                    HashMap<Long, VKUser> mapUsers = null;
+                    HashMap<Integer, VKUser> mapUsers = null;
                     ArrayList<VKMessage> oldMessages = api.getMessagesHistory(uid, chat_id, offset, count);
                     if (oldMessages.isEmpty()) {
                         isLoadingOldMessages = false;
@@ -886,7 +886,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 });
 
                 try {
-                    Long mid = api.sendMessage(uid, chat_id, message.body, null, null, null, null, null, null, null, null);
+                    int mid = api.sendMessage(uid, chat_id, message.body, null, null, null, null, null, null, null, null);
                     item.status = MessageItem.Status.SENT;
                     item.message.mid = mid;
                     helper.addMessageToDB(message);
@@ -918,7 +918,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             @Override
             public void run() {
                 try {
-                    ArrayList<Long> mids = new ArrayList<Long>();
+                    ArrayList<Integer> mids = new ArrayList<>();
                     for (int i = 0; i < items.size(); i++) {
                         mids.add(items.get(i).message.mid);
                     }

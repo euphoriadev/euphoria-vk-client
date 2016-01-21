@@ -11,7 +11,7 @@ public class Account {
     public static final String API_ID = "4510232"; // ID TimeVK
     public String access_token; // токен
     public String fullName, photo, status = "";
-    public long user_id; // ID пользователя
+    public int user_id; // ID пользователя
 
     SharedPreferences prefs;
     Editor editor;
@@ -68,7 +68,7 @@ public class Account {
      */
     public Account restore() {
         access_token = prefs.getString("access_token", null);
-        user_id = prefs.getLong("user_id", 0);
+        user_id = (int) prefs.getLong("user_id", 0);
 
         fullName = prefs.getString("fullName", "");
         photo = prefs.getString("photo", "");

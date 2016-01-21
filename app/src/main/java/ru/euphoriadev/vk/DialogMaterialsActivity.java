@@ -29,8 +29,8 @@ public class DialogMaterialsActivity extends BaseThemedActivity {
     MaterialsPageAdapter adapter;
     Api api;
 
-    long chat_id;
-    long user_id;
+    int chat_id;
+    int user_id;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,8 +41,8 @@ public class DialogMaterialsActivity extends BaseThemedActivity {
         toolbar = (Toolbar) findViewById(R.id.materials_toolbar);
         tabLayout = (TabLayout) findViewById(R.id.materials_tablayout);
 
-        chat_id = getIntent().getLongExtra("chat_id", 0L);
-        user_id = getIntent().getLongExtra("user_id", 0L);
+        chat_id = getIntent().getIntExtra("chat_id", 0);
+        user_id = getIntent().getIntExtra("user_id", 0);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.materials_from_talk));

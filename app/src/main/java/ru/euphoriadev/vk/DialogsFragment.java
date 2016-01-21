@@ -235,7 +235,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
     }
 
-    private void downloadDialog(final long id, final long chatid, final String userName) {
+    private void downloadDialog(final int id, final int chatid, final String userName) {
         if (chatid != 0) {
             Toast.makeText(getActivity(), "Sorry, can't download the chat. Wait for updates", Toast.LENGTH_LONG).show();
             return;
@@ -541,7 +541,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         deleteMessagesFrom(database);
                         insertMessagesTo(database, vkDialogs, true);
 
-                        HashMap<Long, VKUser> mapUsers = new HashMap<>();
+                        HashMap<Integer, VKUser> mapUsers = new HashMap<>();
                         for (int i = 0; i < vkDialogs.size(); i++) {
                             mapUsers.put(vkDialogs.get(i).uid, null);
                         }
@@ -604,7 +604,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                     // получаем диалоги из вк
                     ArrayList<VKMessage> vkDialogs = api.getMessagesDialogs(0, 30, null, null);
-                    HashMap<Long, VKUser> mapUsers = new HashMap<>();
+                    HashMap<Integer, VKUser> mapUsers = new HashMap<>();
 
                     for (int i = 0; i < vkDialogs.size(); i++) {
                         mapUsers.put(vkDialogs.get(i).uid, null);
@@ -676,7 +676,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public void run() {
                 try {
-                    HashMap<Long, VKUser> mapUsers = new HashMap<>();
+                    HashMap<Integer, VKUser> mapUsers = new HashMap<>();
 
                     ArrayList<VKMessage> dialogs = api.getMessagesDialogs(adapter.getCount(), count, null, null);
                     if (dialogs.isEmpty()) {
@@ -847,7 +847,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         return;
                     }
 
-                    HashMap<Long, VKUser> mapUsers = new HashMap<>();
+                    HashMap<Integer, VKUser> mapUsers = new HashMap<>();
                     for (VKMessage m : searchDialogs) {
                         mapUsers.put(m.uid, null);
                     }

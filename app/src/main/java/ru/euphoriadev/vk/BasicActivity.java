@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -90,6 +91,7 @@ public class BasicActivity extends BaseThemedActivity implements
         setStatusBarColor();
         hideSpinner();
         setTitle(R.string.messages);
+
 
         ViewUtil.setTypeface(toolbar);
 
@@ -197,6 +199,12 @@ public class BasicActivity extends BaseThemedActivity implements
 //            return;
 //        }
 //        lastFragmentId = id;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getSupportActionBar().setSubtitle(null);
+            }
+        });
         switch (id) {
 
             case R.id.navFriends:

@@ -18,7 +18,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="16dp">
 
-            <ru.euphoriadev.vk.view.TextCircleView
+            <ru.euphoriadev.vk.view.CircleImageView
                 android:id="@+id/ivDialogPhoto"
                 android:layout_width="46dp"
                 android:layout_height="46dp"

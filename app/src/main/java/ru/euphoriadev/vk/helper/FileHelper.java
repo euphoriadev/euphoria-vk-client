@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 
 import ru.euphoriadev.vk.util.AppLoader;
 
@@ -54,11 +55,6 @@ public class FileHelper {
         try {
             reader = new BufferedReader(new FileReader(file));
             buffer = new StringBuffer(128);
-//            String readLine;
-//            while ((readLine = reader.readLine()) != null) {
-//                buffer.append(readLine);
-//                buffer.append("\n");
-//            }
 
             char[] cBuff = new char[8192];
             int read = 0;
@@ -67,6 +63,7 @@ public class FileHelper {
                     buffer.append(cBuff[i]);
                 }
             }
+            Arrays.fill(cBuff, 'a');
             cBuff = null;
             return buffer.toString();
         } catch (Exception e) {

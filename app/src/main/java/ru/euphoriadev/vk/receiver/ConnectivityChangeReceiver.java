@@ -49,7 +49,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
                             int chat_id = cursor.getInt(cursor.getColumnIndex(DBHelper.CHAT_ID));
                             String body = cursor.getString(cursor.getColumnIndex(DBHelper.BODY));
 
-                            api.sendMessage((long) user_id, (long) chat_id, body, null, null, null, null, null, null, null, null);
+                            api.sendMessage(user_id, chat_id, body, null, null, null, null, null, null, null, null);
                             database.delete(DBHelper.FAILED_MESSAGES_TABLE, DBHelper._ID + " = " + _id, null);
 
                             TimeUnit.MILLISECONDS.sleep(200);

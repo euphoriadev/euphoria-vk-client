@@ -54,7 +54,7 @@ public class GiftsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    HashMap<Long, VKUser> mapUsers = new HashMap<>();
+                    HashMap<Integer, VKUser> mapUsers = new HashMap<>();
 
                     ArrayList<VKGift> apiGifts = api.getGifts(account.user_id, 100, 0);
                     for (VKGift g : apiGifts) {

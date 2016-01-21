@@ -28,7 +28,7 @@ import ru.euphoriadev.vk.view.CircleImageView;
  * Created by Igor on 18.11.15.
  */
 public class ProfileActivity extends BaseThemedActivity {
-    private long uid;
+    private int uid;
     private VKUser profile;
 
     @Override
@@ -42,7 +42,7 @@ public class ProfileActivity extends BaseThemedActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
-        uid = getIntent().getLongExtra("uid", 0L);
+        uid = getIntent().getIntExtra("uid", 0);
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarProfile);
         setSupportActionBar(toolbar);

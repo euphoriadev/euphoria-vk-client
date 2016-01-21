@@ -9,8 +9,8 @@ import ru.euphoriadev.vk.api.Api;
 
 public class VKVideo implements Serializable {
     private static final long serialVersionUID = 1L;
-    public long vid;
-    public long owner_id;
+    public int vid;
+    public int owner_id;
     public String title;
     public String description;
     public long duration;
@@ -33,8 +33,8 @@ public class VKVideo implements Serializable {
 
     public static VKVideo parse(JSONObject o) throws NumberFormatException, JSONException {
         VKVideo v = new VKVideo();
-        v.vid = o.getLong("id");
-        v.owner_id = o.getLong("owner_id");
+        v.vid = o.optInt("id");
+        v.owner_id = o.optInt("owner_id");
         v.title = Api.unescape(o.optString("title"));
         v.duration = o.optLong("duration");
         v.description = Api.unescape(o.optString("description"));
@@ -65,8 +65,8 @@ public class VKVideo implements Serializable {
 
     public static VKVideo parseForAttachments(JSONObject o) {
         VKVideo v = new VKVideo();
-        v.vid = o.optLong("id");
-        v.owner_id = o.optLong("owner_id");
+        v.vid = o.optInt("id");
+        v.owner_id = o.optInt("owner_id");
         v.title = Api.unescape(o.optString("title"));
         v.duration = o.optLong("duration");
         v.description = Api.unescape(o.optString("description"));

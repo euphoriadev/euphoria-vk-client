@@ -41,9 +41,9 @@ public class ImageViewerActivity extends Activity {
 
         api = Api.get();
 
-        final long user_id = getIntent().getExtras().getLong("user_id");
+        final int user_id = getIntent().getExtras().getInt("user_id");
 
-        final ArrayList<Long> uids = new ArrayList<>();
+        final ArrayList<Integer> uids = new ArrayList<>();
         uids.add(user_id);
 
 //        ImageView view = new ImageView(this);

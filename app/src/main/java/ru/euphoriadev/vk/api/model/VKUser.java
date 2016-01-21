@@ -20,7 +20,7 @@ public class VKUser implements Serializable {
      *
      * User ID.
      */
-    public long user_id;
+    public int user_id;
     /**
      * First name of user.
      */
@@ -80,7 +80,7 @@ public class VKUser implements Serializable {
 
     public static VKUser parse(JSONObject source) {
         VKUser user = new VKUser();
-        user.user_id = source.optLong("id");
+        user.user_id = source.optInt("id");
         user.first_name = source.optString("first_name", "DELETED");
         user.last_name = source.optString("last_name");
         user.photo_50 = source.optString("photo_50");

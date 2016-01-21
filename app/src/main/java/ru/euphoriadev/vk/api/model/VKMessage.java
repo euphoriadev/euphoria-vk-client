@@ -25,11 +25,11 @@ public class VKMessage implements Serializable {
     /**
      * 	Message ID. (Not returned for forwarded messages), positive number
      */
-    public long mid;
+    public int mid;
     /**
      *  For an incoming message, the user ID of the author. For an outgoing message, the user ID of the receiver.
      */
-    public long uid;
+    public int uid;
     /**
      *  Date (in Unix time) when the message was sent.
      */
@@ -57,7 +57,7 @@ public class VKMessage implements Serializable {
     /**
      *  Chat ID
      */
-    public long chat_id;
+    public int chat_id;
     /**
      *  User IDs of chat participants
      */
@@ -69,7 +69,7 @@ public class VKMessage implements Serializable {
     /**
      *  Number of chat participants.
      */
-    public long users_count;
+    public int users_count;
     /**
      *  Whether the message is deleted (false — no, true — yes).
      */
@@ -97,7 +97,7 @@ public class VKMessage implements Serializable {
     /**
      * The count of unread messages
      */
-    public long unread;
+    public int unread;
     /**
      * Field transferred, if a service message
      */
@@ -115,10 +115,10 @@ public class VKMessage implements Serializable {
     }
 
     @Deprecated
-    public static VKMessage parse(JSONObject o, boolean from_history, long history_uid, boolean from_chat, long me) throws NumberFormatException, JSONException {
+    public static VKMessage parse(JSONObject o, boolean from_history, int history_uid, boolean from_chat, int me) throws NumberFormatException, JSONException {
         VKMessage m = new VKMessage();
         if (from_chat) {
-            long from_id = o.getLong("user_id");
+            int from_id = o.optInt("user_id");
             m.uid = from_id;
             m.is_out = (from_id == me);
         } else if (from_history) {
@@ -128,17 +128,17 @@ public class VKMessage implements Serializable {
         } else {
             //тут не очень, потому что при получении списка диалогов если есть моё сообщение, которое я написал в беседу, то в нём uid будет мой. Хотя в других случайх uid всегда собеседника.
             // TODO: Впрочем, это вполне нормально
-            m.uid = o.getLong("user_id");
+            m.uid = o.optInt("user_id");
             m.is_out = o.optInt("out") == 1;
         }
-        m.mid = o.optLong("id");
+        m.mid = o.optInt("id");
         m.date = o.optLong("date");
-        if (o.has("users_count")) m.users_count = o.optLong("users_count");
+        if (o.has("users_count")) m.users_count = o.optInt("users_count");
         m.title = Api.unescape(o.optString("title"));
         m.body = Api.unescapeWithSmiles(o.optString("body"));
         m.read_state = (o.optInt("read_state") == 1);
         if (o.has("chat_id"))
-            m.chat_id = o.getLong("chat_id");
+            m.chat_id = o.optInt("chat_id");
 
         //for dialog list
         JSONArray tmp = o.optJSONArray("chat_active");
@@ -171,15 +171,15 @@ public class VKMessage implements Serializable {
 
     public static VKMessage parse(JSONObject source) {
         VKMessage message = new VKMessage();
-        message.mid = source.optLong("id");
-        message.uid = source.optLong("user_id");
-        message.chat_id = source.optLong("chat_id");
+        message.mid = source.optInt("id");
+        message.uid = source.optInt("user_id");
+        message.chat_id = source.optInt("chat_id");
         message.date = source.optLong("date");
         message.is_out = source.optLong("out") == 1;
         message.read_state = source.optLong("read_state") == 1;
         message.title = Api.unescape(source.optString("title"));
         message.body = Api.unescapeWithSmiles(source.optString("body"));
-        message.users_count = source.optLong("users_count");
+        message.users_count = source.optInt("users_count");
         message.is_deleted = source.optLong("deleted") == 1;
         message.is_important = source.optLong("important") == 1;
         message.emoji = source.optLong("emoji") == 1;
@@ -213,7 +213,7 @@ public class VKMessage implements Serializable {
         }
 
         // TODO: from_id возврвщается только тогда, когда получаем историю
-        long from_id = source.optLong("from_id", -1);
+        int from_id = source.optInt("from_id", -1);
         if (from_id != -1 && message.chat_id != 0) {
             message.uid = from_id;
         }
@@ -243,7 +243,7 @@ public class VKMessage implements Serializable {
     // parse from long poll (update[])
     public static VKMessage parse(JSONArray a) throws JSONException {
         VKMessage m = new VKMessage();
-        m.mid = a.optLong(1);
+        m.mid = a.optInt(1);
         m.flag = a.optInt(2);
         m.uid = a.optInt(3);
         m.date = a.optLong(4);
@@ -252,9 +252,9 @@ public class VKMessage implements Serializable {
         m.read_state = ((m.flag & UNREAD) == 0);
         m.is_out = (m.flag & OUTBOX) != 0;
         if ((m.flag & BESEDA) != 0) {
-            m.chat_id = a.optLong(3) - 2000000000;// & 63;//cut 6 last digits
+            m.chat_id = a.optInt(3) - 2000000000;// & 63;//cut 6 last digits
             JSONObject o = a.optJSONObject(7);
-            m.uid = o.optLong("from");
+            m.uid = o.optInt("from");
         }
        // m.attachment = a.getJSONArray(7); TODO
         m.attachments = VKAttachment.parseArray(a.optJSONArray(7));
@@ -282,7 +282,7 @@ public class VKMessage implements Serializable {
                     case "chat":
                         item.type = SearchDialogItem.SDIType.CHAT;
                         VKMessage m = new VKMessage();
-                        m.chat_id = o.getLong("id");
+                        m.chat_id = o.optInt("id");
                         m.admin_id = o.getLong("admin_id");
                         m.title = o.getString("title");
                         JSONArray users = o.optJSONArray("users");

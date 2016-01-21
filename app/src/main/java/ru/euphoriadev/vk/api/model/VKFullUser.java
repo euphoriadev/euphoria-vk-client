@@ -12,7 +12,7 @@ import ru.euphoriadev.vk.api.Api;
 //Fields are optional. Should be null if not populated
 public class VKFullUser implements Serializable {
     private static final long serialVersionUID = 1L;
-    public long uid;
+    public int uid;
     public String first_name = "DELETED";
     public String last_name = "";
     public String nickname;
@@ -81,7 +81,7 @@ public class VKFullUser implements Serializable {
     public int user_photos_count;
     public int user_videos_count;
     public int followers_count;
-    public long invited_by;
+    public int invited_by;
     //public int subscriptions_count;
     //public int online_friends_count;
     public String phone;//for getByPhones
@@ -114,7 +114,7 @@ public class VKFullUser implements Serializable {
 
     public static VKFullUser parse(JSONObject source) {
         VKFullUser u = new VKFullUser();
-        u.uid = source.optLong("id");
+        u.uid = source.optInt("id");
         if (!source.isNull("first_name"))
             u.first_name = Api.unescape(source.optString("first_name"));
         if (!source.isNull("last_name"))
@@ -243,14 +243,14 @@ public class VKFullUser implements Serializable {
             u.about = source.optString("about");
 
         if (!source.isNull("invited_by"))
-            u.invited_by = source.optLong("invited_by");
+            u.invited_by = source.optInt("invited_by");
 
         return u;
     }
 
     public static VKFullUser parseFromNews(JSONObject jprofile) throws JSONException {
         VKFullUser m = new VKFullUser();
-        m.uid = jprofile.getLong("id");
+        m.uid = jprofile.optInt("id");
         m.first_name = Api.unescape(jprofile.optString("first_name"));
         m.last_name = Api.unescape(jprofile.optString("last_name"));
         m.photo = jprofile.optString("photo_50");
@@ -264,7 +264,7 @@ public class VKFullUser implements Serializable {
 
     public static VKFullUser parseFromGetByPhones(JSONObject o) throws JSONException {
         VKFullUser u = new VKFullUser();
-        u.uid = o.getLong("id");
+        u.uid = o.optInt("id");
         u.first_name = Api.unescape(o.optString("first_name"));
         u.last_name = Api.unescape(o.optString("last_name"));
         u.phone = o.optString("phone");
@@ -313,7 +313,7 @@ public class VKFullUser implements Serializable {
 
     public static VKFullUser parseFromFave(JSONObject jprofile) throws JSONException {
         VKFullUser m = new VKFullUser();
-        m.uid = Long.parseLong(jprofile.getString("id"));
+        m.uid = jprofile.optInt("id");
         m.first_name = Api.unescape(jprofile.optString("first_name"));
         m.last_name = Api.unescape(jprofile.optString("last_name"));
         m.photo_medium_rec = jprofile.optString("photo_100");
@@ -329,7 +329,7 @@ public class VKFullUser implements Serializable {
 
     public static VKFullUser parseFromNotifications(JSONObject jprofile) throws JSONException {
         VKFullUser m = new VKFullUser();
-        m.uid = jprofile.getLong("id");
+        m.uid = jprofile.optInt("id");
         m.first_name = Api.unescape(jprofile.optString("first_name"));
         m.last_name = Api.unescape(jprofile.optString("last_name"));
         m.photo_medium_rec = jprofile.optString("photo_100");

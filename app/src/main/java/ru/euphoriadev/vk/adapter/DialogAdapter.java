@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -59,19 +60,15 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
     private LayoutInflater inflater;
     private ArrayList<DialogItem> dialogItems;
     private ThemeManagerOld tManager;
-    private SQLiteDatabase database;
     private Handler handler;
     private ServiceConnection serviceConnection;
     private LongPollService longPollService;
     private boolean mBoundService = false;
-    private Spanned spannableString;
     private DBHelper helper;
-    private Typeface typeface;
     private Typeface typefaceBold;
     private int fullNameTextColor;
     private int bodyTextColor;
     private Date date;
-    private int newMessage = 0;
 
 
     public DialogAdapter(final Context context, ArrayList<DialogItem> listMessages) {
@@ -89,7 +86,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
 
         helper = DBHelper.get(context);
         helper.open();
-        database = helper.getWritableDatabase();
         handler = new Handler(Looper.getMainLooper());
         serviceConnection = new ServiceConnection() {
             @Override
@@ -499,7 +495,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         });
     }
 
-    private void addUserToDB(final long uid, final VKMessage message) {
+    private void addUserToDB(final int uid, final VKMessage message) {
         ThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -535,8 +531,8 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         TextView tvDate;
         View indicator;
         TextView tvUnreadCount;
-        CircleImageView ivPhoto;
-        CircleImageView ivLastPhotoUser;
+        ImageView ivPhoto;
+        ImageView ivLastPhotoUser;
         View onlineIndicator;
         //     LinearLayout lLayout;
 

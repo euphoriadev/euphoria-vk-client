@@ -61,7 +61,7 @@ public class ImportantMessagesActivity extends BaseThemedActivity {
                         return;
                     }
 
-                    HashMap<Long, VKUser> mapUsers = new HashMap<>();
+                    HashMap<Integer, VKUser> mapUsers = new HashMap<>();
                     for (int i = 0; i < vkMessages.size(); i++) {
                         VKMessage message = vkMessages.get(i);
                         message.chat_id = 1;
@@ -69,7 +69,7 @@ public class ImportantMessagesActivity extends BaseThemedActivity {
                     }
 
                     // находим юзеров по id сообщения
-                    Set<Long> uids = mapUsers.keySet();
+                    Set<Integer> uids = mapUsers.keySet();
                     ArrayList<VKUser> vkUsers = Api.get().getProfiles(uids, null, null, null, null);
                     for (int i = 0; i < vkUsers.size(); i++) {
                         VKUser user = vkUsers.get(i);

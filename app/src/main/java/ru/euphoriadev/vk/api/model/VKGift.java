@@ -11,7 +11,7 @@ public class VKGift implements Serializable {
     /**
      * User id who sent the gift, or 0 if the sender is hidden
      */
-    public long from_id;
+    public int from_id;
 
     /**
      * Gift ID
@@ -36,7 +36,7 @@ public class VKGift implements Serializable {
 
     public VKGift(JSONObject sourse) {
         id = sourse.optLong("id");
-        from_id = sourse.optLong("from_id");
+        from_id = sourse.optInt("from_id");
         date = sourse.optLong("date");
 
         if (sourse.has("gift")) {

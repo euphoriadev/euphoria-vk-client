@@ -4,12 +4,16 @@ import android.content.Context;
 import android.net.http.HttpResponseCache;
 import android.util.Log;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -94,8 +98,7 @@ public class AsyncHttpClient implements Closeable {
                 Log.e(TAG, "Server returned response code: " + responseCode);
                 throw new HttpResponseCodeException(responseMessage, responseCode);
             }
-
-            InputStream is = connection.getInputStream();
+            InputStream is = AndroidUtils.clone(connection.getInputStream());
             String encoding = connection.getHeaderField("Content-Encoding");
             if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
                 is = new GZIPInputStream(is);
@@ -104,10 +107,18 @@ public class AsyncHttpClient implements Closeable {
             // MalformedURLException | ConnectException | UnsupportedEncodingException | ProtocolException | HttpResponseCodeException
         } catch (IOException e) {
             e.printStackTrace();
+            if (connection != null) {
+                IOUtils.closeQuietly(connection.getErrorStream());
+            }
 
             if (e instanceof HttpResponseCodeException) {
                 throw (HttpResponseCodeException) e;
             } else throw new HttpResponseCodeException(e.getMessage(), HttpResponseCodeException.NETWORK_ERROR);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+                connection = null;
+            }
         }
     }
 

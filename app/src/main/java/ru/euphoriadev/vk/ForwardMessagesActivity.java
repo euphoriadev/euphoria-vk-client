@@ -40,16 +40,15 @@ public class ForwardMessagesActivity extends BaseThemedActivity {
             @Override
             public void run() {
                 try {
-
                     ArrayList<VKMessage> apiMessages = (ArrayList<VKMessage>) getIntent().getSerializableExtra("messages");
-                    ArrayList<Long> uids = new ArrayList<Long>();
+                    ArrayList<Integer> uids = new ArrayList<>();
 
                     for (VKMessage m : apiMessages) {
                         uids.add(m.uid);
                     }
 
                     ArrayList<VKUser> profiles = api.getProfiles(uids, null, null, null, null);
-                    HashMap<Long, VKUser> mapPhotos = new HashMap<>();
+                    HashMap<Integer, VKUser> mapPhotos = new HashMap<>();
                     for (VKUser user : profiles) {
                         mapPhotos.put(user.user_id, user);
                     }

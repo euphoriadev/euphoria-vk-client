@@ -188,8 +188,8 @@ public class Api {
                 ;
     }
 
-    public long getUserId() {
-        return mAccount.user_id;
+    public int getUserId() {
+        return (int) mAccount.user_id;
     }
 
     public Account getAccount() {
@@ -390,7 +390,7 @@ public class Api {
 
     //*** methods for users ***//
     //http://vk.com/dev/users.get
-    public ArrayList<VKFullUser> getProfilesFull(Collection<Long> uids, Collection<String> domains, String fields, String name_case, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
+    public ArrayList<VKFullUser> getProfilesFull(Collection<Integer> uids, Collection<String> domains, String fields, String name_case, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
         if (uids == null && domains == null)
             return null;
         if ((uids != null && uids.size() == 0) || (domains != null && domains.size() == 0))
@@ -419,7 +419,7 @@ public class Api {
         return VKFullUser.parse(response.optJSONObject(0));
     }
 
-    public ArrayList<VKUser> getProfiles(Collection<Long> uids, Collection<String> domains, String name_case, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
+    public ArrayList<VKUser> getProfiles(Collection<Integer> uids, Collection<String> domains, String name_case, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
         if (uids == null && domains == null)
             return null;
         if ((uids != null && uids.size() == 0) || (domains != null && domains.size() == 0))
@@ -437,9 +437,9 @@ public class Api {
         return VKUser.parseUsers(array);
     }
 
-    public VKUser getProfile(long user_id) {
+    public VKUser getProfile(int user_id) {
         try {
-            ArrayList<Long> uids = new ArrayList<>();
+            ArrayList<Integer> uids = new ArrayList<>();
             uids.add(user_id);
 
             return getProfiles(uids, null, null, null, null).get(0);
@@ -927,7 +927,7 @@ public class Api {
     }
 
     //http://vk.com/dev/messages.setActivity
-    public Integer setMessageActivity(Long uid, Long chat_id, boolean typing) throws IOException, JSONException, KException {
+    public Integer setMessageActivity(Integer uid, Integer chat_id, boolean typing) throws IOException, JSONException, KException {
         VKParams params = new VKParams("messages.setActivity");
         params.put("user_id", uid);
         params.put("chat_id", chat_id);
@@ -952,7 +952,7 @@ public class Api {
     }
 
     //http://vk.com/dev/messages.send
-    public Long sendMessage(Long uid, long chat_id, String message, String title, String type, Collection<String> attachments, ArrayList<Long> forward_messages, String lat, String lon, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
+    public Integer sendMessage(int uid, long chat_id, String message, String title, String type, Collection<String> attachments, ArrayList<Long> forward_messages, String lat, String lon, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
         VKParams params = new VKParams("messages.send");
         if (chat_id <= 0)
             params.put("user_id", uid);
@@ -967,7 +967,7 @@ public class Api {
         params.put("long", lon);
         addCaptchaParams(captcha_key, captcha_sid, params);
         JSONObject root = sendRequest(params, true);
-        return root.optLong("response");
+        return root.optInt("response");
     }
 
     //http://vk.com/dev/messages.markAsNew
@@ -1024,7 +1024,7 @@ public class Api {
     }
 
     //http://vk.com/dev/messages.delete
-    public Long deleteMessage(Collection<Long> message_ids) throws IOException, JSONException, KException {
+    public Long deleteMessage(Collection<Integer> message_ids) throws IOException, JSONException, KException {
         if (message_ids.isEmpty()) return null;
 
         VKParams params = new VKParams("messages.delete");
@@ -1036,7 +1036,7 @@ public class Api {
     }
 
     // Получение 1.5к сообщений в истории перписки
-    public ArrayList<VKMessage> getMessagesHistoryWithExecute(Long user_id, Long chat_id, long me, long offset) throws JSONException, IOException, KException {
+    public ArrayList<VKMessage> getMessagesHistoryWithExecute(Integer user_id, Integer chat_id, long me, long offset) throws JSONException, IOException, KException {
         String var;
         if (chat_id != 0) {
             var = "\"chat_id\":"+ chat_id + ",\n" +
@@ -1220,7 +1220,7 @@ public class Api {
      * for audio **
      */
     //http://vk.com/dev/audio.get
-    public ArrayList<VKAudio> getAudio(Long owner_id, Long album_id, long count, long offset, Collection<Long> aids, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
+    public ArrayList<VKAudio> getAudio(Integer owner_id, Integer album_id, long count, long offset, Collection<Long> aids, String captcha_key, String captcha_sid) throws IOException, JSONException, KException {
         VKParams params = new VKParams("audio.get");
         if (owner_id != null)
             params.put("owner_id", owner_id);
@@ -1334,7 +1334,7 @@ public class Api {
      * for video **
      */
     //http://vk.com/dev/video.get
-    public ArrayList<VKVideo> getVideo(String videos, Long owner_id, Long album_id, String width, Long count, Long offset, String access_key) throws IOException, JSONException, KException {
+    public ArrayList<VKVideo> getVideo(String videos, int owner_id, Long album_id, String width, Long count, Long offset, String access_key) throws IOException, JSONException, KException {
         VKParams params = new VKParams("video.get");
         params.put("videos", videos);
         params.put("owner_id", owner_id);
@@ -1413,7 +1413,7 @@ public class Api {
      * for notes **
      */
     //http://vk.com/dev/notes.get
-    public ArrayList<VKNote> getNotes(Long uid, Collection<Long> nids, String sort, Long count, Long offset) throws IOException, JSONException, KException {
+    public ArrayList<VKNote> getNotes(Integer uid, Collection<Long> nids, String sort, Long count, Long offset) throws IOException, JSONException, KException {
         VKParams params = new VKParams("notes.get");
         params.put("user_id", uid);
         params.put("note_ids", arrayToString(nids));
@@ -1729,7 +1729,7 @@ public class Api {
     }
 
     //http://vk.com/dev/groups.get
-    public ArrayList<VKGroup> getGroups(Long user_id) throws IOException, JSONException, KException {
+    public ArrayList<VKGroup> getGroups(Integer user_id) throws IOException, JSONException, KException {
         VKParams params = new VKParams("groups.get");
         params.put("extended", "1");
         params.put("fields", "members_count");
@@ -2474,7 +2474,7 @@ public class Api {
     }
 
     //http://vk.com/dev/messages.getById
-    public ArrayList<VKMessage> getMessagesById(ArrayList<Long> message_ids) throws IOException, JSONException, KException {
+    public ArrayList<VKMessage> getMessagesById(ArrayList<Integer> message_ids) throws IOException, JSONException, KException {
         VKParams params = new VKParams("messages.getById");
         params.put("message_ids", arrayToString(message_ids));
         JSONObject root = sendRequest(params);
@@ -2598,7 +2598,7 @@ public class Api {
      * chat methods **
      */
     //http://vk.com/dev/messages.createChat
-    public Long сreateChat(ArrayList<Long> uids, String title) throws IOException, JSONException, KException {
+    public Long сreateChat(ArrayList<Integer> uids, String title) throws IOException, JSONException, KException {
         if (uids == null || uids.size() == 0)
             return null;
         VKParams params = new VKParams("messages.createChat");
@@ -2841,7 +2841,7 @@ public class Api {
     }
 
     //http://vk.com/dev/docs.get
-    public ArrayList<VKDocument> getDocs(Long owner_id, Long count, Long offset) throws IOException, JSONException, KException {
+    public ArrayList<VKDocument> getDocs(Integer owner_id, Integer count, Long offset) throws IOException, JSONException, KException {
         VKParams params = new VKParams("docs.get");
         params.put("owner_id", owner_id);
         params.put("count", count);
