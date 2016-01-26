@@ -33,6 +33,8 @@
         • Немного изменена разметка;\n
         • Возможность скрыть время в истории;\n
         • Отображение кол-ва диалогов в Toolbar;\n
+        • Настройка иконки отравки;\n
+        • Немного подправлен механизм сохранения сообщений;\n
         \n
         <u>0.8</u>\n
         • Заметки;\n
@@ -307,8 +309,9 @@
     <string name="thank_you">Спасибо!</string>
     <string name="gifts">Подарки</string>
     <string name="prefs_use_second_profile">Использовать второй профиль</string>
-    <string name="prefs_use_second_profile_description">(Еще не реализовано)
-    </string>
+    <string name="prefs_use_second_profile_description">(Еще не реализовано)</string>
+    <string name="prefs_use_cat_icon_send">Добавить няшности</string>
+    <string name="prefs_use_cat_icon_send_description">Использовать другую иконку отправки сообщения: лапка кота</string>
     <string name="videos">Видео</string>
     <string name="prefs_other">Прочее</string>
     <string name="prefa_unstable_connection">Режим RFM</string>

@@ -14,7 +14,13 @@ public class VKUser implements Serializable {
     /**
      * Empty user object
      */
-    public static final VKUser EMPTY_USER = new VKUser();
+    public static final VKUser EMPTY_USER = new VKUser() {
+
+        @Override
+        public String toString() {
+            return "Empty User";
+        }
+    };
 
     /**
      *

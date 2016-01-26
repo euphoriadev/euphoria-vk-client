@@ -16,10 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.api.model.VKResolveScreenName;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.Account;
@@ -92,15 +89,14 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                     try {
                         api.setOffline();
 
-                        ArrayList<Integer> userIds = new ArrayList<>();
-                        userIds.add(account.user_id);
-
-                        ArrayList<VKFullUser> profiles = api.getProfilesFull(userIds, null, "status, photo_100", null, null, null);
-                        for (VKFullUser user : profiles) {
-                            account.fullName = user.first_name + " " + user.last_name;
-                            account.photo = user.photo_medium_rec;
-                            account.status = user.status;
+                        VKUser user = api.getProfile(account.user_id);
+                        if (user == null) {
+                            user = VKUser.EMPTY_USER;
                         }
+
+                        account.fullName = user.toString();
+                        account.photo = user.photo_50;
+                        account.status = user.status;
                         account.save();
 
                         runOnUiThread(new Runnable() {

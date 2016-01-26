@@ -32,6 +32,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
     public static final String ACTION_NEXT_AUDIO = "ru.euphoriadev.vk.ACTION_NEXT";
     public static final String ACTION_PREV_AUDIO = "ru.euphoriadev.vk.ACTION_PREV";
     private final static String TAG = "PlayMusicService";
+
     private String lastPlayUrl;
     private VKAudio mAudio;
     private MediaPlayer mMediaPlayer;
@@ -53,7 +54,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
         starterActivity.putExtra("audio", mAudio);
 
         Intent playIntent = new Intent(getApplicationContext(), PlayMusicService.class).setAction(ACTION_PLAY);
-        Intent pauseInent = new Intent(getApplicationContext(), PlayMusicService.class).setAction(ACTION_PAUSE);
+        Intent pauseIntent = new Intent(getApplicationContext(), PlayMusicService.class).setAction(ACTION_PAUSE);
         Intent prevIntent = new Intent(getApplicationContext(), PlayMusicService.class).setAction(ACTION_PREV_AUDIO);
         Intent nextIntent = new Intent(getApplicationContext(), PlayMusicService.class).setAction(ACTION_NEXT_AUDIO);
 
@@ -69,7 +70,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
                 .setSmallIcon(R.drawable.ic_audiotrack_white)
                 .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, starterActivity, 0))
                 .addAction(R.drawable.ic_fast_rewind, null, PendingIntent.getService(getApplicationContext(), 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(audio.isPlaying ? R.drawable.ic_pause : R.drawable.ic_play_arrow, null, PendingIntent.getService(getApplicationContext(), 0, mAudio.isPlaying ? pauseInent : playIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(audio.isPlaying ? R.drawable.ic_pause : R.drawable.ic_play_arrow, null, PendingIntent.getService(getApplicationContext(), 0, mAudio.isPlaying ? pauseIntent : playIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(R.drawable.ic_fast_forward, null, PendingIntent.getService(getApplicationContext(), 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
 //        ComponentName componentName = new ComponentName(getApplicationContext(), MediaPlayerReceiver.class);

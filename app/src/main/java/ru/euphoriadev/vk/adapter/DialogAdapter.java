@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -118,11 +117,15 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         final DialogItem dialog = search(uid, chat_id);
         if (dialog != null) {
             dialog.isTyping = true;
+            dialog.userIdTyping = (int) uid;
+            dialog.chatIdTyping = (int) chat_id;
             notifyDataSetChanged();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     dialog.isTyping = false;
+                    dialog.userIdTyping = -1;
+                    dialog.chatIdTyping = -1;
                     notifyDataSetChanged();
                 }
             }, 5000);
@@ -338,7 +341,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             holder.tvBody.setText(message.body);
         }
 
-        if (item.message.is_out || item.message.isChat()) {
+        if (item.isTyping ? item.userIdTyping == Api.get().getUserId() : item.message.is_out || item.message.isChat()) {
             holder.ivLastPhotoUser.setVisibility(View.VISIBLE);
 
             Picasso.with(context)
@@ -350,6 +353,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             holder.ivLastPhotoUser.setVisibility(View.GONE);
             holder.ivLastPhotoUser.setImageDrawable(null);
         }
+
 
 //      Загрузка изображений
         try {

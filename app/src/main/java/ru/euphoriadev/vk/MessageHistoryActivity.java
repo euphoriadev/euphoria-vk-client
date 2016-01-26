@@ -57,6 +57,7 @@ import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.util.YandexTranslator;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
@@ -95,7 +96,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         String fullName = getIntent().getExtras().getString("fullName");
         uid = getIntent().getExtras().getInt("user_id");
         chat_id = getIntent().getExtras().getInt("chat_id");
-        long users_count = getIntent().getExtras().getLong("users_count");
+        int users_count = getIntent().getExtras().getInt("users_count");
         boolean isOnline = getIntent().getExtras().getBoolean("online");
         boolean from_saved = getIntent().getExtras().getBoolean("from_saved", false);
         boolean from_service = getIntent().getExtras().getBoolean("from_sarvice", false);
@@ -139,6 +140,9 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 sendMessage(etMessageText.getText().toString());
             }
         });
+        if (!PrefManager.getBoolean(PrefsFragment.KEY_USE_CAT_ICON_SEND)) {
+            fabSend.setImageResource(R.drawable.ic_keyboard_arrow_right);
+        }
 
         ViewUtil.setFilter(fabSend, ThemeManager.getPrimaryTextColorOnAccent(this));
 
@@ -604,6 +608,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             fillList(history, cursor);
 
             lvHistory.setAdapter(adapter);
+            lvHistory.setSelection(history.size());
         }
         cursor.close();
 
@@ -670,23 +675,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         database.execSQL("DELETE FROM " + DBHelper.MESSAGES_TABLE + " WHERE _id = " + _id);
                     }
                     c.close();
-
-                    // загружаем новую партию сообщений в бд
-                    ContentValues cv = new ContentValues();
-                    database.beginTransaction();
-                    for (VKMessage msg : vkMessages) {
-                        cv.put(DBHelper.MESSAGE_ID, msg.mid);
-                        cv.put(DBHelper.USER_ID, msg.uid);
-                        cv.put(DBHelper.CHAT_ID, msg.chat_id);
-                        cv.put(DBHelper.BODY, msg.body);
-                        cv.put(DBHelper.DATE, msg.date);
-                        cv.put(DBHelper.READ_STATE, msg.read_state);
-                        cv.put(DBHelper.IS_OUT, msg.is_out);
-                        database.insert(DBHelper.MESSAGES_TABLE, null, cv);
-
-
-                    }
-                    cv.clear();
+                    VKInsertHelper.insertDialogs(database, vkMessages, true);
                     vkMessages.clear();
                     vkMessages.trimToSize();
 
@@ -694,11 +683,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     adapter.connectToLongPoll();
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    if (database.inTransaction()) {
-                        database.setTransactionSuccessful();
-                        database.endTransaction();
-                    }
                 }
             }
         });
@@ -787,7 +771,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         return;
                     }
 
-                    // если это чат. то загружаем пользователей еще
+                    // если это чат. то загружаем пользователей
                     if (chat_id > 0) {
                         mapUsers = new HashMap<>();
 
@@ -801,7 +785,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                             VKUser user = apiProfiles.get(i);
                             mapUsers.put(user.user_id, user);
                         }
-
                     }
 
 
@@ -810,13 +793,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         history.add(0, new MessageItem(message, mapUsers == null ? emptyUser : mapUsers.get(message.uid)));
                     }
 
-//                    ArrayList<MessageItem> tempMessageList = new ArrayList<>(oldMessagesList.size());
-//                    for (int i = 0; i < oldMessagesList.size(); i++) {
-//                        VKMessage message = oldMessagesList.get(i);
-//                        tempMessageList.add(0, new MessageItem(message, mapUsers == null ? emptyUser : mapUsers.get(message.uid)));
-//                    }
-//
-//                    history.addAll(0, tempMessageList);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -829,6 +805,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
                         }
                     });
+                    VKInsertHelper.insertMessages(database, oldMessages, true);
 //                    adapter.getMessages().trimToSize();
                     if (oldMessages != null) {
                         oldMessages.clear();
@@ -889,11 +866,15 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     int mid = api.sendMessage(uid, chat_id, message.body, null, null, null, null, null, null, null, null);
                     item.status = MessageItem.Status.SENT;
                     item.message.mid = mid;
-                    helper.addMessageToDB(message);
+
+                    VKInsertHelper.sValues.clear();
+                    VKInsertHelper.insertMessage(database, message);
+                    VKInsertHelper.sValues.clear();
+                    VKInsertHelper.insertDialog(database, message);
                 } catch (Exception e) {
                     e.printStackTrace();
                     item.setStatus(MessageItem.Status.ERROR);
-                    if (PreferenceManager.getDefaultSharedPreferences(MessageHistoryActivity.this).getBoolean("resend_failed_msg", true)) {
+                    if (PrefManager.getBoolean("resend_failed_msg", true)) {
                         ContentValues cv = new ContentValues();
                         cv.put(DBHelper.USER_ID, uid);
                         cv.put(DBHelper.CHAT_ID, chat_id);
@@ -1233,6 +1214,10 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
             case R.id.menuHideShowTime:
                 adapter.toggleStateTime();
+                break;
+
+            case R.id.menuMessageAttach:
+                Toast.makeText(this, "Еще не реализовано", Toast.LENGTH_LONG).show();
                 break;
 
             case android.R.id.home:

@@ -35,7 +35,6 @@ public class MediaPlayerHelper {
         intent.setAction(PlayMusicService.ACTION_PLAY);
         intent.putExtra(VALUE, audio);
 
-
         context.startService(intent);
     }
 

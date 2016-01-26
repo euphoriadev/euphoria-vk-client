@@ -9,9 +9,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.ThemeManager;
@@ -98,11 +95,22 @@ public class TestActivity extends BaseThemedActivity {
         buttonGC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tvResult.setText("Garbage Collector\n");
+                tvResult.append("Garbage Collector\n");
                 System.gc();
             }
         });
         rootLayout.addView(buttonGC);
+
+//        AppCompatButton buttonNative = new AppCompatButton(this);
+//        buttonNative.setText("Native method");
+//        buttonNative.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                tvResult.append(NativeUtils.helloFromJni());
+//                System.gc();
+//            }
+//        });
+//        rootLayout.addView(buttonNative);
 
         AppCompatButton buttonClear = new AppCompatButton(this);
         buttonClear.setText("Clear text");
@@ -113,6 +121,7 @@ public class TestActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(buttonClear);
+
     }
 
     private void connectToGoogle() {

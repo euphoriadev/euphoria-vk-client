@@ -47,7 +47,11 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
 
     @Override
     public E getItem(int position) {
-        return mValues.get(position);
+        if (position < getCount()) {
+            return mValues.get(position);
+        } else {
+            return mValues.get(0);
+        }
     }
 
     @Override

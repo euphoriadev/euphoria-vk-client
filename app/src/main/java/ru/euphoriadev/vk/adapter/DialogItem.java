@@ -15,7 +15,10 @@ public class DialogItem implements Comparable<DialogItem> {
     public VKMessage message;
     public VKUser user;
     public Date date;
+
     public boolean isTyping;
+    public int userIdTyping;
+    public int chatIdTyping;
 
 
     public DialogItem(VKMessage message, VKUser user) {

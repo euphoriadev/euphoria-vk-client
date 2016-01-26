@@ -79,6 +79,8 @@
     <string name="type_page">Page</string>
     <string name="type_event">Event</string>
     <string name="offline">Offline</string>
+    <string name="prefs_use_cat_icon_send">Use cat icon</string>
+    <string name="prefs_use_cat_icon_send_description">Use the icon of pads of a cat to send messages</string>
     <string name="prefs_show_divider">Show dividers</string>
     <string name="prefs_show_divider_description">Will be shown dividers in the conversation list</string>
     <string name="prefs_font">Font</string>

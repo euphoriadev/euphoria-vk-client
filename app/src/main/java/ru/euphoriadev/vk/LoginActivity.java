@@ -46,7 +46,7 @@ public class LoginActivity extends Activity {
                     String[] auth = Auth.parseRedirectUrl(url);
                     Intent intent = new Intent();
                     intent.putExtra("token", auth[0]);
-                    intent.putExtra("user_id", Long.parseLong(auth[1]));
+                    intent.putExtra("user_id", Integer.parseInt(auth[1]));
                     setResult(Activity.RESULT_OK, intent);
 
                 }

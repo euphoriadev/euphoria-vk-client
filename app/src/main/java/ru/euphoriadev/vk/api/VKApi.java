@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,7 +44,8 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
 public class VKApi {
     public static final String TAG = "Euphoria.VKApi";
     public static final String BASE_URL = "https://api.vk.com/method/";
-    public static final String API_VERSION = "5.14";
+//  public static final String API_VERSION = "5.14";
+    public static final String API_VERSION = "5.44";
 
     protected static volatile VKApi sInstante;
 
@@ -1272,7 +1272,7 @@ public class VKApi {
         /**
          * Convert items to {@link String}
          */
-        static <T> String arrayToString(Collection<T> items) {
+        public static <T> String arrayToString(Collection<T> items) {
             if (isEmpty(items)) {
                 return null;
             }
@@ -1286,7 +1286,7 @@ public class VKApi {
         }
 
         @SafeVarargs
-        static <T> String arrayToString(T... array) {
+        public static <T> String arrayToString(T... array) {
             if (array.length == 0) {
                 return null;
             }
@@ -1305,7 +1305,7 @@ public class VKApi {
          * @param list the collection to be examined
          * @return true of list is null or empty
          */
-        static boolean isEmpty(Collection list) {
+        public static boolean isEmpty(Collection list) {
             return list == null || list.isEmpty();
         }
 

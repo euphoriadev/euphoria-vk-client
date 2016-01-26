@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.util.LogWriter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -50,6 +49,7 @@ import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.FileLogger;
+import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
@@ -91,6 +91,9 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         ((BasicActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
         ((BasicActivity) getActivity()).hideSpinner();
+        ((BaseThemedActivity) getActivity())
+                .getSupportActionBar()
+                .setSubtitle(activity.getString(R.string.dialogs_number) + PrefManager.getInt("message_count", 0));
 
         listView = (ListView) rootView.findViewById(R.id.lvMess);
         tm.initDivider(listView);
@@ -168,13 +171,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         swipeLayout.setOnRefreshListener(this);
         swipeLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN, Color.BLACK);
 
-//        IconicsDrawable iconPlus = new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_create);
-//        iconPlus.sizeDp(18);
-//        if (tm.isBlackTheme()) {
-//            iconPlus.color(Color.BLACK);
-//        } else {
-//            iconPlus.color(Color.WHITE);
-//        }
 
 
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -219,7 +215,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         //  listView.setAdapter(adapter);
         account = new Account(getActivity()).restore();
         loadDialogs(false);
-
         return rootView;
     }
 
@@ -484,9 +479,16 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
             @Override
             public void onResponse(JSONObject responseJson) {
+                final JSONObject response = responseJson.optJSONObject("response");
+                if (response == null) {
+                    return;
+                }
+                int messageCount = response.optInt("count");
+                PrefManager.putInt("message_count", messageCount);
+
                         ((BaseThemedActivity) getActivity())
                         .getSupportActionBar()
-                        .setSubtitle(activity.getString(R.string.dialogs_number) + responseJson.optJSONObject("response").optInt("count"));
+                        .setSubtitle(activity.getString(R.string.dialogs_number) + messageCount);
             }
 
             @Override

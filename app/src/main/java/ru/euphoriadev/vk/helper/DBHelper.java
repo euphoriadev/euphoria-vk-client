@@ -16,6 +16,9 @@ import ru.euphoriadev.vk.api.model.VKUser;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
+    private static final String DATABASE_NAME = "euphoria.db";
+    private static final int DATABASE_VERSION = 80;
+
     public static final String USERS_TABLE = "users";
     public static final String FRIENDS_TABLE = "friends";
     public static final String DIALOGS_TABLE = "dialogs";
@@ -27,6 +30,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String USER_GROUP_TABLE = "user_group";
     public static final String STATS_MESSAGES_TABLE= "stats_messages";
     public static final String FAILED_MESSAGES_TABLE= "failed_messages";
+
+
     public static final String _ID = "_id";
     public static final String USER_ID = "user_id";
     public static final String OWNER_ID = "owner_id";
@@ -56,6 +61,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String IS_FRIEND = "is_friend";
     public static final String PHOTO_50 = "photo_50";
     public static final String PHOTO_100 = "photo_100";
+    public static final String PHOTO_200 = "photo_200";
     public static final String PHOTO_400 = "photo_400";
     public static final String PHOTO_MAX = "photo_max";
     public static final String POSITION_DECIMAL = "position";
@@ -73,8 +79,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TYPE = "type";
     public static final String DESCRIPTION = "description";
     public static final String MEMBERS_COUNT = "members_count";
-    private static final String DATABASE_NAME = "euphoria.db";
-    private static final int DATABASE_VERSION = 78;
+
+
     private static final String SQL_CREATE_TABLE_USERS = "CREATE TABLE " + USERS_TABLE +
             " (" + USER_ID + " INTEGER PRIMARY KEY ON CONFLICT REPLACE, " +
             " [" + FIRST_NAME + "] VARCHAR(255), " +
@@ -86,6 +92,8 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + IS_FRIEND + "] VARCHAR(255), " +
             " [" + LAST_SEEN + "] INTEGER VARCHAR(255), " +
             " [" + PHOTO_50 + "] VARCHAR(255), " +
+            " [" + PHOTO_100 + "] VARCHAR(255), " +
+            " [" + PHOTO_200 + "] VARCHAR(255), " +
             " [" + PHOTO_400 + "] VARCHAR(255), " +
             " [" + PHOTO_MAX + "] VARCHAR(255), " +
             " [" + POSITION_DECIMAL + "] DECIMAL" +
@@ -97,6 +105,7 @@ public class DBHelper extends SQLiteOpenHelper {
             ");";
     private static final String SQL_CREATE_TABLE_DIALOGS = "CREATE TABLE " + DIALOGS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            " [" + MESSAGE_ID + "] INTEGER, " +
             " [" + USER_ID + "] INTEGER, " +
             " [" + CHAT_ID + "] INTEGER, " +
             " [" + TITLE + "] VARCHAR(255), " +

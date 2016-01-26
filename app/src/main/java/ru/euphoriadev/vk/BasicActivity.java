@@ -22,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,21 +30,16 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
-import ru.euphoriadev.vk.api.VKApi;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
@@ -70,7 +64,6 @@ public class BasicActivity extends BaseThemedActivity implements
     private SharedPreferences sPrefs;
     private long backPressedTime;
 
-    private int lastFragmentId;
     private boolean isInitedDrawer;
 
     @Override
@@ -193,16 +186,14 @@ public class BasicActivity extends BaseThemedActivity implements
     /**
      * Swaps fragments in the main content view
      */
-    private void selectItem(int id) {
+    private void selectItem(final int id) {
         // Update the main content by replacing fragments
-//        if (lastFragmentId == id) {
-//            return;
-//        }
-//        lastFragmentId = id;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getSupportActionBar().setSubtitle(null);
+                if (id != R.id.navPrefs) {
+                    getSupportActionBar().setSubtitle(null);
+                }
             }
         });
         switch (id) {

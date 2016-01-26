@@ -23,20 +23,12 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
-
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.Utils;
 import ru.euphoriadev.vk.service.EternallOnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.AppLoader;
 import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
@@ -57,7 +49,7 @@ import ru.euphoriadev.vk.view.pref.ProgressBarPreference;
  * Created by Igor on 28.02.15.
  */
 public class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-    /** Preference keys */
+    /** Preference keys. Making */
     public static final String KEY_IS_NIGHT_MODE = "is_night_theme";
     public static final String KEY_COLOR_IN_MESSAGES = "color_in_messages";
     public static final String KEY_COLOR_OUT_MESSAGES = "color_out_messages";
@@ -65,6 +57,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     public static final String KEY_BLUR_RADIUS = "blur_radius";
     public static final String KEY_SHOW_DIVIDER = "show_divider";
     public static final String KEY_USE_TWO_PROFILE = "use_two_profile";
+    public static final String KEY_USE_CAT_ICON_SEND = "use_cat_icon_send";
     public static final String KEY_FORCED_LOCALE = "forced_locale";
 
     /** Font keys */
@@ -240,6 +233,14 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         boxTwoProfile.setDefaultValue(false);
 
         categoryUI.addPreference(boxTwoProfile);
+
+        CheckBoxPreference boxUseCatIcon = new MaterialCheckBoxPreference(getActivity());
+        boxUseCatIcon.setTitle(getActivity().getString(R.string.prefs_use_cat_icon_send));
+        boxUseCatIcon.setSummary(getActivity().getString(R.string.prefs_use_cat_icon_send_description));
+        boxUseCatIcon.setKey(KEY_USE_CAT_ICON_SEND);
+        boxUseCatIcon.setDefaultValue(true);
+
+        categoryUI.addPreference(boxUseCatIcon);
 
 
         ListPreference listSelectLocale = new MaterialListPreference(getActivity());
