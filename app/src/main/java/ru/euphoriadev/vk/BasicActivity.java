@@ -121,20 +121,6 @@ public class BasicActivity extends BaseThemedActivity implements
         }
         RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
         startService(new Intent(this, LongPollService.class));
-
-//        VKApi.init(VKApi.VKAccount.from(account));
-//        VKApi.authorization("89672465439", "Psy6727277PS", new VKApi.VKOnResponseListener() {
-//            @Override
-//            public void onResponse(JSONObject responseJson) {
-//                Log.w(VKApi.TAG, responseJson.toString());
-//            }
-//
-//            @Override
-//            public void onError(VKApi.VKException exception) {
-//                Log.w(VKApi.TAG, exception.errorMessage);
-//            }
-//        });
-
     }
 
     @Override
@@ -308,15 +294,21 @@ public class BasicActivity extends BaseThemedActivity implements
                 try {
                     Thread.sleep(1000);
                     api.trackStatsVisitor();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
+                    AndroidUtils.runOnUi(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(BasicActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             }
         });
     }
 
     private void joinInGroup() {
-        int isJoinGroup = sPrefs.getInt("is_join_group", 0);
+        int isJoinGroup = PrefManager.getInt("is_join_group", 0);
 
         // Если уже в группе/ откахались вступить
         if (isJoinGroup == -1) {
@@ -338,7 +330,7 @@ public class BasicActivity extends BaseThemedActivity implements
 
                     if (isMemberGroup) {
                         // если мы уже в группе
-                        PrefManager.putInt("isJoinGroup", -1);
+                        PrefManager.putInt("is_join_group", -1);
                         FileLogger.w("BasicActivity", "IsMemberOfGroup");
                         return;
                     }
@@ -447,13 +439,13 @@ public class BasicActivity extends BaseThemedActivity implements
 
             if (!PrefManager.getBoolean(PrefsFragment.KEY_ENABLE_NOTIFY, true)) {
                 stopService(new Intent(this, LongPollService.class));
+                appLoader.getHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.exit(0);
+                    }
+                }, 800);
             }
-            appLoader.getHandler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    System.exit(0);
-                }
-            }, 800);
         } else {
             Toast.makeText(this, "Press once again to exit",
                     Toast.LENGTH_SHORT).show();
@@ -470,6 +462,8 @@ public class BasicActivity extends BaseThemedActivity implements
 
         System.gc();
         RefreshManager.unregisterForChangePreferences(this);
+        if (!PrefManager.getBoolean(PrefsFragment.KEY_ENABLE_NOTIFY, true))
+            stopService(new Intent(this, LongPollService.class));
     }
 
     @Override

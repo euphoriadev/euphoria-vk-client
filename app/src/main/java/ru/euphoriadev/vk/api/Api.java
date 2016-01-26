@@ -196,6 +196,10 @@ public class Api {
         return mAccount;
     }
 
+    public void setAccount(Account account) {
+        this.mAccount = account;
+    }
+
     public void setAccessToken(String access_token) {
         this.access_token = access_token;
     }

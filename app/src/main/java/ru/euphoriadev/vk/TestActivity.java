@@ -121,7 +121,6 @@ public class TestActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(buttonClear);
-
     }
 
     private void connectToGoogle() {

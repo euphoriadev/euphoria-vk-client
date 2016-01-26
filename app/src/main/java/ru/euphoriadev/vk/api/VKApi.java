@@ -3,10 +3,13 @@ package ru.euphoriadev.vk.api;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -103,6 +106,12 @@ public class VKApi {
      */
     public static VKMessages messages() {
         return new VKMessages();
+    }
+    /**
+     * Methods for friends
+     */
+    public static VKFriends friends() {
+        return new VKFriends();
     }
 
     /**
@@ -237,6 +246,13 @@ public class VKApi {
         }
 
         /**
+         * Create new vk account and restore properties from sd
+         */
+        public VKAccount(File file) {
+            this.restore(file);
+        }
+
+        /**
          * Create new VKAccount from {@link Account}, this is to support
          *
          * @param account the old account to get properties (access_token, userId)
@@ -266,22 +282,66 @@ public class VKApi {
         }
 
         /**
-         * Restores account properties from SD
+         * Save account properties into file
+         *
+         * @return true if save is successful
+         */
+        public boolean save(File file) {
+            JSONObject json = new JSONObject();
+            try {
+                json.putOpt(ACCESS_TOKEN, accessToken);
+                json.putOpt(USER_ID, userId);
+                json.putOpt(API_ID, apiId);
+                json.putOpt(EMAIL, email);
+
+                FileUtils.write(file, json.toString());
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Restores account properties from SharedPreferences
          *
          * @return this account
          */
         public VKAccount restore() {
             this.accessToken = PrefManager.getString(ACCESS_TOKEN);
-            this.email = PrefManager.getString(EMAIL);
             this.userId = PrefManager.getLong(USER_ID);
             this.apiId = PrefManager.getInt(API_ID);
+            this.email = PrefManager.getString(EMAIL);
             return this;
         }
 
+        /**
+         * Restores account properties from SD
+         *
+         * @return this account
+         */
+        public VKAccount restore(File file) {
+            try {
+                String readText = FileUtils.readFileToString(file);
+                JSONObject json = new JSONObject(readText);
+
+                this.accessToken = json.optString(ACCESS_TOKEN);
+                this.email = json.optString(EMAIL);
+                this.userId = json.optInt(USER_ID);
+                this.apiId = json.optInt(EMAIL);
+
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            return this;
+        }
+
+
         public void clear() {
             PrefManager.remove(ACCESS_TOKEN);
-            PrefManager.remove(EMAIL);
             PrefManager.remove(USER_ID);
+            PrefManager.remove(EMAIL);
+            PrefManager.remove(API_ID);
         }
     }
 
@@ -467,6 +527,233 @@ public class VKApi {
     }
 
     /**
+     * Api methods for friends
+     * <p/>
+     * http://vk.com/dev/friends
+     */
+    public static class VKFriends {
+
+        /**
+         * Returns a list of user IDs or detailed information about a user's friends
+         *
+         * http://vk.com/dev/friends.get
+         */
+        public VKFriendsMethodSetter get() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.get"));
+        }
+
+        /**
+         * Returns a list of user IDs of a user's friends who are online
+         *
+         * http://vk.com/dev/friends.getOnline
+         */
+        public VKFriendsMethodSetter getOnline() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getOnline"));
+        }
+
+        /**
+         * Returns a list of user IDs of the mutual friends of two users
+         *
+         * http://vk.com/dev/friends.getMutual
+         */
+        public VKFriendsMethodSetter getMutual() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getMutual"));
+        }
+
+        /**
+         * Returns a list of user IDs of the current user's recently added friends
+         *
+         * http://vk.com/dev/friends.getRecent
+         */
+        public VKFriendsMethodSetter getRecent() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getRecent"));
+        }
+
+        /**
+         * Returns information about the current user's incoming and outgoing friend requests
+         *
+         * http://vk.com/dev/friends.getRequests
+         */
+        public VKFriendsMethodSetter getRequests() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getRequests"));
+        }
+
+        /**
+         * Approves or creates a friend request.
+         * If the selected user ID is in the friend request list obtained
+         * using the friends.getRequests method,
+         * this method approves the friend request and adds
+         * the selected user to the current user's friend list.
+         * Otherwise, this method creates a friend request from the current user to
+         * the selected user.
+         *
+         * Returns one of the following values:
+         * 1 — Friend request sent.
+         * 2 — Friend request from the user approved.
+         * 4 — Request resending.
+         *
+         * Errors:
+         * 174	Cannot add user himself as friend
+         * 175	Cannot add this user to friends as they have put you on their blacklist
+         * 176  Cannot add this user to friends as you put him on blacklist
+         *
+         * http://vk.com/dev/friends.add
+         */
+        public VKFriendsMethodSetter add() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.add"));
+        }
+
+        /**
+         * Edits the friend lists of the selected user
+         *
+         * Result:
+         * Returns 1.
+         *
+         * http://vk.com/dev/friends.edit
+         */
+        public VKFriendsMethodSetter edit() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.edit"));
+        }
+
+        /**
+         * Declines a friend request or deletes a user from the current user's friend list.
+         * If the selected user ID is in the friend request list obtained
+         * using the friends.getRequests method,
+         * this method declines the friend request.
+         * Otherwise, this method deletes the specified user from the friend list
+         * of the current user obtained using the friends.get method.
+         *
+         * Returns one of the following values:
+         * 1 — User deleted from the current user's friend list.
+         * 2 — Friend request from the user declined.
+         * 3 — Friend request suggestion for the user deleted.
+         *
+         * Starting from version 5.28 returns object with fields:
+         * success —             managed successfully remove other
+         * friend_deleted —      has been removed each
+         * out_request_deleted — cancelled outgoing request
+         * in_request_deleted —  rejected the incoming request
+         * suggestion_deleted —  rejected the recommendation of a friend
+         *
+         * http://vk.com/dev/friends.delete
+         */
+        public VKFriendsMethodSetter delete() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.delete"));
+        }
+
+        /**
+         * Returns a list of the current user's friend lists
+         *
+         * Returns an array of list objects, each containing the following fields:
+         * lid —  Friend list ID.
+         * name — Friend list name.
+         *
+         * http://vk.com/dev/friends.getLists
+         */
+        public VKFriendsMethodSetter getLists() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getLists"));
+        }
+
+        /**
+         * Creates a new friend list for the current user
+         *
+         * Returns the ID (lid) of the friend list that was created
+         *
+         * http://vk.com/dev/friends.addList
+         */
+        public VKFriendsMethodSetter addList() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.addList"));
+        }
+
+        /**
+         * Edits a friend list of the current user.
+         *
+         * Returns 1.
+         *
+         * http://vk.com/dev/friends.editList
+         */
+        public VKFriendsMethodSetter editList() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.editList"));
+        }
+
+        /**
+         * Deletes a friend list of the current user.
+         *
+         * Returns 1.
+         *
+         * http://vk.com/dev/friends.deleteList
+         */
+        public VKFriendsMethodSetter deleteList() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.deleteList"));
+        }
+
+        /**
+         * Returns a list of IDs of the current user's friends
+         * who installed the application.
+         *
+         * http://vk.com/dev/friends.getAppUsers
+         */
+        public VKFriendsMethodSetter getAppUsers() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getAppUsers"));
+        }
+
+        /**
+         * Returns a list of the current user's friends whose phone numbers,
+         * validated or specified in a profile, are in a given list.
+         * This method can be used only if the current user's mobile phone number
+         * is validated. To check the validation,
+         * use the users.get method with user_ids=API_USER and
+         * fields=has_mobile parameters where API_USER is equal
+         * to the current user ID.
+         *
+         * Result:
+         * For users whose validated phone numbers are in the list,
+         * returns information as an array of user objects,
+         * each containing a set of fields defined by the fields parameter.
+         * The uid, first_name, last_name, and phone fields are always returned,
+         * regardless of the selected fields.
+         * The phone field of each object contains a phone number from
+         * the list of phone numbers intended for search.
+         *
+         * http://vk.com/dev/friends.getByPhones
+         */
+        public VKFriendsMethodSetter getByPhones() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getByPhones"));
+        }
+
+        /**
+         * Marks all incoming friend requests as viewed
+         *
+         * Result:
+         * Returns 1
+         *
+         * http://vk.com/dev/friends.deleteAllRequests
+         */
+        public VKFriendsMethodSetter deleteAllRequests() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.deleteAllRequests"));
+        }
+
+        /**
+         * Returns a list of profiles of users whom the current user may know.
+         * For the method to return enough suggestions,
+         * method account.importContacts will be called first.
+         *
+         * Result:
+         * Returns an array of user objects,
+         * each containing a set of fields defined by the fields parameter.
+         * The uid, first_name, last_name, lists,
+         * and online fields are always returned, regardless of the selected fields
+         *
+         * http://vk.com/dev/friends.getSuggestions
+         */
+        public VKFriendsMethodSetter getSuggestions() {
+            return new VKFriendsMethodSetter(new VKRequest("friends.getSuggestions"));
+        }
+
+    }
+
+
+    /**
      * Common setters, e.g. fields, user_ids, offset
      */
     public static class VKMethodSetter {
@@ -489,6 +776,9 @@ public class VKApi {
             return this;
         }
 
+        /**
+         * User ID, By default, current user ID
+         */
         public VKMethodSetter userIds(int userId) {
             userIds(Collections.singletonList(userId));
             return this;
@@ -539,6 +829,22 @@ public class VKApi {
          */
         public VKMethodSetter offset(int offset) {
             this.request.params.put(VKConst.OFFSET, offset);
+            return this;
+        }
+
+        /**
+         * Captcha Sid, specifies for Captcha needed error
+         */
+        public VKMethodSetter captchaSid(String captchaSid) {
+            this.request.params.put(VKConst.CAPTCHA_SID, captchaSid);
+            return this;
+        }
+
+        /**
+         * Captcha key, specifies for Captcha needed error
+         */
+        public VKMethodSetter captchaKey(String captchaKey) {
+            this.request.params.put(VKConst.CAPTCHA_KEY, captchaKey);
             return this;
         }
 
@@ -1109,6 +1415,314 @@ public class VKApi {
         }
     }
 
+    /**
+     * Method setter for friends
+     */
+    public static class VKFriendsMethodSetter extends VKMethodSetter {
+        public static final String SORT_ORDER_HINTS = "hints";
+        public static final String SORT_ORDER_RAMDOM = "random";
+        public static final String SORT_ORDER_MOBILE = "mobile";
+        public static final String SORT_ORDER_NAME = "name";
+        /**
+         * Create new VKMethodSetter
+         *
+         * @param request the request which set params
+         */
+        public VKFriendsMethodSetter(VKRequest request) {
+            super(request);
+        }
+
+        /** Setters for friends.get */
+
+        /**
+         * Sort order:
+         * name —   by name (enabled only if the fields parameter is used)
+         * random — by random, returns friends in random order
+         * hints —  by rating, similar to how friends are sorted in My friends section
+         * mobile — by mobile, above those of friends who have installed the mobile app
+         */
+        public VKFriendsMethodSetter sort(String sortOrder) {
+            request.params.put(VKConst.SORT, sortOrder);
+            return this;
+        }
+
+        /**
+         * Case for declension of user name and surname:
+         * nom — nominative (default)
+         * gen — genitive
+         * dat — dative
+         * acc — accusative
+         * ins — instrumental
+         * abl — prepositional
+         */
+        public VKFriendsMethodSetter nameCase(String nameCase) {
+            request.params.put(VKConst.NAME_CASE, nameCase);
+            return this;
+        }
+
+        /** Setters for friends.getOnline */
+
+        /**
+         * Friend list ID. If this parameter is not set,
+         * information about all online friends is returned
+         */
+        public VKFriendsMethodSetter listId(int listId) {
+            request.params.put(VKConst.LIST_ID, listId);
+            return this;
+        }
+
+        /**
+         * Online mobile flag
+         * true — to return an additional online_mobile field
+         * false — (default)
+         */
+        public VKFriendsMethodSetter onlineMobile(boolean onlineMobile) {
+            request.params.put(VKConst.ONLINE_MOBUILE, onlineMobile);
+            return this;
+        }
+
+
+        /** Setters for friends.getMutual */
+
+        /**
+         * ID of the user whose friends will be checked against the friends
+         * of the user specified in target_uid
+         */
+        public VKFriendsMethodSetter sourceUid(int sourceUid) {
+            request.params.put(VKConst.SOURCE_UID, sourceUid);
+            return this;
+        }
+
+        /**
+         * ID of the user whose friends will be checked against the friends
+         * of the user specified in source_uid
+         */
+        public VKFriendsMethodSetter targetUid(int targetUid) {
+            request.params.put(VKConst.TARGET_UID, targetUid);
+            return this;
+        }
+
+        /**
+         * A list of user IDs to which you want to search for mutual friends
+         */
+        public VKFriendsMethodSetter targetUids(int... uids) {
+            request.params.put(VKConst.TARGET_UIDS, VKUtil.arrayToString(uids));
+            return this;
+        }
+
+        /**
+         * A list of user IDs to which you want to search for mutual friends
+         */
+        public VKFriendsMethodSetter targetUids(int uid) {
+            targetUids(Collections.singletonList(uid));
+            return this;
+        }
+
+        /**
+         * A list of user IDs to which you want to search for mutual friends
+         */
+        public VKFriendsMethodSetter targetUids(Collection<Integer> uids) {
+            request.params.put(VKConst.TARGET_UIDS, VKUtil.arrayToString(uids));
+            return this;
+        }
+
+
+        /** Setters for friends.getRequests */
+
+        /**
+         * true — to return response messages from users who have sent a friend request or,
+         * if suggested is set to true, to return a list of suggested friends
+         */
+        public VKFriendsMethodSetter extended(boolean extended) {
+            request.params.put(VKConst.EXTENDED, extended);
+            return this;
+        }
+
+        /**
+         * true — to return a list of mutual friends (up to 20), if any
+         */
+        public VKFriendsMethodSetter needMutual(boolean needMutual) {
+            request.params.put(VKConst.NEED_MUTUAL, needMutual);
+            return this;
+        }
+
+        /**
+         * false - do not return viewed requests, true — return viewed requests.
+         * (If out = 1, need_viewed is ignored).
+         */
+        public VKFriendsMethodSetter needViewed(boolean needViewed) {
+            request.params.put(VKConst.NEED_VIEWED, needViewed);
+            return this;
+        }
+
+        /**
+         * true — to return a list of suggested friends
+         * false — to return friend requests (default)
+         */
+        public VKFriendsMethodSetter suggested(boolean suggested) {
+            request.params.put(VKConst.SUGGESTED, suggested);
+            return this;
+        }
+
+
+        /** Setters for friends.add */
+
+        /**
+         * Text of the message (up to 500 characters) for the friend request, if any
+         */
+        public VKFriendsMethodSetter text(String text) {
+            request.params.put(VKConst.TEXT, text);
+            return this;
+        }
+
+
+        /** Setters for friends.getRequests */
+
+        /**
+         * IDs of the friend lists to which to add the user
+         */
+        public VKFriendsMethodSetter listIds(int... ids) {
+            request.params.put(VKConst.LIST_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * IDs of the friend lists to which to add the user
+         */
+        public VKFriendsMethodSetter listIds(Collection<Integer> ids) {
+            request.params.put(VKConst.LIST_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * IDs of the friend lists to which to add the user
+         */
+        public VKFriendsMethodSetter listIds(int id) {
+            request.params.put(VKConst.LIST_IDS, VKUtil.arrayToString(new int[] { id }));
+            return this;
+        }
+
+
+        /** Setters for friends.getLists */
+
+        /**
+         * Return whether the system marks list of public user's friends
+         */
+        public VKFriendsMethodSetter returnSystem(boolean returnSystem) {
+            request.params.put(VKConst.RETURN_SYSTEM, returnSystem);
+            return this;
+        }
+
+
+        /** Setters for friends.addList */
+
+        /**
+         * Name of the friend list
+         */
+        public VKFriendsMethodSetter name(String name) {
+            request.params.put(VKConst.NAME, name);
+            return this;
+        }
+
+
+        /** Setters for friends.editList */
+
+        /**
+         * (Applies if user_ids parameter is not set.)
+         * User IDs to add to the friend list.
+         */
+        public VKFriendsMethodSetter addUserIds(int... ids) {
+            request.params.put(VKConst.ADD_USER_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * (Applies if user_ids parameter is not set.)
+         * User IDs to add to the friend list.
+         */
+        public VKFriendsMethodSetter addUserIds(Collection<Integer> ids) {
+            request.params.put(VKConst.ADD_USER_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * (Applies if user_ids parameter is not set.)
+         * User IDs to add to the friend list.
+         */
+        public VKFriendsMethodSetter addUserIds(int id) {
+            request.params.put(VKConst.ADD_USER_IDS, VKUtil.arrayToString(new int[] { id }));
+            return this;
+        }
+
+        /**
+         * (Applies if user_ids parameter is not set.)
+         * User IDs to delete from the friend list.
+         */
+        public VKFriendsMethodSetter deleteUserIds(int... ids) {
+            request.params.put(VKConst.DELETE_USER_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * (Applies if user_ids parameter is not set.)
+         * User IDs to delete from the friend list.
+         */
+        public VKFriendsMethodSetter deleteUserIds(Collection<Integer> ids) {
+            request.params.put(VKConst.DELETE_USER_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * (Applies if user_ids parameter is not set.)
+         * User IDs to delete from the friend list.
+         */
+        public VKFriendsMethodSetter deleteUserIds(int id) {
+            request.params.put(VKConst.DELETE_USER_IDS, VKUtil.arrayToString(new int[] { id }));
+            return this;
+        }
+
+
+        /** Setters for friends.getByPhones */
+
+        /**
+         * List of phone numbers in MSISDN format (maximum 1000).
+         *
+         * Example:
+         * +79219876543,+79111234567
+         */
+        public VKFriendsMethodSetter phones(String... phones) {
+            request.params.put(VKConst.PHONES, VKUtil.arrayToString(phones));
+            return this;
+        }
+
+        /**
+         * List of phone numbers in MSISDN format (maximum 1000).
+         *
+         * Example:
+         * +79219876543,+79111234567
+         */
+        public VKFriendsMethodSetter phones(Collection<String> phones) {
+            request.params.put(VKConst.PHONES, VKUtil.arrayToString(phones));
+            return this;
+        }
+
+
+        /** Setters for friends.getSuggestions */
+
+        /**
+         * Types of potential friends to return:
+         * mutual — users with many mutual friends
+         * contacts — users found with the account.importContacts method
+         * mutual_contacts — users who imported the same contacts
+         * as the current user with the account.importContacts method
+         */
+        public VKFriendsMethodSetter filter(String filter) {
+            request.params.put(VKConst.FILTER, filter);
+            return this;
+        }
+    }
+
+
 
     /**
      * Class for execution and configuration API-requests
@@ -1411,6 +2025,23 @@ public class VKApi {
         public static final String FORWARD_MESSAGES = "forward_messages";
         public static final String STICKER_ID = "sticker_id";
 
+        /** Friends */
+        public static final String LIST_ID = "list_id";
+        public static final String LIST_IDS = "list_ids";
+        public static final String SOURCE_UID = "source_uid";
+        public static final String TARGET_UID = "target_uid";
+        public static final String TARGET_UIDS = "target_uids";
+        public static final String NEED_MUTUAL = "need_mutual";
+        public static final String NEED_VIEWED = "need_viewed";
+        public static final String SUGGESTED = "suggested";
+        public static final String TEXT = "text";
+        public static final String RETURN_SYSTEM = "return_system";
+        public static final String NAME = "name";
+        public static final String ADD_USER_IDS = "add_user_ids";
+        public static final String DELETE_USER_IDS = "delete_user_ids";
+        public static final String PHONES = "phones";
+        public static final String FILTER = "filter";
+
         /** Get subscriptions */
         public static final String EXTENDED = "extended";
 
@@ -1441,6 +2072,7 @@ public class VKApi {
         public static final String BIRTH_MONTH = "birth_month";
         public static final String BIRTH_YEAR = "birth_year";
         public static final String ONLINE = "online";
+        public static final String ONLINE_MOBUILE = "online_mobile";
         public static final String HAS_PHOTO = "has_photo";
         public static final String SCHOOL_COUNTRY = "school_country";
         public static final String SCHOOL_CITY = "school_city";
@@ -1590,35 +2222,129 @@ public class VKApi {
             // empty
         }
 
+        /**
+         * Unknown error occurred
+         */
         public static final int UNKNOWN_ERROR = 1;
+        /**
+         * Application is disabled. Enable your application or use test mode
+         */
         public static final int APP_OFF = 2;
+        /**
+         * Unknown method passed
+         */
         public static final int UNKNOWN_METHOD = 3;
+        /**
+         * Incorrect signature
+         */
         public static final int INVALID_SIGNATURE = 4;
+        /**
+         * User authorization failed
+         */
         public static final int USER_AUTHORIZATION_FAILED = 5;
+        /**
+         * Too many requests per second
+         */
         public static final int TOO_MANY_REQUESTS_PER_SECOND = 6;
+        /**
+         * Permission to perform this action is denied
+         */
         public static final int NO_RIGHTS = 7;
+        /**
+         * Invalid request
+         */
         public static final int BAD_REQUEST = 8;
+        /**
+         * Flood control
+         */
         public static final int TOO_MANY_SIMILAR_ACTIONS = 9;
+        /**
+         * Internal server error
+         */
         public static final int INTERNAL_SERVER_ERROR = 10;
+        /**
+         * In test mode application should be disabled or user should be authorized
+         */
+        public static final int IN_TEST_MODE = 11;
+        /**
+         * Captcha needed
+         */
         public static final int CAPTCHA_NEEDED = 14;
+        /**
+         * Access denied
+         */
         public static final int ACCESS_DENIED = 15;
+        /**
+         * HTTP authorization failed
+         */
         public static final int REQUIRES_REQUESTS_OVER_HTTPS = 16;
+        /**
+         * Validation required
+         */
         public static final int VALIDATION_REQUIRED = 17;
+        /**
+         * Permission to perform this action is denied
+         * for non-standalone applications
+         */
         public static final int ACTION_PROHIBITED = 20;
+        /**
+         * Permission to perform this action
+         * is allowed only for Standalone and OpenAPI applications
+         */
         public static final int ACTION_ALLOWED_ONLY_FOR_STANDALONE = 21;
+        /**
+         * This method was disabled
+         */
         public static final int METHOD_OFF = 23;
+        /**
+         * Confirmation required
+         */
         public static final int CONFIRMATION_REQUIRED = 24;
+        /**
+         * One of the parameters specified was missing or invalid
+         */
         public static final int PARAMETER_IS_NOT_SPECIFIED = 100;
+        /**
+         * Invalid application API ID
+         */
         public static final int INCORRECT_APP_ID = 101;
+        /**
+         * Invalid user id
+         */
         public static final int INCORRECT_USER_ID = 113;
+        /**
+         * Invalid timestamp
+         */
         public static final int INCORRECT_TIMESTAMP = 150;
+        /**
+         * Access to album denied
+         */
         public static final int ACCESS_TO_ALBUM_DENIED = 200;
+        /**
+         * Access to audio denied
+         */
         public static final int ACCESS_TO_AUDIO_DENIED = 201;
+        /**
+         * Access to group denied
+         */
         public static final int ACCESS_TO_GROUP_DENIED = 203;
+        /**
+         * This album is full
+         */
         public static final int ALBUM_IS_FULL = 300;
+        /**
+         * Permission denied.
+         * You must enable votes processing in application settings
+         */
         public static final int ACTION_DENIED = 500;
+        /**
+         * Permission denied.
+         * You have no access to operations specified with given object(s)
+         */
+        public static final int PERMISSION_DENIED = 600;
 
         /** Message errors */
+
         public static final int CANNOT_SEND_MESSAGE_BLACK_LIST = 900;
         public static final int CANNOT_SEND_MESSAGE_GROUP = 901;
 

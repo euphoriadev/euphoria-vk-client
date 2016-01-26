@@ -24,7 +24,9 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -70,6 +72,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
     private ListView lvHistory;
     private EditText etMessageText;
+    private LinearLayout attachmentPanel;
+    private ImageButton buttonAttachment;
     private ArrayList<MessageItem> history;
     private MessageCursorAdapter cursorAdapter;
     private MessageAdapter adapter;
@@ -250,6 +254,19 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             public void onClick(View v) {
                 if (chat_id != 0) getChatMembers();
 
+            }
+        });
+
+        attachmentPanel = (LinearLayout) findViewById(R.id.attachmentPanel);
+        attachmentPanel.setVisibility(View.GONE);
+
+        buttonAttachment = (ImageButton) findViewById(R.id.btnMessageAttach);
+        buttonAttachment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                attachmentPanel.setVisibility(attachmentPanel.getVisibility() == View.VISIBLE
+                        ? View.GONE : View.VISIBLE);
             }
         });
 

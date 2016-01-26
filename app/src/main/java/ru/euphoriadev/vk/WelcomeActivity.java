@@ -33,7 +33,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private final int REQUEST_LOGIN = 1;
     Account account;
     Api api;
-    private Button btnAccessToken, btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +60,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 //            return;
 //        }
 
-        btnLogin = (Button) findViewById(R.id.btnLogin);
-        btnAccessToken = (Button) findViewById(R.id.btnAccessToken);
+        Button btnLogin = (Button) findViewById(R.id.btnLogin);
+        Button btnAccessToken = (Button) findViewById(R.id.btnAccessToken);
         ImageView ivLogin = (ImageView) findViewById(R.id.ivLogin);
 
         ivLogin.setOnClickListener(this);
@@ -98,6 +97,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                         account.photo = user.photo_50;
                         account.status = user.status;
                         account.save();
+                        api.setAccount(account);
 
                         runOnUiThread(new Runnable() {
                             @Override

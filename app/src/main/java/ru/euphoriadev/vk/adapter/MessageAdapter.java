@@ -21,7 +21,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -171,8 +170,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
             }
         };
     }
-//    IconicsDrawable iconDoneAll;
-
 
     @Override
     public void clear() {
@@ -944,12 +941,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         public boolean put(int key, View fwdMessageView) {
             if (totalSize >= maxSize) {
                 Log.w(TAG, "Size overflow ".concat(String.valueOf(totalSize)));
-                // Размер переполнен
-                // Пробуем переиспользовать старые View
-//                removeView(baseCache.valueAt(0));
-//                baseCache.removeAt(0);
-
-//                baseCache.setValueAt(baseCache.indexOfKey(key), fwdMessageView);
 
                 clear();
                 return false;
