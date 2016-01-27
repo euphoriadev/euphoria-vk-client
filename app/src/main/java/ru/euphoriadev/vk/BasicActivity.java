@@ -95,7 +95,6 @@ public class BasicActivity extends BaseThemedActivity implements
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-
         navigationView = (NavigationView) findViewById(R.id.navView);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.navMessages);
@@ -248,8 +247,6 @@ public class BasicActivity extends BaseThemedActivity implements
 
                     }
                 });
-
-
                 break;
 
         }
@@ -332,9 +329,7 @@ public class BasicActivity extends BaseThemedActivity implements
                         // если мы уже в группе
                         PrefManager.putInt("is_join_group", -1);
                         FileLogger.w("BasicActivity", "IsMemberOfGroup");
-                        return;
-                    }
-
+                    } else
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -357,17 +352,14 @@ public class BasicActivity extends BaseThemedActivity implements
                     public void onClick(DialogInterface dialog, int which) {
                         joinInGroup(59383198);
                         Toast.makeText(BasicActivity.this, R.string.thank_you, Toast.LENGTH_LONG).show();
+                        PrefManager.putInt("is_join_group", -1);
 
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        SharedPreferences.Editor editor = sPrefs.edit();
-                        editor.putInt("is_join_group", -1);
-
-                        if (Build.VERSION.SDK_INT < 16) editor.commit();
-                        else editor.apply();
+                        PrefManager.putInt("is_join_group", -1);
                     }
                 });
         final AlertDialog dialog = builder.create();

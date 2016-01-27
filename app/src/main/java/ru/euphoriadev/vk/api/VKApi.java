@@ -1359,8 +1359,17 @@ public class VKApi {
          * (Required if message is not set.)
          * List of objects attached to the message, separated by commas
          */
-        @SafeVarargs
-        public final VKMessageMethodSetter attachment(Collection<String>... attachments) {
+        public final VKMessageMethodSetter attachment(Collection<String> attachments) {
+            this.request.params.put(VKConst.ATTACHMENT, VKUtil.arrayToString(attachments));
+            return this;
+        }
+
+
+        /**
+         * (Required if message is not set.)
+         * List of objects attached to the message, separated by commas
+         */
+        public final VKMessageMethodSetter attachment(String... attachments) {
             this.request.params.put(VKConst.ATTACHMENT, VKUtil.arrayToString(attachments));
             return this;
         }

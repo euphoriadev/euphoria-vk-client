@@ -11,7 +11,7 @@ public class Account {
     public static final String API_ID = "4510232"; // ID TimeVK
     public String access_token; // токен
     public String fullName, photo, status = "";
-    public int user_id; // ID пользователя
+    public long user_id; // ID пользователя
 
     SharedPreferences prefs;
     Editor editor;

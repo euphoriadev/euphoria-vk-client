@@ -259,7 +259,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
         attachmentPanel = (LinearLayout) findViewById(R.id.attachmentPanel);
         attachmentPanel.setVisibility(View.GONE);
-
         buttonAttachment = (ImageButton) findViewById(R.id.btnMessageAttach);
         buttonAttachment.setOnClickListener(new View.OnClickListener() {
             @Override

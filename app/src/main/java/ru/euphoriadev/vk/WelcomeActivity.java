@@ -88,7 +88,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                     try {
                         api.setOffline();
 
-                        VKUser user = api.getProfile(account.user_id);
+                        VKUser user = api.getProfile((int) account.user_id);
                         if (user == null) {
                             user = VKUser.EMPTY_USER;
                         }
@@ -215,7 +215,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                     account.access_token = accessToken;
                     account.user_id = object_id.object_id;
 
-                    final VKUser vkUser = api.getProfile(account.user_id);
+                    final VKUser vkUser = api.getProfile((int) account.user_id);
                     account.fullName = vkUser.toString();
                     account.photo = vkUser.photo_50;
                     account.save();
@@ -230,7 +230,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                     account.access_token = accessToken;
                     account.user_id = Integer.parseInt(idOrScreenName);
 
-                    final VKUser vkUser = api.getProfile(account.user_id);
+                    final VKUser vkUser = api.getProfile((int) account.user_id);
                     account.fullName = vkUser.toString();
                     account.photo = vkUser.photo_50;
                     account.save();

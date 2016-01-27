@@ -53,7 +53,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     public static final String KEY_IS_NIGHT_MODE = "is_night_theme";
     public static final String KEY_COLOR_IN_MESSAGES = "color_in_messages";
     public static final String KEY_COLOR_OUT_MESSAGES = "color_out_messages";
-    public static final String KEY_MAKING_DRAWER_HEADER = "making_drawer_header";
+    public static final String KEY_MAKING_DRAWER_HEADER = "drawer_header";
     public static final String KEY_BLUR_RADIUS = "blur_radius";
     public static final String KEY_SHOW_DIVIDER = "show_divider";
     public static final String KEY_USE_TWO_PROFILE = "use_two_profile";
