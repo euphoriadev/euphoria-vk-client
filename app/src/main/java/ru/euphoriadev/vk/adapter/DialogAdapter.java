@@ -344,11 +344,15 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         if (item.isTyping ? item.userIdTyping == Api.get().getUserId() : item.message.is_out || item.message.isChat()) {
             holder.ivLastPhotoUser.setVisibility(View.VISIBLE);
 
-            Picasso.with(context)
-                    .load(item.message.is_out ? Api.get().getAccount().photo : user.photo_50)
-                    .placeholder(R.drawable.camera_b)
-                    .config(Bitmap.Config.RGB_565)
-                    .into(holder.ivLastPhotoUser);
+            try {
+                Picasso.with(context)
+                        .load(item.message.is_out ? Api.get().getAccount().photo : user.photo_50)
+                        .placeholder(R.drawable.camera_b)
+                        .config(Bitmap.Config.RGB_565)
+                        .into(holder.ivLastPhotoUser);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             holder.ivLastPhotoUser.setVisibility(View.GONE);
             holder.ivLastPhotoUser.setImageDrawable(null);
@@ -366,8 +370,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             e.printStackTrace();
         }
 
-//        ImageLoader.get(context).
-//                displayImage(item.photo, holder.ivPhoto);
 
         holder.ivPhoto.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -73,7 +73,6 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
         this.closeListener = listener;
     }
 
-
     public ArrayList<E> getValues() {
         return mValues;
     }

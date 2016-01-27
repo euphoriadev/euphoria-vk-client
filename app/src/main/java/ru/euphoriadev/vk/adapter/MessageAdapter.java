@@ -54,6 +54,7 @@ import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
@@ -401,7 +402,9 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
             holder.llFwdMessagesContainer.setVisibility(View.GONE);
         }
 
-
+        if (item.message.emoji) {
+            Emoji.parseEmoji(holder.tvBody);
+        }
         if (!item.message.attachments.isEmpty()) {
             int fwdMessageCount = 0;
             boolean hasAttach = false;

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,31 +17,14 @@ import ru.euphoriadev.vk.util.ViewUtil;
 /**
  * Created by user on 30.06.15.
  */
-public class ChatMemberAdapter extends BaseAdapter {
+public class ChatMemberAdapter extends BaseArrayAdapter<ChatMember> {
 
     private Context mContext;
     private LayoutInflater inflater;
     private ArrayList<ChatMember> members;
 
     public ChatMemberAdapter(Context context, ArrayList<ChatMember> members) {
-        this.mContext = context;
-        this.members = members;
-        this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    @Override
-    public int getCount() {
-        return members.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return members.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
+        super(context, members);
     }
 
     @Override
@@ -52,7 +34,7 @@ public class ChatMemberAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.chat_member_list_item, parent, false);
         }
 
-        ChatMember member = (ChatMember) getItem(position);
+        ChatMember member = getItem(position);
 
         TextView tvTitle = (TextView) view.findViewById(R.id.tvChatMemberTitle);
         TextView tvInvitedBy = (TextView) view.findViewById(R.id.tvChatMemberInvitedBy);

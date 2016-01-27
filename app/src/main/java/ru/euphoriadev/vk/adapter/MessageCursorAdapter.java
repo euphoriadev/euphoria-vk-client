@@ -95,8 +95,6 @@ public class MessageCursorAdapter extends MessageAdapter {
         }
     }
 
-
-
     @Override
     public void notifyDataSetChanged() {
         mCursor.close();
@@ -104,27 +102,4 @@ public class MessageCursorAdapter extends MessageAdapter {
         super.notifyDataSetChanged();
     }
 
-    public VKUser getUserFromDB(long uid) {
-        if (database == null || !database.isOpen()) {
-            database = DBHelper.get(getContext()).getWritableDatabase();
-        }
-
-        Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.USERS_TABLE + " WHERE " + DBHelper.USER_ID + " = " + uid, null);
-        VKUser user = null;
-        if (cursor.getCount() != 0)
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(0);
-                String fistName = cursor.getString(1);
-                String lastName = cursor.getString(2);
-                String photo50 = cursor.getString(8);
-
-                user = new VKUser();
-                user.user_id = id;
-                user.first_name = fistName;
-                user.last_name = lastName;
-                user.photo_50 = photo50;
-            }
-        cursor.close();
-        return user;
-    }
 }

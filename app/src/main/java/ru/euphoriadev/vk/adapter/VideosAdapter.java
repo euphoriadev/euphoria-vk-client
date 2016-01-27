@@ -57,11 +57,8 @@ public class VideosAdapter extends ArrayAdapter<VideosAdapter.VideoItem> {
         }
 
         holder.tvTitle.setText(item.video.title);
-//        holder.tvDescription.setText(item.user.toString() + " | " + String.format("% d", item.video.views) + " Просмотров");
-
         holder.tvDescription.setText(item.video.description);
         holder.tvDuration.setText(dateFormat.format(TimeUnit.SECONDS.toMillis(item.video.duration)));
-
         picasso.load(item.video.image_big)
                 .into(holder.ivImage);
 

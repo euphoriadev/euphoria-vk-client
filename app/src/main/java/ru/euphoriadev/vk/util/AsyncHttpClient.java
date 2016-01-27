@@ -1,24 +1,17 @@
 package ru.euphoriadev.vk.util;
 
 import android.content.Context;
-import android.net.http.HttpResponseCache;
 import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.Closeable;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -92,7 +85,7 @@ public class AsyncHttpClient implements Closeable {
             int responseCode = connection.getResponseCode();
             String responseMessage = connection.getResponseMessage();
 
-            Log.i(TAG, "response code: " + responseCode);
+            Log.i(TAG, "code: " + responseCode);
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 // error...
                 Log.e(TAG, "Server returned response code: " + responseCode);

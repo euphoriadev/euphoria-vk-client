@@ -3,7 +3,7 @@ package ru.euphoriadev.vk.adapter;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 
 /**
- * Created by user on 30.06.15.
+ * Created by Igor on 30.06.15.
  */
 public class ChatMember {
     public VKFullUser user;

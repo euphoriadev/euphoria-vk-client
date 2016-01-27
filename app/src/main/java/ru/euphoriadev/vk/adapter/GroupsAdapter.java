@@ -31,7 +31,7 @@ public class GroupsAdapter extends BaseArrayAdapter<VKGroup> {
 
     @Override
     public boolean compareTo(String q, VKGroup value) {
-        return value.name.contains(q);
+        return value.name.toLowerCase().contains(q);
     }
 
     @Override
