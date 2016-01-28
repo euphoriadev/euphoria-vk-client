@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ru.euphoriadev.vk.api.VKApi;
 import ru.euphoriadev.vk.api.model.VKMessage;
@@ -133,7 +134,7 @@ public class VKInsertHelper {
      * @param database the {@link SQLiteDatabase} to insert messages it
      * @param users    a list of users to insert into the database
      */
-    public static void insertUsers(SQLiteDatabase database, ArrayList<VKUser> users) {
+    public static void insertUsers(SQLiteDatabase database, List<VKUser> users) {
         insertUsers(database, users, true);
     }
 
@@ -145,7 +146,7 @@ public class VKInsertHelper {
      * @param useTransaction true to use transactions, speeds up the inserting
      * @see SQLiteDatabase#beginTransaction()
      */
-    public static void insertUsers(SQLiteDatabase database, ArrayList<VKUser> users, boolean useTransaction) {
+    public static void insertUsers(SQLiteDatabase database, List<VKUser> users, boolean useTransaction) {
         checkOpen(database);
         if (checkIsEmpty(users)) {
             return;
@@ -205,12 +206,10 @@ public class VKInsertHelper {
      */
     private static void checkOpen(SQLiteDatabase database) {
         sValues.clear();
-        if (database == null || !database.isOpen()) {
-            database = DBHelper.get(AppLoader.appContext).getWritableDatabase();
-        }
+        AndroidUtils.checkDatabase(AppLoader.appContext, database);
     }
 
-    private static boolean checkIsEmpty(ArrayList list) {
+    private static boolean checkIsEmpty(List list) {
         return VKApi.VKUtil.isEmpty(list);
     }
 }

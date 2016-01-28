@@ -89,9 +89,10 @@ public class CrashManager {
         buffer.append(BuildConfig.VERSION_CODE).append('\n');
         buffer.append("\n");
 
-        buffer.append("----- Error Stack Trace -----");
+        buffer.append("----- Error Stack Trace -----\n");
         buffer.append("Error Tag: ");
         buffer.append(tag);
+        buffer.append('\n');
         buffer.append("Error message: ");
         buffer.append(message).append('\n');
         buffer.append("Trace: ");

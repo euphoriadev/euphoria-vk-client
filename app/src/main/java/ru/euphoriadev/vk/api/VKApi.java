@@ -467,6 +467,23 @@ public class VKApi {
         }
 
         /**
+         * Sends a sticker
+         * <p/>
+         * Result:
+         * After successful execution, returns the sent message ID (mid).
+         *
+         * Error codes:
+         * 900	Cannot send sticker to user from blacklist
+         *
+         * http://vk.com/dev/messages.sendSticker
+         */
+        public VKMessageMethodSetter sendSticker() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.sendSticker"), new VKParams()));
+        }
+
+
+
+        /**
          * Deletes one or more messages
          * <p/>
          * http://vk.com/dev/messages.delete

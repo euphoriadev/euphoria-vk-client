@@ -66,7 +66,7 @@ import ru.euphoriadev.vk.view.CircleImageView;
 public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements LongPollService.VKOnDialogListener {
 
     private static final int DEFAULT_COLOR = Color.parseColor("#424242");
-    private static final int DEFAULT_DARK_COLOR = Color.parseColor("#303030");
+    private static final int DEFAULT_DARK_COLOR = ThemeManager.darkenColor(DEFAULT_COLOR);
     private final Object mLock = new Object();
     public boolean isScrolling;
     public boolean mShowTime;

@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,6 +22,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -33,6 +35,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+
+import ru.euphoriadev.vk.helper.DBHelper;
 
 public class AndroidUtils {
 
@@ -314,10 +319,19 @@ public class AndroidUtils {
         AppLoader.getLoader().getHandler().post(runnable);
     }
 
-    public static boolean isMinimemSdk(int sdk) {
-        return Build.VERSION.SDK_INT <= sdk;
+    public static void checkDatabase(Context context, SQLiteDatabase database) {
+        if (database == null || !database.isOpen()) {
+            database = DBHelper.get(context).getWritableDatabase();
+        }
     }
 
+    public static HashSet<Integer> keySet(SparseArray array) {
+        HashSet<Integer> set = new HashSet<>(array.size());
+        for (int i = 0; i < array.size(); i++) {
+            set.add(array.keyAt(i));
+        }
+        return set;
+    }
 
     public static class PicassoBlurTransform implements Transformation {
         public int radius;

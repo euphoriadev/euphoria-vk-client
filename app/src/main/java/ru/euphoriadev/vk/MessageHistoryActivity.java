@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -17,6 +18,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,10 +34,15 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,6 +53,7 @@ import ru.euphoriadev.vk.adapter.MessageAdapter;
 import ru.euphoriadev.vk.adapter.MessageCursorAdapter;
 import ru.euphoriadev.vk.adapter.MessageItem;
 import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKAttachment;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.api.model.VKMessage;
@@ -280,9 +288,140 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             ViewUtil.setFilter(buttonAttachment, ThemeManager.getPrimaryLightTextColor());
         }
 
-        getMessages(from_saved);
+        new LoadMessagesTask(30, 0, from_saved).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         loadWallpaperFromSD();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.w("MessageActivity", "requestCode: " + requestCode);
+        Log.w("MessageActivity", "resultCode: " + resultCode);
+
+        if (resultCode == RESULT_OK) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+            Cursor cursor = getContentResolver().query(
+                    selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String filePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            PrefManager.putString(ThemeManager.PREF_KEY_MESSAGE_WALLPAPER_PATH, filePath);
+            ThemeManager.updateThemeValues();
+            loadWallpaperFromSD();
+
+            Log.w("MessageActivity", "image path is " + filePath);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (adapter.isInMultiSelectMode()) {
+            adapter.disableMultiSelectMode();
+            invalidateOptionsMenu();
+            return;
+        }
+        super.onBackPressed();
+        this.overridePendingTransition(R.anim.diagonaltranslate_right, R.anim.diagonaltranslate_right2);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.message_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (adapter.isInMultiSelectMode()) {
+            menu.findItem(R.id.menuStatsMessages).setVisible(false);
+            menu.findItem(R.id.menuUpdateMessages).setVisible(false);
+            menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(false);
+            menu.findItem(R.id.menuMessageTranslateAll).setVisible(false);
+            menu.findItem(R.id.menuWallpaper).setVisible(false);
+
+            menu.findItem(R.id.menuMessageDelete).setVisible(true);
+        } else {
+            menu.findItem(R.id.menuStatsMessages).setVisible(true);
+            menu.findItem(R.id.menuUpdateMessages).setVisible(true);
+            menu.findItem(R.id.menuMessageTranslateAll).setVisible(true);
+            menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(true);
+            menu.findItem(R.id.menuWallpaper).setVisible(true);
+
+            menu.findItem(R.id.menuMessageDelete).setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menuStatsMessages:
+                getAllMessages();
+                break;
+
+            case R.id.menuUpdateMessages:
+                adapter.clear();
+                new LoadMessagesTask(30, 0, false).execute();
+                break;
+
+            case R.id.menuMessageMaterialsOfDialog:
+                Intent intent = new Intent(getApplicationContext(), DialogMaterialsActivity.class);
+                intent.putExtra("user_id", uid);
+                intent.putExtra("chat_id", chat_id);
+                startActivity(intent);
+                break;
+
+            case R.id.menuMessageTranslateAll:
+                YandexTranslator.Language[] languages = YandexTranslator.Language.values();
+                final CharSequence[] items = new CharSequence[languages.length];
+                for (int i = 0; i < languages.length; i++) {
+                    items[i] = languages[i].name();
+                }
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MessageHistoryActivity.this);
+                builder.setTitle("На какой язык перевести?");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        translateAllMessages(items[which].toString());
+                    }
+                });
+                builder.create().show();
+                break;
+
+            case R.id.menuMessageDelete:
+                deleteMessages(adapter.getSelectedItems());
+                adapter.disableMultiSelectMode();
+                break;
+
+            case R.id.menuWallpaper:
+                pickImageFromGallery();
+                break;
+
+            case R.id.menuHideShowTime:
+                adapter.toggleStateTime();
+                break;
+
+            case android.R.id.home:
+                finish();
+                this.overridePendingTransition(R.anim.diagonaltranslate_right,
+                        R.anim.diagonaltranslate_right2);
+                break;
+
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     private void makeMessageOptionsDialog(final MessageItem messageItem) {
         AlertDialog.Builder builder = new AlertDialog.Builder(MessageHistoryActivity.this);
@@ -580,142 +719,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         return text;
     }
 
-    /**
-     * Загрузка сообщений
-     *
-     * @param fromSavedMessages загрузить сохраненные сообщения из бд
-     */
-    private void getMessages(boolean fromSavedMessages) {
-        helper = DBHelper.get(this);
-        database = helper.getWritableDatabase();
-
-        final Cursor cursor;
-        final String sql;
-
-        // если чат
-        if (chat_id != 0) {
-            sql = "SELECT * FROM " + DBHelper.MESSAGES_TABLE +
-                    " LEFT JOIN " + DBHelper.USERS_TABLE +
-                    " ON " + DBHelper.MESSAGES_TABLE + "." + DBHelper.USER_ID +
-                    " = " + DBHelper.USERS_TABLE + "." + DBHelper.USER_ID +
-                    " WHERE " + DBHelper.MESSAGES_TABLE + "." + DBHelper.CHAT_ID +
-                    " = " + chat_id;
-        } else {
-            sql = "SELECT * FROM " + DBHelper.MESSAGES_TABLE + " WHERE user_id = " + uid + " AND chat_id = 0";
-        }
-        // читаем сообщения
-        cursor = database.rawQuery(sql, null);
-
-        // загружаем CursorAdapter. который оптимизирован
-        // для большого кол-ва сообщений
-        if (fromSavedMessages) {
-            String saveSql = "SELECT * FROM " + DBHelper.SAVED_MESSAGES_TABLE + "_" + uid;
-            Cursor saveCursor = database.rawQuery(saveSql, null);
-            cursorAdapter = new MessageCursorAdapter(this, saveCursor, saveSql, chat_id, uid);
-            lvHistory.setAdapter(cursorAdapter);
-            lvHistory.setSelection(cursorAdapter.getCount());
-
-            if (cursorAdapter.getCount() > 500) {
-                lvHistory.setFastScrollEnabled(true);
-            }
-            return;
-        }
-
-        history = new ArrayList<>(30);
-        adapter = new MessageAdapter(this, history, uid, chat_id);
-        adapter.setCloseListener(new BaseArrayAdapter.OnMultiModeCloseListener() {
-            @Override
-            public void onClose() {
-                Log.w("MessageActivity", "onClose ActionMode");
-                invalidateOptionsMenu();
-            }
-        });
-        // если сообщения есть, то заполняем
-        if (cursor.getCount() > 0) {
-            fillList(history, cursor);
-
-            lvHistory.setAdapter(adapter);
-            lvHistory.setSelection(history.size());
-        }
-        cursor.close();
-
-        // если нет интернета
-        if (!AndroidUtils.isInternetConnection(this)) {
-            return;
-        }
-
-        ThreadExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ArrayList<VKMessage> vkMessages = api.getMessagesHistory(uid, chat_id, 0, 30);
-
-                    // если чат, то обновляем юзеров
-                    HashMap<Integer, VKUser> mapUsers = null;
-                    if (chat_id != 0) {
-                        mapUsers = new HashMap<>();
-                        for (VKMessage message : vkMessages) {
-                            mapUsers.put(message.uid, null);
-                        }
-
-
-                        ArrayList<VKUser> vkUsers = api.getProfiles(mapUsers.keySet(), null, null, null, null);
-                        for (VKUser user : vkUsers) {
-                            mapUsers.put(user.user_id, user);
-                            helper.addUserToDB(user);
-                        }
-                        vkUsers.clear();
-                        vkUsers.trimToSize();
-                    }
-
-                    history.clear();
-                    for (VKMessage vkMessage : vkMessages) {
-                        history.add(0, new MessageItem(vkMessage, mapUsers == null ? VKUser.EMPTY_USER : mapUsers.get(vkMessage.uid)));
-                    }
-                    if (mapUsers != null) {
-                        mapUsers.clear();
-                        mapUsers = null;
-                    }
-
-                    // обновляем список
-                    lvHistory.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (lvHistory.getAdapter() != null) {
-                                adapter.notifyDataSetChanged();
-                            } else {
-                                lvHistory.setAdapter(adapter);
-                            }
-                            lvHistory.setSelection(adapter.getCount());
-//                            lvHistory.setAdapter(adapter);
-//                                adapter.notifyDataSetChanged();
-                            // по неизвестным мне причиным, обновление адаптера вызывает краш
-                            // на 4.1-4.4
-                        }
-                    });
-
-                    // удаляем все сообщения, что бы загрузить на их место новые
-                    Cursor c = database.rawQuery(sql, null);
-                    while (c.moveToNext()) {
-                        int _id = c.getInt(0);
-                        //  database.delete(DBHelper.MESSAGES_TABLE, "_id = " + _id, null);
-                        database.execSQL("DELETE FROM " + DBHelper.MESSAGES_TABLE + " WHERE _id = " + _id);
-                    }
-                    c.close();
-                    VKInsertHelper.insertMessages(database, vkMessages, true);
-                    vkMessages.clear();
-                    vkMessages.trimToSize();
-
-//                    if (chat_id != 0 & uid != 0)
-                    adapter.connectToLongPoll();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-    }
-
     private void setTyping() {
         if (!AndroidUtils.isInternetConnection(this)) {
             return;
@@ -969,41 +972,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         });
     }
 
-
-    private void fillList(ArrayList<MessageItem> list, Cursor cursor) {
-        VKUser emptyUser = new VKUser();
-        history.ensureCapacity(cursor.getCount());
-        while (cursor.moveToNext()) {
-            String body = cursor.getString(4);
-            String photo = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.PHOTO_50)) : null;
-            String firstName = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.FIRST_NAME)) : null;
-            String lastName = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.LAST_NAME)) : null;
-            int out = cursor.getInt(7);
-            int read_state = cursor.getInt(6);
-            int date = cursor.getInt(5);
-            int mid = cursor.getInt(1);
-
-            VKMessage message = new VKMessage();
-
-            message.mid = mid;
-            message.chat_id = chat_id;
-            message.date = date;
-            message.body = body;
-            message.is_out = out == 1;
-            message.read_state = read_state == 1;
-
-            VKUser user = null;
-            if (firstName != null || lastName != null) {
-                user = new VKUser();
-                user.photo_50 = photo;
-                user.first_name = firstName;
-                user.last_name = lastName;
-            }
-
-            list.add(0, new MessageItem(message, user == null ? emptyUser : user));
-        }
-    }
-
     private void exitFromChat() {
         new Thread(new Runnable() {
             @Override
@@ -1117,7 +1085,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         startActivityForResult(photoPickerIntent, 100);
     }
 
-
     private void loadWallpaperFromSD() {
         String path = ThemeManager.getWallpaperPath(this);
         ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
@@ -1129,137 +1096,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         } else {
             ivWallpaper.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        Log.w("MessageActivity", "requestCode: " + requestCode);
-        Log.w("MessageActivity", "resultCode: " + resultCode);
-
-        if (resultCode == RESULT_OK) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-            Cursor cursor = getContentResolver().query(
-                    selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String filePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            PrefManager.putString(ThemeManager.PREF_KEY_MESSAGE_WALLPAPER_PATH, filePath);
-            ThemeManager.updateThemeValues();
-            loadWallpaperFromSD();
-
-            Log.w("MessageActivity", "image path is " + filePath);
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (adapter.isInMultiSelectMode()) {
-            adapter.disableMultiSelectMode();
-            invalidateOptionsMenu();
-            return;
-        }
-        super.onBackPressed();
-        this.overridePendingTransition(R.anim.diagonaltranslate_right, R.anim.diagonaltranslate_right2);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.message_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (adapter.isInMultiSelectMode()) {
-            menu.findItem(R.id.menuStatsMessages).setVisible(false);
-            menu.findItem(R.id.menuUpdateMessages).setVisible(false);
-            menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(false);
-            menu.findItem(R.id.menuMessageTranslateAll).setVisible(false);
-            menu.findItem(R.id.menuWallpaper).setVisible(false);
-
-            menu.findItem(R.id.menuMessageDelete).setVisible(true);
-        } else {
-            menu.findItem(R.id.menuStatsMessages).setVisible(true);
-            menu.findItem(R.id.menuUpdateMessages).setVisible(true);
-            menu.findItem(R.id.menuMessageTranslateAll).setVisible(true);
-            menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(true);
-            menu.findItem(R.id.menuWallpaper).setVisible(true);
-
-            menu.findItem(R.id.menuMessageDelete).setVisible(false);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.menuStatsMessages:
-                getAllMessages();
-                break;
-
-            case R.id.menuUpdateMessages:
-                adapter.clear();
-                getMessages(false);
-                break;
-
-            case R.id.menuMessageMaterialsOfDialog:
-                Intent intent = new Intent(getApplicationContext(), DialogMaterialsActivity.class);
-                intent.putExtra("user_id", uid);
-                intent.putExtra("chat_id", chat_id);
-                startActivity(intent);
-                break;
-
-            case R.id.menuMessageTranslateAll:
-                YandexTranslator.Language[] languages = YandexTranslator.Language.values();
-                final CharSequence[] items = new CharSequence[languages.length];
-                for (int i = 0; i < languages.length; i++) {
-                    items[i] = languages[i].name();
-                }
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(MessageHistoryActivity.this);
-                builder.setTitle("На какой язык перевести?");
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        translateAllMessages(items[which].toString());
-                    }
-                });
-                builder.create().show();
-                break;
-
-            case R.id.menuMessageDelete:
-                deleteMessages(adapter.getSelectedItems());
-                adapter.disableMultiSelectMode();
-                break;
-
-            case R.id.menuWallpaper:
-                pickImageFromGallery();
-                break;
-
-            case R.id.menuHideShowTime:
-                adapter.toggleStateTime();
-                break;
-
-            case android.R.id.home:
-                finish();
-                this.overridePendingTransition(R.anim.diagonaltranslate_right,
-                        R.anim.diagonaltranslate_right2);
-                break;
-
-
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -1283,6 +1119,277 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
     }
 
+    /**
+     * Async task for load messages
+     */
+    private class LoadMessagesTask extends AsyncTask<Void, Void, Void> {
+        private int count;
+        private int offset;
+        private boolean fromSaved;
 
+        /**
+         * Create a new AsyncTask
+         *
+         * @param count     Number of messages to return, max value 200
+         * @param offset    needed to return a specific subset of messages
+         * @param fromSaved true, if you have to get messages only from database
+         */
+        public LoadMessagesTask(int count, int offset, boolean fromSaved) {
+            this.count = count;
+            this.offset = offset;
+            this.fromSaved = fromSaved;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            history = new ArrayList<>(30);
+            adapter = new MessageAdapter(MessageHistoryActivity.this, history, uid, chat_id);
+            adapter.setCloseListener(new BaseArrayAdapter.OnMultiModeCloseListener() {
+                @Override
+                public void onClose() {
+                    Log.w("MessageActivity", "onClose ActionMode");
+                    invalidateOptionsMenu();
+                }
+            });
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            helper = DBHelper.get(MessageHistoryActivity.this);
+            database = helper.getWritableDatabase();
+
+            if (fromSaved) {
+                cursorAdapter();
+                return null;
+            }
+            // prepare sql command
+            String sql = chat_id != 0 ? ("SELECT * FROM " + DBHelper.MESSAGES_TABLE +
+                    " LEFT JOIN " + DBHelper.USERS_TABLE +
+                    " ON " + DBHelper.MESSAGES_TABLE + "." + DBHelper.USER_ID +
+                    " = " + DBHelper.USERS_TABLE + "." + DBHelper.USER_ID +
+                    " WHERE " + DBHelper.MESSAGES_TABLE + "." + DBHelper.CHAT_ID +
+                    " = " + chat_id)
+                    : ("SELECT * FROM " + DBHelper.MESSAGES_TABLE + " WHERE user_id = " + uid + " AND chat_id = 0");
+
+            Cursor cursor = database.rawQuery(sql, null);
+            if (cursor.getCount() > 0) {
+                // Start dialog is not first,
+                // loaded messages
+
+                getMessagesFrom(cursor);
+                publishProgress(null);
+            }
+            if (!AndroidUtils.isInternetConnection(MessageHistoryActivity.this)) {
+                // if user not have internet connection
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MessageHistoryActivity.this, R.string.check_internet, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                cursor.close();
+                return null;
+            }
+            ArrayList<VKMessage> messages = loadMessagesFromNetwork();
+            if (messages.isEmpty()) {
+                // no messages or error
+                return null;
+            }
+            // cache users
+            SparseArray<VKUser> users = new SparseArray<>(30);
+            for (int i = 0; i < messages.size(); i++) {
+                VKMessage message = messages.get(i);
+                users.append(message.uid, VKUser.EMPTY_USER);
+            }
+
+            HashSet<Integer> keySet = AndroidUtils.keySet(users);
+            ArrayList<VKUser> vkUsers = loadUsersFromNetwork(keySet);
+            for (int i = 0; i < vkUsers.size(); i++) {
+                VKUser user = vkUsers.get(i);
+                users.put(user.user_id, user);
+            }
+
+            history.clear();
+            for (int i = 0; i < messages.size(); i++) {
+                VKMessage message = messages.get(i);
+                history.add(0, new MessageItem(message, users.get(message.uid)));
+            }
+            cursor.close();
+            publishProgress(null);
+
+            deleteOldMessages(sql);
+            VKInsertHelper.insertMessages(database, messages, true);
+//            VKInsertHelper.insertUsers(database, vkUsers, true);
+
+            messages.clear();
+            messages.trimToSize();
+            messages = null;
+            vkUsers.clear();
+            vkUsers.trimToSize();
+            vkUsers = null;
+            users.clear();
+            users = null;
+            keySet.clear();
+            keySet = null;
+            cursor.close();
+
+            System.gc();
+            return null;
+
+        }
+
+        /**
+         * Download messages.
+         * Returns a list of the current user's private messages,
+         * that match search criteria
+         */
+        private ArrayList<VKMessage> loadMessagesFromNetwork() {
+            try {
+                return Api.get().getMessagesHistory(uid, chat_id, this.offset, this.count);
+            } catch (Exception e) {
+                e.printStackTrace();
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MessageHistoryActivity.this, R.string.check_internet, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            return new ArrayList<>(0);
+        }
+
+        /**
+         * Load users from network.
+         * Returns detailed information on users
+         *
+         * @param uids the user IDs or screen names (screen_name).
+         */
+        private ArrayList<VKUser> loadUsersFromNetwork(Collection<Integer> uids) {
+            try {
+                return Api.get().getProfiles(uids, null, null, null, null);
+            } catch (IOException | JSONException | KException e) {
+                e.printStackTrace();
+            }
+            return new ArrayList<>(0);
+        }
+
+        private void getMessagesFrom(Cursor cursor) {
+            while (cursor.moveToNext()) {
+                String body = cursor.getString(4);
+                String photo = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.PHOTO_50)) : null;
+                String firstName = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.FIRST_NAME)) : null;
+                String lastName = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.LAST_NAME)) : null;
+                int out = cursor.getInt(7);
+                int read_state = cursor.getInt(6);
+                int date = cursor.getInt(5);
+                int mid = cursor.getInt(1);
+
+                VKMessage message = new VKMessage();
+
+                message.mid = mid;
+                message.chat_id = chat_id;
+                message.date = date;
+                message.body = body;
+                message.is_out = out == 1;
+                message.read_state = read_state == 1;
+
+                VKUser user = null;
+                if (firstName != null || lastName != null) {
+                    user = new VKUser();
+                    user.photo_50 = photo;
+                    user.first_name = firstName;
+                    user.last_name = lastName;
+                }
+
+                history.add(0, new MessageItem(message, user == null ? VKUser.EMPTY_USER : user));
+            }
+        }
+
+        /**
+         * Delete old messages, that would be in their place to put new
+         */
+        public void deleteOldMessages(String sql) {
+            Cursor c = database.rawQuery(sql, null);
+            while (c.moveToNext()) {
+                int _id = c.getInt(0);
+                //  database.delete(DBHelper.MESSAGES_TABLE, "_id = " + _id, null);
+                database.execSQL("DELETE FROM " + DBHelper.MESSAGES_TABLE + " WHERE _id = " + _id);
+            }
+            c.close();
+        }
+
+        private ArrayList<VKUser> getUsersFrom(SQLiteDatabase database) {
+            Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.USERS_TABLE, null);
+            ArrayList<VKUser> users = new ArrayList<>(cursor.getCount());
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    VKUser user = new VKUser();
+                    user.user_id = cursor.getInt(0);
+                    user.first_name = cursor.getString(1);
+                    user.last_name = cursor.getString(2);
+                    user.online = cursor.getInt(4) == 1;
+                    user.online_mobile = cursor.getInt(5) == 1;
+                    user.status = cursor.getString(6);
+                    user.photo_50 = cursor.getString(9);
+                    user.photo_100 = cursor.getString(10);
+                    user.photo_200 = cursor.getString(11);
+
+                    users.add(user);
+                }
+                return users;
+            }
+            cursor.close();
+            return users;
+        }
+
+        /**
+         * Set Cursor adapter to list view,
+         * used if user save messages to database
+         */
+        private void cursorAdapter() {
+            final String saveSql = "SELECT * FROM " + DBHelper.SAVED_MESSAGES_TABLE + "_" + uid;
+            final Cursor saveCursor = database.rawQuery(saveSql, null);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    cursorAdapter = new MessageCursorAdapter(MessageHistoryActivity.this, saveCursor, saveSql, chat_id, uid);
+                    lvHistory.setAdapter(cursorAdapter);
+
+                    // sets the currently selected item
+                    lvHistory.setSelection(adapter.getCount());
+
+                    // enables fast scroll indicator
+                    if (cursorAdapter.getCount() > 500) {
+                        lvHistory.setFastScrollEnabled(true);
+                    }
+                }
+            });
+        }
+
+        @Override
+        protected final void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+
+            // init adapter
+            if (adapter == null) {
+                adapter = new MessageAdapter(MessageHistoryActivity.this, history, uid, chat_id);
+
+            } else if (adapter != lvHistory.getAdapter()) {
+                lvHistory.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged();
+            }
+            // sets the currently selected item
+            lvHistory.setSelection(adapter.getCount());
+
+            // enables fast scroll indicator
+            if (adapter.getCount() > 500) {
+                lvHistory.setFastScrollEnabled(true);
+            }
+        }
+    }
 }
 
