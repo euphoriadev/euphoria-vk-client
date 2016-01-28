@@ -62,8 +62,7 @@ public class AppLoader extends Application {
         updatePreferences();
         createAppDir();
 
-//        TypefaceManager.setDefaultFonts();
-        Thread.setDefaultUncaughtExceptionHandler(FileLogger.DEFAULT_ERROR_HANDLER);
+        CrashManager.init();
     }
 
     /**

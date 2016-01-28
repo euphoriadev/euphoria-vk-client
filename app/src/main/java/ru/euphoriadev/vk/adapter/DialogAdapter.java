@@ -341,7 +341,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             holder.tvBody.setText(message.body);
         }
 
-        if (item.isTyping ? item.userIdTyping == Api.get().getUserId() : item.message.is_out || item.message.isChat()) {
+        if ((item.isTyping ? item.userIdTyping == Api.get().getUserId() : item.message.is_out) || item.message.isChat()) {
             holder.ivLastPhotoUser.setVisibility(View.VISIBLE);
 
             try {

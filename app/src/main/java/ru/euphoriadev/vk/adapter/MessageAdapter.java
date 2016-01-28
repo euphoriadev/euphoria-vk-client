@@ -95,6 +95,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     private boolean isBlackTheme;
     private int primaryDarkColorLight;
     private int primaryDarkColorDark;
+    private boolean isWallpaperBackground;
 
     public MessageAdapter(Context context, ArrayList<MessageItem> values) {
         super(context, values);
@@ -142,6 +143,11 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 colorOutMessages = mContext.getResources().getColor(R.color.white);
             }
         }
+        isWallpaperBackground = ThemeManager.getWallpaperPath(mContext) != null;
+        if (isWallpaperBackground) {
+            colorOutMessages = ThemeManager.alphaColor(colorOutMessages);
+            colorInMessages = ThemeManager.alphaColor(colorInMessages);
+        }
         widthDisplay = context.getResources().getDisplayMetrics().widthPixels;
 
         primaryDarkColorDark = mContext.getResources().getColor(R.color.primary_text_default_material_light);
@@ -170,6 +176,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
             }
         };
+
     }
 
     @Override
@@ -689,12 +696,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 //                        ImageView ivDocIcon = (ImageView) docItem.findViewById(R.id.ivDocIcon);
                         holder.llDocContainer.addView(docItem);
 
-//                        IconicsDrawable iconDoc = new IconicsDrawable(mContext, GoogleMaterial.Icon.gmd_description);
-//                        iconDoc.color(tm.getPrimaryTextColor());
-
-                        tvDocTitle.setTextColor(getThemeManager().getPrimaryTextColor());
-                        tvDocSize.setTextColor(getThemeManager().getSecondaryTextColor());
-//                        ivDocIcon.setImageDrawable(iconDoc);
+                        tvDocTitle.setTextColor(primaryTextColor);
+                        tvDocSize.setTextColor(secondaryTextColor);
 
                         tvDocTitle.setText(att.document.title);
                         tvDocSize.setText((att.document.size / 1048576) + "MB");

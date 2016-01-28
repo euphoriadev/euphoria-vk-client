@@ -36,6 +36,8 @@
         • Настройка иконки отравки;\n
         • Немного подправлен механизм сохранения сообщений;\n
         • Начата работа над вложениями и смайликами;\n
+        • Редизайн сообщений;\n
+        • Оптимизация и исправление багов;\n
         \n
         <u>0.8</u>\n
         • Заметки;\n
@@ -399,4 +401,6 @@
     <string name="pref_blur_radius_description">Радиус размытие главной фотографии профиля в боковой шторке</string>
     <string name="show_and_hide_time">Показать/скрыть время</string>
     <string name="dialogs_number">"всего диалогов: "</string>
+    <string name="prefs_use_system_emoji">Использовать системные смайлы</string>
+    <string name="prefs_use_system_emoji_description">Как правило, система отображает смайлики гораздо быстрее</string>
 </resources>

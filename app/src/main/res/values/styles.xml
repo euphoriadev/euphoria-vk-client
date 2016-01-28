@@ -222,7 +222,7 @@
 
     <style name="AppTheme.Orange">
         <item name="colorPrimaryDark">@color/md_orange_800</item>
-        <item name="colorPrimary">@color/md_orange_600</item>
+        <item name="colorPrimary">@color/md_orange_700</item>
         <item name="colorAccent">@color/md_green_500</item>
     </style>
 

@@ -25,7 +25,6 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.NotificationsHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.FileLogger;
 
 /**
  * Created by Igor on 13.11.15.
@@ -49,7 +48,7 @@ public class LongPollService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        FileLogger.i(TAG, "onCreate");
+        Log.i(TAG, "onCreate");
 
         mListeners = new SparseArray<>();
         mHandler = new Handler(Looper.getMainLooper());
@@ -274,7 +273,7 @@ public class LongPollService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        FileLogger.i(TAG, "onDestroy");
+        Log.i(TAG, "onDestroy");
 
         isRunning = false;
         mHandler = null;

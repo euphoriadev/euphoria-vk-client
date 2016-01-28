@@ -48,7 +48,6 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
@@ -645,7 +644,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    FileLogger.e(TAG, "Error get messages", e);
+                    Log.e(TAG, "Error get messages", e);
                 } finally {
                     setRefreshing(false);
                 }
@@ -785,7 +784,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
 
 
-        FileLogger.w("DialogFragment", "onCreateMenu = " + searchView);
+        Log.w("DialogFragment", "onCreateMenu = " + searchView);
         if (searchView != null) {
             final ArrayList<DialogItem> cleanDialogs = new ArrayList<>();
             searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.getComponentName()));
@@ -793,7 +792,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String s) {
-                    FileLogger.w("DialogFragment", "onQueryTextSubmit = " + s);
+                    Log.w("DialogFragment", "onQueryTextSubmit = " + s);
                     cleanDialogs.addAll(dialogItems);
                     searchDialogs(s);
                     return true;

@@ -50,6 +50,9 @@ public class ViewUtil {
         }
     }
 
+    /**
+     * Specify an optional color filter for the drawable
+     */
     public static void setFilter(ViewGroup group, int color) {
         for (int i = 0; i < group.getChildCount(); i++) {
             View child = group.getChildAt(i);

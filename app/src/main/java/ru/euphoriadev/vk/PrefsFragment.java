@@ -30,7 +30,7 @@ import ru.euphoriadev.vk.service.EternallOnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AsyncHttpClient;
-import ru.euphoriadev.vk.util.FileLogger;
+import ru.euphoriadev.vk.util.CrashManager;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
@@ -244,8 +244,8 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         categoryUI.addPreference(boxUseCatIcon);
 
         CheckBoxPreference boxSystemEmoji = new MaterialCheckBoxPreference(getActivity());
-        boxSystemEmoji.setTitle("Use system emoji");
-        boxSystemEmoji.setSummary("As a rule, the system displays the emoticons much faster");
+        boxSystemEmoji.setTitle(R.string.prefs_use_system_emoji);
+        boxSystemEmoji.setSummary(R.string.prefs_use_system_emoji_description);
         boxSystemEmoji.setKey(KEY_USE_SYSTEM_EMOJI);
         boxSystemEmoji.setDefaultValue(true);
 
@@ -319,7 +319,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
                 String s = (String) o;
-                FileLogger.w(KEY_ONLINE_STATUS, s);
+                Log.w(KEY_ONLINE_STATUS, s);
                 getActivity().startService(new Intent(getActivity(), EternallOnlineService.class).putExtra("online_status", (String) o));
                 return true;
             }
@@ -397,7 +397,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         preferenceCleanUpLog.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                FileLogger.cleanup();
+                CrashManager.cleanup();
                 return true;
             }
         });

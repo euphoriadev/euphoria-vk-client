@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -54,7 +54,6 @@ import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Encrypter;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
@@ -149,8 +148,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         }
 
         ViewUtil.setFilter(fabSend, ThemeManager.getPrimaryTextColorOnAccent(this));
-
-        etMessageText.getBackground().setColorFilter(ThemeManager.isDarkTheme() ? Color.parseColor("#424242") : Color.WHITE, PorterDuff.Mode.MULTIPLY);
+        ViewUtil.setFilter(etMessageText, ThemeManager.isDarkTheme() ? Color.parseColor("#424242") : Color.WHITE);
 
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -231,7 +229,17 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             }
 
         });
-
+        View listViewFooter = new View(this);
+        listViewFooter.setVisibility(View.VISIBLE);
+        listViewFooter.setBackgroundColor(Color.TRANSPARENT);
+        listViewFooter.setVisibility(View.INVISIBLE);
+        listViewFooter.setEnabled(false);
+        listViewFooter.setClickable(false);
+        listViewFooter.setLayoutParams(new AbsListView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                AndroidUtils.pxFromDp(this, 75)
+        ));
+        lvHistory.addFooterView(listViewFooter);
 
         fabSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -268,8 +276,10 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         ? View.GONE : View.VISIBLE);
             }
         });
+        if (!ThemeManager.isDarkTheme()) {
+            ViewUtil.setFilter(buttonAttachment, ThemeManager.getPrimaryLightTextColor());
+        }
 
-        executor = Executors.newSingleThreadExecutor();
         getMessages(from_saved);
         loadWallpaperFromSD();
     }
@@ -282,6 +292,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 switch (which) {
                     case 0:
                         // Переслать
+                        Toast.makeText(MessageHistoryActivity.this, "Not yet implements", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
                         // Копировать
@@ -434,8 +445,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
                             if (dialogs.isEmpty()) {
                                 stop[0] = true;
-                                FileLogger.w("Dialogs", "IS EMPTY");
-                                FileLogger.w("Dialogs", "STOPPING...");
+                                Log.w("Dialogs", "IS EMPTY");
+                                Log.w("Dialogs", "STOPPING...");
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -691,7 +702,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         database.execSQL("DELETE FROM " + DBHelper.MESSAGES_TABLE + " WHERE _id = " + _id);
                     }
                     c.close();
-                    VKInsertHelper.insertDialogs(database, vkMessages, true);
+                    VKInsertHelper.insertMessages(database, vkMessages, true);
                     vkMessages.clear();
                     vkMessages.trimToSize();
 
@@ -774,6 +785,9 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     }
 
     private void getOldMessages(final int count, final long offset) {
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
+        }
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -850,9 +864,12 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             return;
         }
         if (text.equalsIgnoreCase("КЕК") || text.equalsIgnoreCase("ЛОЛ")) {
-            FileLogger.w("MessageHistoryActivity", "an attempt to send word KEK");
+            Log.w("MessageHistoryActivity", "an attempt to send word KEK");
             Toast.makeText(this, "Сообщение с данным текстом нельзя отправить", Toast.LENGTH_LONG).show();
             return;
+        }
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
         }
         final String finalText = text;
         executor.execute(new Runnable() {
@@ -1062,7 +1079,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     @Override
                     public void run() {
                         dialog.dismiss();
-                        adapter.notifyDataSetChanged();
+                        if (adapter != null)
+                            adapter.notifyDataSetChanged();
                     }
                 });
 
@@ -1102,11 +1120,14 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
     private void loadWallpaperFromSD() {
         String path = ThemeManager.getWallpaperPath(this);
+        ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
         if (!TextUtils.isEmpty(path)) {
-            ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
+            ivWallpaper.setVisibility(View.VISIBLE);
             Picasso.with(this)
                     .load(new File(path))
                     .into(ivWallpaper);
+        } else {
+            ivWallpaper.setVisibility(View.GONE);
         }
     }
 
@@ -1158,22 +1179,18 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (adapter.isInMultiSelectMode()) {
-            menu.findItem(R.id.menuMessageAttach).setVisible(false);
             menu.findItem(R.id.menuStatsMessages).setVisible(false);
             menu.findItem(R.id.menuUpdateMessages).setVisible(false);
             menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(false);
             menu.findItem(R.id.menuMessageTranslateAll).setVisible(false);
-            menu.findItem(R.id.menuMessageAttach).setVisible(false);
             menu.findItem(R.id.menuWallpaper).setVisible(false);
 
             menu.findItem(R.id.menuMessageDelete).setVisible(true);
         } else {
-            menu.findItem(R.id.menuMessageAttach).setVisible(true);
             menu.findItem(R.id.menuStatsMessages).setVisible(true);
             menu.findItem(R.id.menuUpdateMessages).setVisible(true);
             menu.findItem(R.id.menuMessageTranslateAll).setVisible(true);
             menu.findItem(R.id.menuMessageMaterialsOfDialog).setVisible(true);
-            menu.findItem(R.id.menuMessageAttach).setVisible(true);
             menu.findItem(R.id.menuWallpaper).setVisible(true);
 
             menu.findItem(R.id.menuMessageDelete).setVisible(false);
@@ -1225,15 +1242,12 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 adapter.disableMultiSelectMode();
                 break;
 
-            case R.id.menuWallpaper: pickImageFromGallery();
+            case R.id.menuWallpaper:
+                pickImageFromGallery();
                 break;
 
             case R.id.menuHideShowTime:
                 adapter.toggleStateTime();
-                break;
-
-            case R.id.menuMessageAttach:
-                Toast.makeText(this, "Еще не реализовано", Toast.LENGTH_LONG).show();
                 break;
 
             case android.R.id.home:

@@ -39,7 +39,6 @@ import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
 import ru.euphoriadev.vk.util.Refreshable;
@@ -263,7 +262,7 @@ public class BasicActivity extends BaseThemedActivity implements
             // mDrawerLayout.closeDrawer(mDrawerList);
         } else {
             // Error
-            FileLogger.e(this.getClass().getName(), "Error. Fragment is not created");
+            Log.e(this.getClass().getName(), "Error. Fragment is not created");
         }
 
     }
@@ -327,7 +326,7 @@ public class BasicActivity extends BaseThemedActivity implements
                     if (isMemberGroup) {
                         // если мы уже в группе
                         PrefManager.putInt("is_join_group", -1);
-                        FileLogger.w("BasicActivity", "IsMemberOfGroup");
+                        Log.w("BasicActivity", "IsMemberOfGroup");
                     } else
                     runOnUiThread(new Runnable() {
                         @Override

@@ -205,7 +205,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(WelcomeActivity.this, "Ошибка. Неверный id", Toast.LENGTH_LONG).show();
+                                Toast.makeText(WelcomeActivity.this, "Error!", Toast.LENGTH_LONG).show();
                             }
                         });
                         return;

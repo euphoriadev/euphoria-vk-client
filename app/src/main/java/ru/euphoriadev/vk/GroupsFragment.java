@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +29,6 @@ import ru.euphoriadev.vk.api.model.VKGroup;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
@@ -301,7 +301,7 @@ public class GroupsFragment extends Fragment {
             searchView = (SearchView) searchItem.getActionView();
         }
 
-        FileLogger.w("GroupsFragment", "onCreateMenu = " + searchView);
+        Log.w("GroupsFragment", "onCreateMenu = " + searchView);
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.getComponentName()));
             searchView.setQueryHint(getString(R.string.search));

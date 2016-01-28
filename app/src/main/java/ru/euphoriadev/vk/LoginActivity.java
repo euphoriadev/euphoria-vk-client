@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import ru.euphoriadev.vk.api.Auth;
 import ru.euphoriadev.vk.util.Account;
-import ru.euphoriadev.vk.util.FileLogger;
 
 public class LoginActivity extends Activity {
     private static final String TAG = "Kate.LoginActivity";
@@ -40,7 +40,7 @@ public class LoginActivity extends Activity {
         try {
             if (url == null)
                 return;
-            FileLogger.i(TAG, "url =" + url);
+            Log.i(TAG, "url =" + url);
             if (url.startsWith(Auth.redirect_url)) {
                 if (!url.contains("error=")) {
                     String[] auth = Auth.parseRedirectUrl(url);

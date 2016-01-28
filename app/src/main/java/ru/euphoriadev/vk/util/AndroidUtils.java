@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Transformation;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.TeeInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -313,6 +312,10 @@ public class AndroidUtils {
 
     public static void runOnUi(Runnable runnable) {
         AppLoader.getLoader().getHandler().post(runnable);
+    }
+
+    public static boolean isMinimemSdk(int sdk) {
+        return Build.VERSION.SDK_INT <= sdk;
     }
 
 

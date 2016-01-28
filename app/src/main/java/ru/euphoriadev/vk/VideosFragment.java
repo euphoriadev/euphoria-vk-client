@@ -2,6 +2,7 @@ package ru.euphoriadev.vk;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.api.model.VKVideo;
 import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
@@ -90,7 +90,7 @@ public class VideosFragment extends android.support.v4.app.Fragment {
                         }
                     });
                 } catch (Exception e) {
-                    FileLogger.e(TAG, "Error get videos", e);
+                    Log.e(TAG, "Error get videos", e);
                 }
             }
         });
@@ -99,7 +99,7 @@ public class VideosFragment extends android.support.v4.app.Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        FileLogger.i(TAG, "onDestroy");
+        Log.i(TAG, "onDestroy");
         if (adapter != null) {
             adapter.clear();
             adapter = null;

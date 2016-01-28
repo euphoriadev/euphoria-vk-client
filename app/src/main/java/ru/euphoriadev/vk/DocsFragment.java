@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +24,6 @@ import ru.euphoriadev.vk.adapter.DocsAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.helper.FileHelper;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
 
@@ -71,7 +71,7 @@ public class DocsFragment extends Fragment {
             searchView = (SearchView) searchItem.getActionView();
         }
 
-        FileLogger.w("GroupsFragment", "onCreateMenu = " + searchView);
+        Log.w("GroupsFragment", "onCreateMenu = " + searchView);
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setQueryHint(getString(R.string.search));

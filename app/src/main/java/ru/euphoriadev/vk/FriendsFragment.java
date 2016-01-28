@@ -11,6 +11,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +30,6 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.FileLogger;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
@@ -181,7 +181,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             searchView = (SearchView) searchItem.getActionView();
         }
 
-        FileLogger.w("GroupsFragment", "onCreateMenu = " + searchView);
+        Log.w("GroupsFragment", "onCreateMenu = " + searchView);
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.getComponentName()));
             searchView.setQueryHint(getString(R.string.search));

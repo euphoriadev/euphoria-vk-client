@@ -19,7 +19,6 @@ import ru.euphoriadev.vk.MusicPlayerActivity;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.helper.DBHelper;
-import ru.euphoriadev.vk.util.FileLogger;
 
 /**
  * Created by Igor on 06.10.15.
@@ -214,7 +213,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void startPlay(String url) {
-        FileLogger.i(TAG, "startPlay vie url = " + url);
+        Log.i(TAG, "startPlay vie url = " + url);
         if (TextUtils.isEmpty(url)) {
             return;
         }
