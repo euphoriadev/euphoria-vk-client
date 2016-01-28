@@ -11,6 +11,7 @@ import android.widget.ScrollView;
 
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.AsyncHttpClient;
+import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.ThemeManager;
 
 /**
@@ -112,6 +113,17 @@ public class TestActivity extends BaseThemedActivity {
 //        });
 //        rootLayout.addView(buttonNative);
 
+        AppCompatButton buttonDownEmoji = new AppCompatButton(this);
+        buttonDownEmoji.setText("Download emojis now");
+        buttonDownEmoji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvResult.append("Start downloading emojis...");
+                Emoji.executeDownloadingTask(TestActivity.this);
+            }
+        });
+        rootLayout.addView(buttonDownEmoji);
+
         AppCompatButton buttonClear = new AppCompatButton(this);
         buttonClear.setText("Clear text");
         buttonClear.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +133,7 @@ public class TestActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(buttonClear);
+
     }
 
     private void connectToGoogle() {

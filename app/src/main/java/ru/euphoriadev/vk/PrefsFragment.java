@@ -59,6 +59,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     public static final String KEY_USE_TWO_PROFILE = "use_two_profile";
     public static final String KEY_USE_CAT_ICON_SEND = "use_cat_icon_send";
     public static final String KEY_FORCED_LOCALE = "forced_locale";
+    public static final String KEY_USE_SYSTEM_EMOJI = "use_system_emoji";
 
     /** Font keys */
     public static final String KEY_FONT_FAMILY = "font_family";
@@ -238,9 +239,17 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         boxUseCatIcon.setTitle(getActivity().getString(R.string.prefs_use_cat_icon_send));
         boxUseCatIcon.setSummary(getActivity().getString(R.string.prefs_use_cat_icon_send_description));
         boxUseCatIcon.setKey(KEY_USE_CAT_ICON_SEND);
-        boxUseCatIcon.setDefaultValue(true);
+        boxUseCatIcon.setDefaultValue(false);
 
         categoryUI.addPreference(boxUseCatIcon);
+
+        CheckBoxPreference boxSystemEmoji = new MaterialCheckBoxPreference(getActivity());
+        boxSystemEmoji.setTitle("Use system emoji");
+        boxSystemEmoji.setSummary("As a rule, the system displays the emoticons much faster");
+        boxSystemEmoji.setKey(KEY_USE_SYSTEM_EMOJI);
+        boxSystemEmoji.setDefaultValue(true);
+
+        categoryUI.addPreference(boxSystemEmoji);
 
 
         ListPreference listSelectLocale = new MaterialListPreference(getActivity());

@@ -64,8 +64,8 @@ public class LoginActivity extends Activity {
 
         if (webview != null) {
             webview.removeAllViews();
-            webview.destroy();
             webview.clearCache(true);
+            webview.destroy();
             webview = null;
         }
 

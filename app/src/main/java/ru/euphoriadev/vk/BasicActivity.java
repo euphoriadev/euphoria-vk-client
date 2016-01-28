@@ -3,7 +3,6 @@ package ru.euphoriadev.vk;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -234,10 +233,10 @@ public class BasicActivity extends BaseThemedActivity implements
                                         Account account = new Account(BasicActivity.this);
                                         account.clear();
 
-                                        DBHelper dbHelper = DBHelper.get(BasicActivity.this);
-                                        SQLiteDatabase database = dbHelper.getWritableDatabase();
-                                        dbHelper.dropTables(database);
-                                        dbHelper.close();
+//                                        DBHelper dbHelper = DBHelper.get(BasicActivity.this);
+//                                        SQLiteDatabase database = dbHelper.getWritableDatabase();
+//                                        dbHelper.dropTables(database);
+//                                        dbHelper.close();
                                         finish();
                                     }
                                 });

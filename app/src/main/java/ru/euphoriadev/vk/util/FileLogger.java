@@ -2,8 +2,6 @@ package ru.euphoriadev.vk.util;
 
 import android.util.Log;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -50,7 +48,7 @@ public class FileLogger {
 
     private FileLogger() {
         appLoader = AppLoader.getLoader();
-        sdf = new SimpleDateFormat("dd.MM.yyyy.HH:mm:ss");
+        sdf = new SimpleDateFormat("dd-MM-yyyy-HH.mm.ss");
         if (!appLoader.writeLog) {
             return;
         }
