@@ -95,7 +95,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     private boolean isBlackTheme;
     private int primaryDarkColorLight;
     private int primaryDarkColorDark;
-    private boolean isWallpaperBackground;
 
     public MessageAdapter(Context context, ArrayList<MessageItem> values) {
         super(context, values);
@@ -143,7 +142,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 colorOutMessages = mContext.getResources().getColor(R.color.white);
             }
         }
-        isWallpaperBackground = ThemeManager.getWallpaperPath(mContext) != null;
+        boolean isWallpaperBackground = ThemeManager.getWallpaperPath(mContext) != null;
         if (isWallpaperBackground) {
             colorOutMessages = ThemeManager.alphaColor(colorOutMessages);
             colorInMessages = ThemeManager.alphaColor(colorInMessages);
@@ -341,6 +340,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
             holder.tvBody.setText(item.message.body);
         }
 
+        if (mShowTime)
         if (this.date.getYear() > item.date.getYear()) {
             // если отправили больше года назад
             sdf.applyPattern("d MMM, yyyy"); // 23 Окт, 2015
@@ -364,6 +364,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 //                    //     tvDate.setText(item.user.toString() + ", ");
 //                    //     tvDate.append(sdf.format(item.message.date * 1000));
 //                } else {
+                if (mShowTime)
                 holder.tvDate.setText(sdf.format(item.date));
 //                holder.tvDateOneLine.setText(sdf.format(item.date));
                 break;

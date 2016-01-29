@@ -168,4 +168,6 @@
     <string name="dialogs_number">"dialogs number: "</string>
     <string name="prefs_use_system_emoji">Use system emoji</string>
     <string name="prefs_use_system_emoji_description">As a rule, the system displays the emoticons much faster</string>
+    <string name="prefs_check_auto_update">Auto update</string>
+    <string name="prefs_check_auto_update_description">Check for updates once a aay</string>
 </resources>

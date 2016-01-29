@@ -38,6 +38,7 @@
         • Начата работа над вложениями и смайликами;\n
         • Редизайн сообщений;\n
         • Оптимизация и исправление багов;\n
+        • Автообновление;\n
         \n
         <u>0.8</u>\n
         • Заметки;\n
@@ -403,4 +404,6 @@
     <string name="dialogs_number">"всего диалогов: "</string>
     <string name="prefs_use_system_emoji">Использовать системные смайлы</string>
     <string name="prefs_use_system_emoji_description">Как правило, система отображает смайлики гораздо быстрее</string>
+    <string name="prefs_check_auto_update">Автообновление</string>
+    <string name="prefs_check_auto_update_description">Проверка обновлений раз в день</string>
 </resources>

@@ -4,6 +4,7 @@ package ru.euphoriadev.vk.util;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.text.ClipboardManager;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 import com.squareup.picasso.Transformation;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,7 +40,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 
+import ru.euphoriadev.vk.BuildConfig;
+import ru.euphoriadev.vk.PrefsFragment;
+import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.helper.FileHelper;
 
 public class AndroidUtils {
 
@@ -53,7 +60,6 @@ public class AndroidUtils {
         int duration = longLength ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
         Toast.makeText(c, redId, duration).show();
     }
-
 
 
     // Нужно добавить строчку в manifest:
@@ -331,6 +337,68 @@ public class AndroidUtils {
             set.add(array.keyAt(i));
         }
         return set;
+    }
+
+    public static void checkUpdate(final Context context, final boolean forceCheck) {
+        boolean isCheckUpdate = PrefManager.getBoolean(PrefsFragment.KEY_CHECK_UPDATE);
+        if (!isCheckUpdate && !forceCheck) {
+            return;
+        }
+        long lastUpdateTime = PrefManager.getLong(PrefsFragment.LAST_UPDATE_TIME);
+        if (!forceCheck &&(System.currentTimeMillis() - lastUpdateTime) <= 24 * 60 * 60 * 1000) {
+            return;
+        }
+
+        AsyncHttpClient client = new AsyncHttpClient(context);
+        AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest(PrefsFragment.UPDATE_URL);
+
+        client.execute(request, new AsyncHttpClient.HttpRequest.OnResponseListener() {
+            @Override
+            public void onResponse(AsyncHttpClient client, AsyncHttpClient.HttpResponse response) {
+                PrefManager.putLong(PrefsFragment.KEY_CHECK_UPDATE, System.currentTimeMillis());
+
+                JSONObject json = response.getContentAsJson();
+                if (BuildConfig.VERSION_CODE >= json.optInt("version_code")) {
+                    if (!forceCheck) {
+                        return;
+                    }
+                    AndroidUtils.runOnUi(new Runnable() {
+                        @Override
+                        public void run() {
+                            showToast(context, "Update not found", true);
+                        }
+                    });
+                    return;
+                }
+
+                createUpdateDialog(context, json);
+            }
+
+            @Override
+            public void onError(AsyncHttpClient client, final AsyncHttpClient.HttpResponseCodeException exception) {
+                runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        showToast(context, "Error! " + exception.getMessage(), true);
+                    }
+                });
+            }
+        });
+    }
+
+    private static void createUpdateDialog(Context context, final JSONObject json) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.update))
+                .setMessage(context.getString(R.string.found_new_version) + json.optString("version") + "\n" + context.getString(R.string.download_ask))
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FileHelper.downloadFileWithDefaultManager(json.optString("url"), "Euphoria.apk", "application/vnd.android.package-archive");
+                    }
+                });
+
+        builder.create().show();
     }
 
     public static class PicassoBlurTransform implements Transformation {

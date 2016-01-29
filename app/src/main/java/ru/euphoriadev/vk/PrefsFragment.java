@@ -1,15 +1,12 @@
 package ru.euphoriadev.vk;
 
 
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -23,17 +20,13 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.service.EternallOnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.CrashManager;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
@@ -78,7 +71,11 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     public static final String KEY_WRITE_LOG = "write_log";
     public static final String KEY_RESEND_FAILED_MESSAGES = "resend_failed_msg";
     public static final String KEY_ENCRYPT_MESSAGES = "encrypt_messages";
+    public static final String KEY_CHECK_UPDATE = "auto_update";
 
+    /** Web url for check updates this app */
+    public static final String UPDATE_URL = "http://timeteam.3dn.ru/timevk_up.txt";
+    public static final String LAST_UPDATE_TIME = "last_update_time";
 
     boolean isSetListView;
     PreferenceScreen rootScreen;
@@ -391,7 +388,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         categoryLog.addPreference(boxEnableLog);
 
 
-
         Preference preferenceCleanUpLog = new MaterialPreference(getActivity());
         preferenceCleanUpLog.setTitle(R.string.prefs_clear_log);
         preferenceCleanUpLog.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -432,11 +428,18 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         categoryOther.addPreference(listEncrypt);
 
 
+        CheckBoxPreference autoUpdatePreference = new MaterialCheckBoxPreference(getActivity());
+        autoUpdatePreference.setTitle(R.string.prefs_check_auto_update);
+        autoUpdatePreference.setSummary(R.string.prefs_check_auto_update_description);
+        autoUpdatePreference.setKey(KEY_CHECK_UPDATE);
+        autoUpdatePreference.setDefaultValue(true);
+
+        categoryOther.addPreference(autoUpdatePreference);
+
         PreferenceCategory categoryAbout = new MaterialPreferenceCategory(getActivity());
         categoryAbout.setTitle(getActivity().getString(R.string.prefs_about));
 
         rootScreen.addPreference(categoryAbout);
-
 
 
         Preference versionScreen = new MaterialPreference(getActivity());
@@ -571,74 +574,10 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         }
     }
 
-    private JSONObject loadJsonFromSite(String url) {
-        try {
-            return new AsyncHttpClient(getActivity()).execute(new AsyncHttpClient.HttpRequest(url)).getContentAsJson();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
 
     private void checkUpdate() {
-        ThreadExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final JSONObject json = loadJsonFromSite("http://timeteam.3dn.ru/timevk_up.txt");
-                    if (json == null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                AndroidUtils.showToast(getActivity(), R.string.check_internet, true);
-                            }
-                        });
-                        return;
-                    }
-                    if (BuildConfig.VERSION_CODE < json.optInt("version_code")) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                builder.setTitle(getActivity().getString(R.string.update))
-                                        .setMessage(getActivity().getString(R.string.found_new_version) + json.optString("version") + "\n" + getActivity().getString(R.string.download_ask))
-                                        .setNegativeButton("Cancel", null)
-                                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                String url = json.optString("url");
-                                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                                                //  request.setDescription("Some descrition");
-                                                request.setTitle("Euphoria.apk");
-                                                request.setMimeType("application/vnd.android.package-archive");
-                                                // in order for this if to run, you must use the android 3.2 to compile your app
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                                                    request.allowScanningByMediaScanner();
-                                                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                                }
-                                                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Euphoria.apk");
-                                                // get download service and enqueue file
-                                                DownloadManager manager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
-                                                manager.enqueue(request);
-                                            }
-                                        }).create().show();
-                            }
-                        });
-                    } else {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.no_updates), Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        AndroidUtils.checkUpdate(getActivity(), true);
     }
 
     @Override

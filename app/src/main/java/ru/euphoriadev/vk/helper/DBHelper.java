@@ -17,7 +17,7 @@ import ru.euphoriadev.vk.api.model.VKUser;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "euphoria.db";
-    private static final int DATABASE_VERSION = 81;
+    private static final int DATABASE_VERSION = 82;
 
     public static final String USERS_TABLE = "users";
     public static final String FRIENDS_TABLE = "friends";

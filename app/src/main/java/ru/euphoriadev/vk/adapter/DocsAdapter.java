@@ -60,7 +60,7 @@ public class DocsAdapter extends BaseArrayAdapter<VKDocument> {
 //                menu.getMenuInflater().inflate(R.menu.oopup_menu_doc, menu.getMenu());
 //                menu.show();
 
-                FileHelper.downloadFileWithDefaultManager(doc.url, doc.title);
+                FileHelper.downloadFileWithDefaultManager(doc.url, doc.title, null);
             }
         });
         if (doc.isImage()) {

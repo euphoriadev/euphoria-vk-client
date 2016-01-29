@@ -117,7 +117,7 @@ public class DocsFragment extends Fragment {
             public void run() {
                 for (int i = 0; i < adapter.getValues().size(); i++) {
                     VKDocument doc = adapter.getValues().get(i);
-                    FileHelper.downloadFileWithDefaultManager(doc.url, doc.title);
+                    FileHelper.downloadFileWithDefaultManager(doc.url, doc.title, null);
                 }
             }
         });

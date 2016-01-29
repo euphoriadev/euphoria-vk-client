@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
@@ -97,8 +96,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     private long lastTypeNotification;
     private boolean forceClose;
     private boolean hideTyping;
-    private boolean isButtonPositionOflistView;
-    private boolean isLoadingMessages = false;
+    /** can I load old messages, If false, then messages are loading */
+    private boolean canLoadOldMessages;
 
 
     @Override
@@ -198,17 +197,15 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 // Если находимся в конце списка
                 if (visibleItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
                     // то скрываем тень
-                    isButtonPositionOflistView = true;
                     if (vshadow.getVisibility() == View.VISIBLE) vshadow.setVisibility(View.GONE);
                 } else {
-                    isButtonPositionOflistView = false;
                     // а когда начинаем прокручивать, то она появляется
                     if (vshadow.getVisibility() == View.GONE) vshadow.setVisibility(View.VISIBLE);
                 }
 
 //                // если находися на 10 position списка - грузим старые сообщеньки
-                if (!isLoadingMessages && adapter != null && firstVisibleItem <= 20) {
-                    isLoadingMessages = true;
+                if (canLoadOldMessages && adapter != null && firstVisibleItem <= 20) {
+                    canLoadOldMessages = false;
                     getOldMessages(30, adapter.getCount());
                 }
 //                Log.w("ListView", "firstVisibleItem - " + firstVisibleItem + ", visibleItemCount " + visibleItemCount);
@@ -543,8 +540,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 public void run() {
                     try {
 
-                        // будем показывать 20 самых часто используемых слов
-                        final HashMap<String, Integer> mapWords = new HashMap<>();
 
                         String sql;
                         // если зашли в диалог с пользователем
@@ -802,7 +797,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     HashMap<Integer, VKUser> mapUsers = null;
                     ArrayList<VKMessage> oldMessages = api.getMessagesHistory(uid, chat_id, offset, count, false);
                     if (oldMessages.isEmpty()) {
-                        isLoadingMessages = false;
+                        canLoadOldMessages = true;
                         return;
                     }
 
@@ -832,7 +827,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            isLoadingMessages = false;
+                            canLoadOldMessages = true;
                             if (adapter != null) {
                                 adapter.notifyDataSetChanged();
                                 lvHistory.setSelection(lvHistory.getFirstVisiblePosition() + count);
@@ -840,7 +835,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
                         }
                     });
-                    Collections.reverse(oldMessages);
                     VKInsertHelper.insertMessages(database, oldMessages, true);
 //                    adapter.getMessages().trimToSize();
                     if (oldMessages != null) {
@@ -1156,7 +1150,14 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     invalidateOptionsMenu();
                 }
             });
-            isLoadingMessages = true;
+            canLoadOldMessages = false;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            canLoadOldMessages = true;
         }
 
         @Override
@@ -1182,7 +1183,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             if (cursor.getCount() > 0) {
                 // Start dialog is not first,
                 // loaded messages
-
+                history.ensureCapacity(cursor.getCount());
                 getMessagesFrom(cursor);
                 publishProgress(null);
             }
@@ -1217,6 +1218,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
                 keySet.clear();
             }
+
             for (int i = 0; i < vkUsers.size(); i++) {
                 VKUser user = vkUsers.get(i);
                 users.put(user.user_id, user);
@@ -1232,7 +1234,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             publishProgress(null);
 
             deleteOldMessages(sql);
-            Collections.reverse(messages);
 
             VKInsertHelper.insertMessages(database, messages, true);
             VKInsertHelper.updateUsers(database, vkUsers, true);
@@ -1254,7 +1255,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         @Override
         protected final void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
-            isLoadingMessages = false;
 
             // init adapter
             if (adapter == null) {
@@ -1272,6 +1272,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             if (adapter.getCount() > 500) {
                 lvHistory.setFastScrollEnabled(true);
             }
+
         }
 
         /**
@@ -1310,7 +1311,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         }
 
         private void getMessagesFrom(Cursor cursor) {
-            while (cursor.moveToNext()) {
+            // Reverse getting messages from database
+            for (cursor.moveToLast(); !cursor.isBeforeFirst(); cursor.moveToPrevious()) {
                 String body = cursor.getString(4);
                 String photo = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.PHOTO_50)) : null;
                 String firstName = chat_id != 0 ? cursor.getString(cursor.getColumnIndex(DBHelper.FIRST_NAME)) : null;

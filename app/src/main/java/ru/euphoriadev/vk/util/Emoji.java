@@ -198,7 +198,7 @@ public class Emoji {
 
 
     public static void parseEmoji(TextView view) {
-        if (PrefManager.getBoolean(PrefsFragment.KEY_USE_SYSTEM_EMOJI)) {
+        if (PrefManager.getBoolean(PrefsFragment.KEY_USE_SYSTEM_EMOJI, true)) {
             // enables "use system emoji"
             return;
         }
