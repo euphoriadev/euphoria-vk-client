@@ -870,7 +870,7 @@ public class Api {
     }
 
     //http://vk.com/dev/messages.getHistory
-    public ArrayList<VKMessage> getMessagesHistory(long uid, long chat_id, long offset, int count) throws IOException, JSONException, KException {
+    public ArrayList<VKMessage> getMessagesHistory(long uid, long chat_id, long offset, int count, boolean rev) throws IOException, JSONException, KException {
         VKParams params = new VKParams("messages.getHistory");
         if (chat_id <= 0)
             params.put("user_id", uid);
@@ -879,7 +879,7 @@ public class Api {
         params.put("offset", offset);
         if (count != 0)
             params.put("count", count);
-//        params.put("rev", 0);
+        params.put("rev", rev);
         JSONObject root = sendRequest(params);
         JSONObject response = root.optJSONObject("response");
         JSONArray array = response.optJSONArray("items");

@@ -742,7 +742,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     while (!isEmpty) {
                         // если true - удалили все сообщения
                         // еще раз вызывать удаление не нужно
-                        isEmpty = api.getMessagesHistory(user_id, chat_id, 0, 10).isEmpty();
+                        isEmpty = api.getMessagesHistory(user_id, chat_id, 0, 10, false).isEmpty();
 
                         api.deleteMessageDialog(user_id, chat_id);
                     }

@@ -163,6 +163,56 @@ public class VKInsertHelper {
         }
     }
 
+    /**
+     * Insert or update users to database
+     *
+     * @param database the {@link SQLiteDatabase} to insert/update it
+     * @param user     the user to insert/update into database
+     * @return the number of rows affected,
+     */
+    public static long updateUser(SQLiteDatabase database, VKUser user) {
+        prepareContentValuesFor(user);
+        int updateRows = database.update(DBHelper.USERS_TABLE, sValues, DBHelper.USER_ID + " = " + user.user_id, null);
+        if (updateRows <= 0) {
+            return database.insert(DBHelper.USERS_TABLE, null, sValues);
+        }
+        return updateRows;
+    }
+
+    /**
+     * Insert or update users to database with use transactions
+     *
+     * @param database the {@link SQLiteDatabase} to update users it
+     * @param users    a list of users to update into the database
+     */
+    public static void updateUsers(SQLiteDatabase database, List<VKUser> users) {
+        updateUsers(database, users, true);
+    }
+
+    /**
+     * Insert or update users to SQLite database
+     *
+     * @param database       the {@link SQLiteDatabase} to insert messages it
+     * @param users          a list of users to insert/update into database
+     * @param useTransaction true to use transactions, for speeds up inserting
+     * @see SQLiteDatabase#beginTransaction()
+     */
+    public static void updateUsers(SQLiteDatabase database, List<VKUser> users, boolean useTransaction) {
+        checkOpen(database);
+        if (checkIsEmpty(users)) {
+            return;
+        }
+
+        if (useTransaction) database.beginTransaction();
+        for (int i = 0; i < users.size(); i++) {
+            updateUser(database, users.get(i));
+        }
+        sValues.clear();
+        if (useTransaction) {
+            database.setTransactionSuccessful();
+            database.endTransaction();
+        }
+    }
 
     private static void prepareContentValuesForMessage(VKMessage message) {
         sValues.put(DBHelper.MESSAGE_ID, message.mid);

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Process;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
@@ -96,7 +98,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     private boolean forceClose;
     private boolean hideTyping;
     private boolean isButtonPositionOflistView;
-    private boolean isLoadingOldMessages = false;
+    private boolean isLoadingMessages = false;
 
 
     @Override
@@ -205,8 +207,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 }
 
 //                // если находися на 10 position списка - грузим старые сообщеньки
-                if (!isLoadingOldMessages && adapter != null && firstVisibleItem <= 20) {
-                    isLoadingOldMessages = true;
+                if (!isLoadingMessages && adapter != null && firstVisibleItem <= 20) {
+                    isLoadingMessages = true;
                     getOldMessages(30, adapter.getCount());
                 }
 //                Log.w("ListView", "firstVisibleItem - " + firstVisibleItem + ", visibleItemCount " + visibleItemCount);
@@ -798,9 +800,9 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 try {
                     VKUser emptyUser = VKUser.EMPTY_USER;
                     HashMap<Integer, VKUser> mapUsers = null;
-                    ArrayList<VKMessage> oldMessages = api.getMessagesHistory(uid, chat_id, offset, count);
+                    ArrayList<VKMessage> oldMessages = api.getMessagesHistory(uid, chat_id, offset, count, false);
                     if (oldMessages.isEmpty()) {
-                        isLoadingOldMessages = false;
+                        isLoadingMessages = false;
                         return;
                     }
 
@@ -830,7 +832,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            isLoadingOldMessages = false;
+                            isLoadingMessages = false;
                             if (adapter != null) {
                                 adapter.notifyDataSetChanged();
                                 lvHistory.setSelection(lvHistory.getFirstVisiblePosition() + count);
@@ -838,6 +840,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
                         }
                     });
+                    Collections.reverse(oldMessages);
                     VKInsertHelper.insertMessages(database, oldMessages, true);
 //                    adapter.getMessages().trimToSize();
                     if (oldMessages != null) {
@@ -1153,10 +1156,12 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     invalidateOptionsMenu();
                 }
             });
+            isLoadingMessages = true;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             helper = DBHelper.get(MessageHistoryActivity.this);
             database = helper.getWritableDatabase();
 
@@ -1204,24 +1209,33 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 users.append(message.uid, VKUser.EMPTY_USER);
             }
 
-            HashSet<Integer> keySet = AndroidUtils.keySet(users);
-            ArrayList<VKUser> vkUsers = loadUsersFromNetwork(keySet);
+            ArrayList<VKUser> vkUsers = getUsersFrom(database);
+            if (vkUsers.isEmpty()) {
+                // database not have users... add
+                HashSet<Integer> keySet = AndroidUtils.keySet(users);
+                vkUsers = loadUsersFromNetwork(keySet);
+
+                keySet.clear();
+            }
             for (int i = 0; i < vkUsers.size(); i++) {
                 VKUser user = vkUsers.get(i);
                 users.put(user.user_id, user);
             }
 
             history.clear();
-            for (int i = 0; i < messages.size(); i++) {
+            // Reverse adding
+            for (int i = messages.size() - 1; i >= 0; i--) {
                 VKMessage message = messages.get(i);
-                history.add(0, new MessageItem(message, users.get(message.uid)));
+                history.add(new MessageItem(message, users.get(message.uid)));
             }
             cursor.close();
             publishProgress(null);
 
             deleteOldMessages(sql);
+            Collections.reverse(messages);
+
             VKInsertHelper.insertMessages(database, messages, true);
-//            VKInsertHelper.insertUsers(database, vkUsers, true);
+            VKInsertHelper.updateUsers(database, vkUsers, true);
 
             messages.clear();
             messages.trimToSize();
@@ -1231,13 +1245,33 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             vkUsers = null;
             users.clear();
             users = null;
-            keySet.clear();
-            keySet = null;
             cursor.close();
 
             System.gc();
             return null;
+        }
 
+        @Override
+        protected final void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+            isLoadingMessages = false;
+
+            // init adapter
+            if (adapter == null) {
+                adapter = new MessageAdapter(MessageHistoryActivity.this, history, uid, chat_id);
+
+            } else if (adapter != lvHistory.getAdapter()) {
+                lvHistory.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged();
+            }
+            // sets the currently selected item
+            lvHistory.setSelection(adapter.getCount());
+
+            // enables fast scroll indicator
+            if (adapter.getCount() > 500) {
+                lvHistory.setFastScrollEnabled(true);
+            }
         }
 
         /**
@@ -1247,7 +1281,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
          */
         private ArrayList<VKMessage> loadMessagesFromNetwork() {
             try {
-                return Api.get().getMessagesHistory(uid, chat_id, this.offset, this.count);
+                return Api.get().getMessagesHistory(uid, chat_id, this.offset, this.count, false);
             } catch (Exception e) {
                 e.printStackTrace();
                 AndroidUtils.runOnUi(new Runnable() {
@@ -1303,7 +1337,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     user.last_name = lastName;
                 }
 
-                history.add(0, new MessageItem(message, user == null ? VKUser.EMPTY_USER : user));
+                history.add(new MessageItem(message, user == null ? VKUser.EMPTY_USER : user));
             }
         }
 
@@ -1369,27 +1403,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             });
         }
 
-        @Override
-        protected final void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-
-            // init adapter
-            if (adapter == null) {
-                adapter = new MessageAdapter(MessageHistoryActivity.this, history, uid, chat_id);
-
-            } else if (adapter != lvHistory.getAdapter()) {
-                lvHistory.setAdapter(adapter);
-            } else {
-                adapter.notifyDataSetChanged();
-            }
-            // sets the currently selected item
-            lvHistory.setSelection(adapter.getCount());
-
-            // enables fast scroll indicator
-            if (adapter.getCount() > 500) {
-                lvHistory.setFastScrollEnabled(true);
-            }
-        }
     }
 }
 
