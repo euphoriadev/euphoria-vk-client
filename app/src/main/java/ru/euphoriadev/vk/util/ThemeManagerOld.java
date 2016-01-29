@@ -10,8 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.widget.ListView;
 
-import java.util.Locale;
-
+import ru.euphoriadev.vk.PrefsFragment;
 import ru.euphoriadev.vk.R;
 
 /**
@@ -112,9 +111,6 @@ public class ThemeManagerOld {
     }
 
 
-    private void setTheme(int resId) {
-        mContext.setTheme(resId);
-    }
 
     private int getColor(int resId) {
         return ContextCompat.getColor(mContext, resId);
@@ -238,14 +234,6 @@ public class ThemeManagerOld {
     }
 
 
-    public boolean isBlurHeader() {
-        return sPrefs.getString("making_drawer_header", "default").equalsIgnoreCase("blur_photo");
-    }
-
-    public String getLocale() {
-        return sPrefs.getString("forced_locale", Locale.getDefault().getLanguage());
-    }
-
     public boolean isSystemFont() {
         return getFont().equals("Default");
     }
@@ -258,7 +246,7 @@ public class ThemeManagerOld {
         return mColour.equalsIgnoreCase("BLACK");
     }
     public boolean isShowDivider() {
-        return sPrefs.getBoolean("show_divider", false);
+        return sPrefs.getBoolean(PrefsFragment.KEY_SHOW_DIVIDER, false);
     }
 
 }

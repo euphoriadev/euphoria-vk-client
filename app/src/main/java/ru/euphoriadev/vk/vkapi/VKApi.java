@@ -1,4 +1,4 @@
-package ru.euphoriadev.vk.api;
+package ru.euphoriadev.vk.vkapi;
 
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
@@ -28,8 +28,9 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
 /**
  * Created by Igor on 15.01.16.
  * <p/>
- * Simple VK Library for execute request
- * <p/>
+ * a Simple new VK Library for execute request.
+ * This library is a "mixture" of "VK-SDK" and "VK-Android-SDK by Thest1" library
+ *
  * <p/>
  * Example to init api and execute users.get request:
  * <pre>
@@ -481,8 +482,6 @@ public class VKApi {
             return new VKMessageMethodSetter(new VKRequest(("messages.sendSticker"), new VKParams()));
         }
 
-
-
         /**
          * Deletes one or more messages
          * <p/>
@@ -541,6 +540,91 @@ public class VKApi {
             return new VKMessageMethodSetter(new VKRequest(("messages.markAsImportant"), new VKParams()));
         }
 
+        /**
+         * Returns data required for connection to a Long Poll server.
+         * With Long Poll connection,
+         * you can immediately know about incoming messages and other events.
+         *
+         * Result:
+         * Returns an object with key, server, ts fields.
+         * With such data you can connect to an instant message server
+         * to immediately receive incoming messages and other events
+         *
+         * http://vk.com/dev/messages.getLongPollServer
+         */
+        public VKMessageMethodSetter getLongPollServer() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getLongPollServer"), new VKParams()));
+        }
+
+        /**
+         * Returns updates in user's private messages.
+         * To speed up handling of private messages,
+         * it can be useful to cache previously loaded messages on
+         * a user's mobile device/desktop, to prevent re-receipt at each call.
+         * With this method, you can synchronize a local copy of
+         * the message list with the actual version.
+         *
+         * Result:
+         * Returns an object that contains the following fields:
+         * 1 — history:     An array similar to updates field returned
+         *                  from the Long Poll server,
+         *                  with these exceptions:
+         *                  - For events with code 4 (addition of a new message),
+         *                  there are no fields except the first three.
+         *                  - There are no events with codes 8, 9 (friend goes online/offline)
+         *                  or with codes 61, 62 (typing during conversation/chat).
+         *
+         * 2 — messages:    An array of private message objects that were found
+         *                  among events with code 4 (addition of a new message)
+         *                  from the history field.
+         *                  Each object of message contains a set of fields described here.
+         *                  The first array element is the total number of messages
+         *
+         * http://vk.com/dev/messages.getLongPollHistory
+         */
+        public VKMessageMethodSetter getLongPollHistory() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getLongPollHistory"), new VKParams()));
+        }
+
+        /**
+         * Returns information about a chat
+         *
+         * Returns a list of chat objects.
+         * If the fields parameter is set,
+         * the users field contains a list of user objects with
+         * an additional invited_by field containing the ID of the user who
+         * invited the current user to chat.
+         *
+         * http://vk.com/dev/messages.getChat
+         */
+        public VKMessageMethodSetter getChat() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getChat"), new VKParams()));
+        }
+
+        /**
+         * Creates a chat with several participants
+         *
+         * Returns the ID of the created chat (chat_id).
+         *
+         * Errors:
+         * 9	Flood control
+         * http://vk.com/dev/messages.createChat
+         */
+        public VKMessageMethodSetter createChat() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.createChat"), new VKParams()));
+        }
+
+        /**
+         * Edits the title of a chat
+         *
+         * Result:
+         * Returns 1
+         *
+         * http://vk.com/dev/messages.editChat
+         */
+        public VKMessageMethodSetter editChat() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.editChat"), new VKParams()));
+        }
     }
 
     /**
@@ -846,6 +930,20 @@ public class VKApi {
          */
         public VKMethodSetter offset(int offset) {
             this.request.params.put(VKConst.OFFSET, offset);
+            return this;
+        }
+
+        /**
+         * Case for declension of user name and surname:
+         * nom — nominative (default)
+         * gen — genitive
+         * dat — dative
+         * acc — accusative
+         * ins — instrumental
+         * abl — prepositional
+         */
+        public VKMethodSetter nameCase(String nameCase) {
+            this.request.params.put(VKConst.NAME_CASE, nameCase);
             return this;
         }
 
@@ -1437,6 +1535,104 @@ public class VKApi {
          */
         public final VKMessageMethodSetter important(boolean important) {
             this.request.params.put(VKConst.IMPORTANT, important);
+            return this;
+        }
+
+        /** Setters for messages.getLongPollServer */
+
+        /**
+         * True, to use SSL
+         */
+        public final VKMessageMethodSetter useSsl(boolean useSsl) {
+            this.request.params.put(VKConst.USE_SSL, useSsl);
+            return this;
+        }
+
+        /**
+         * True, to return the pts field,
+         * needed for the messages.getLongPollHistory method
+         */
+        public final VKMessageMethodSetter needPts(boolean needPts) {
+            this.request.params.put(VKConst.NEED_PTS, needPts);
+            return this;
+        }
+
+
+        /** Setters for messages.getLongPollHistory */
+
+        /**
+         * Last value of the ts parameter returned from the Long Poll server
+         * or by using messages.getLongPollServer method.
+         */
+        public final VKMessageMethodSetter ts(int ts) {
+            this.request.params.put(VKConst.TS, ts);
+            return this;
+        }
+
+        /**
+         * Last value of the parameter new_pts received from Long Poll server
+         * used to receive actions, which are kept always
+         */
+        public final VKMessageMethodSetter pts(int pts) {
+            this.request.params.put(VKConst.PTS, pts);
+            return this;
+        }
+
+        /**
+         * Number of messages that need to return
+         */
+        public final VKMessageMethodSetter msgsLimit(int limit) {
+            this.request.params.put(VKConst.MSGS_LIMIT, limit);
+            return this;
+        }
+
+        /**
+         * True - returns history only from those users who are currently online
+         */
+        public final VKMessageMethodSetter onlines(boolean onlines) {
+            this.request.params.put(VKConst.ONLINES, onlines);
+            return this;
+        }
+
+        /**
+         * Maximum ID of the message among existing ones in the local copy.
+         * Both messages received with API methods
+         * (for example, messages.getDialogs, messages.getHistory),
+         * and data received from a Long Poll server (events with code 4)
+         * are taken into account
+         */
+        public final VKMessageMethodSetter maxMsgId(int id) {
+            this.request.params.put(VKConst.MAX_MSG_ID, id);
+            return this;
+        }
+
+
+        /** Setters for messages.messages.getChat */
+
+        /**
+         * Chat IDs
+         */
+        public final VKMessageMethodSetter chatIds(int... ids) {
+            this.request.params.put(VKConst.MAX_MSG_ID, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * Chat IDs
+         */
+        public final VKMessageMethodSetter chatIds(Collection<Integer> ids) {
+            this.request.params.put(VKConst.MAX_MSG_ID, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+
+        /** Setters for messages.messages.createChat */
+
+        /**
+         * Chat title
+         */
+        public final VKMessageMethodSetter title(String title) {
+            this.request.params.put(VKConst.TITLE, title);
             return this;
         }
     }
@@ -2050,6 +2246,14 @@ public class VKApi {
         public static final String ATTACHMENT = "attachment";
         public static final String FORWARD_MESSAGES = "forward_messages";
         public static final String STICKER_ID = "sticker_id";
+        public static final String USE_SSL = "use_ssl";
+        public static final String NEED_PTS = "need_pts";
+        public static final String TS = "ts";
+        public static final String PTS = "pts";
+        public static final String ONLINES = "onlines";
+        public static final String MSGS_LIMIT = "msgs_limit";
+        public static final String MAX_MSG_ID = "max_msg_id";
+        public static final String TITLE = "title";
 
         /** Friends */
         public static final String LIST_ID = "list_id";

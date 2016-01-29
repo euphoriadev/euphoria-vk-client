@@ -217,7 +217,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         CheckBoxPreference boxDivider = new MaterialCheckBoxPreference(getActivity());
         boxDivider.setTitle(getActivity().getString(R.string.prefs_show_divider));
         boxDivider.setSummary(getActivity().getString(R.string.prefs_show_divider_description));
-        boxDivider.setDefaultValue(false);
+        boxDivider.setDefaultValue(true);
         boxDivider.setKey(KEY_SHOW_DIVIDER);
 
 

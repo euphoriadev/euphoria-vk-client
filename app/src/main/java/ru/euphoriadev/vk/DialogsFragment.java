@@ -42,7 +42,6 @@ import java.util.HashMap;
 import ru.euphoriadev.vk.adapter.DialogAdapter;
 import ru.euphoriadev.vk.adapter.DialogItem;
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.VKApi;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
@@ -54,6 +53,7 @@ import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
+import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 10.07.15.

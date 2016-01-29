@@ -6,10 +6,10 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.euphoriadev.vk.api.VKApi;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 22.01.16.

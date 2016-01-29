@@ -1,7 +1,6 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +22,6 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
     private ArrayList<E> mSelectedItems;
     private LayoutInflater inflater;
     private ThemeManagerOld tm;
-    private Typeface typeface;
     private OnMultiModeCloseListener closeListener;
 
     public BaseArrayAdapter(Context context, ArrayList<E> values) {
@@ -34,9 +32,6 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         this.tm = ThemeManagerOld.get(context);
-        if (tm.isSystemFont()) {
-            typeface = Typeface.createFromAsset(context.getAssets(), tm.getFont());
-        }
         mSelectedItems = new ArrayList<>();
     }
 
@@ -71,6 +66,7 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
     public void setCloseListener(OnMultiModeCloseListener listener) {
         this.closeListener = listener;
     }
+
 
     public ArrayList<E> getValues() {
         return mValues;

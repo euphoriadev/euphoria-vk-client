@@ -51,7 +51,7 @@
             android:scaleType="centerCrop"
             android:visibility="gone"/>
 
-        <ListView
+        <ru.euphoriadev.vk.view.FixedListView
             android:id="@+id/lvHistory"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

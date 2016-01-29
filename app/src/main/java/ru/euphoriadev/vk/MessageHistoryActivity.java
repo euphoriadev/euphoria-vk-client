@@ -70,6 +70,7 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.util.YandexTranslator;
+import ru.euphoriadev.vk.view.FixedListView;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 
 /**
@@ -78,7 +79,7 @@ import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 
 public class MessageHistoryActivity extends BaseThemedActivity {
 
-    private ListView lvHistory;
+    private FixedListView lvHistory;
     private EditText etMessageText;
     private LinearLayout attachmentPanel;
     private ImageButton buttonAttachment;
@@ -119,7 +120,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         SharedPreferences sPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         hideTyping = sPrefs.getBoolean("hide_typing", false);
 
-        lvHistory = (ListView) findViewById(R.id.lvHistory);
+        lvHistory = (FixedListView) findViewById(R.id.lvHistory);
         lvHistory.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
         lvHistory.setStackFromBottom(true);
 
@@ -1224,12 +1225,15 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 users.put(user.user_id, user);
             }
 
-            history.clear();
-            // Reverse adding
-            for (int i = messages.size() - 1; i >= 0; i--) {
-                VKMessage message = messages.get(i);
-                history.add(new MessageItem(message, users.get(message.uid)));
+            synchronized (history) {
+                history.clear();
+                // Reverse adding
+                for (int i = messages.size() - 1; i >= 0; i--) {
+                    VKMessage message = messages.get(i);
+                    history.add(new MessageItem(message, users.get(message.uid)));
+                }
             }
+
             cursor.close();
             publishProgress(null);
 
