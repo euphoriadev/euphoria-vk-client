@@ -41,8 +41,8 @@ import java.io.InputStream;
 import java.util.HashSet;
 
 import ru.euphoriadev.vk.BuildConfig;
-import ru.euphoriadev.vk.PrefsFragment;
 import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.FileHelper;
 
@@ -340,22 +340,22 @@ public class AndroidUtils {
     }
 
     public static void checkUpdate(final Context context, final boolean forceCheck) {
-        boolean isCheckUpdate = PrefManager.getBoolean(PrefsFragment.KEY_CHECK_UPDATE);
+        boolean isCheckUpdate = PrefManager.getBoolean(SettingsFragment.KEY_CHECK_UPDATE, true);
         if (!isCheckUpdate && !forceCheck) {
             return;
         }
-        long lastUpdateTime = PrefManager.getLong(PrefsFragment.LAST_UPDATE_TIME);
+        long lastUpdateTime = PrefManager.getLong(SettingsFragment.LAST_UPDATE_TIME);
         if (!forceCheck &&(System.currentTimeMillis() - lastUpdateTime) <= 24 * 60 * 60 * 1000) {
             return;
         }
 
         AsyncHttpClient client = new AsyncHttpClient(context);
-        AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest(PrefsFragment.UPDATE_URL);
+        AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest(SettingsFragment.UPDATE_URL);
 
         client.execute(request, new AsyncHttpClient.HttpRequest.OnResponseListener() {
             @Override
             public void onResponse(AsyncHttpClient client, AsyncHttpClient.HttpResponse response) {
-                PrefManager.putLong(PrefsFragment.KEY_CHECK_UPDATE, System.currentTimeMillis());
+                PrefManager.putLong(SettingsFragment.KEY_CHECK_UPDATE, System.currentTimeMillis());
 
                 JSONObject json = response.getContentAsJson();
                 if (BuildConfig.VERSION_CODE >= json.optInt("version_code")) {

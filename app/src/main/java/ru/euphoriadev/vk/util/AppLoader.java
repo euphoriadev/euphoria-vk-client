@@ -16,8 +16,8 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import ru.euphoriadev.vk.PrefsFragment;
 import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.SettingsFragment;
 
 /**
  * Created by Igor on 16.11.15.
@@ -181,10 +181,10 @@ public class AppLoader extends Application {
      * Обновление настроек
      */
     public void updatePreferences() {
-        isDarkTheme = sPrefs.getBoolean(PrefsFragment.KEY_IS_NIGHT_MODE, true);
-        forcedLocale = sPrefs.getString(PrefsFragment.KEY_FORCED_LOCALE, Locale.getDefault().getLanguage());
-        writeLog = sPrefs.getBoolean(PrefsFragment.KEY_WRITE_LOG, true);
-        makingDrawerHeader = sPrefs.getString(PrefsFragment.KEY_MAKING_DRAWER_HEADER, "Default");
+        isDarkTheme = sPrefs.getBoolean(SettingsFragment.KEY_IS_NIGHT_MODE, true);
+        forcedLocale = sPrefs.getString(SettingsFragment.KEY_FORCED_LOCALE, Locale.getDefault().getLanguage());
+        writeLog = sPrefs.getBoolean(SettingsFragment.KEY_WRITE_LOG, true);
+        makingDrawerHeader = sPrefs.getString(SettingsFragment.KEY_MAKING_DRAWER_HEADER, "Default");
     }
 
     /**

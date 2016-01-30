@@ -2,6 +2,7 @@ package ru.euphoriadev.vk.util;
 
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.commons.io.FileUtils;
 
@@ -12,6 +13,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 
 import ru.euphoriadev.vk.BuildConfig;
+import ru.euphoriadev.vk.SettingsFragment;
 
 /**
  * Created by Igor on 28.01.16.
@@ -26,6 +28,11 @@ public class CrashManager {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
             createReportFile(ex);
+            if (ex instanceof IndexOutOfBoundsException) {
+                // For some users the app crashes with error while loading messages
+                PrefManager.putBoolean(SettingsFragment.KEY_USE_ALTERNATIVE_UPDATE_MESSAGES, true);
+                Toast.makeText(AppLoader.appContext, "Enabled an alternative method to update the message list", Toast.LENGTH_LONG).show();
+            }
             Log.e(TAG, "Create crash report");
             if (sOldHandler != null) {
                 sOldHandler.uncaughtException(thread, ex);

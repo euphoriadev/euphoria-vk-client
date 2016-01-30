@@ -41,7 +41,7 @@ import ru.euphoriadev.vk.view.pref.ProgressBarPreference;
 /**
  * Created by Igor on 28.02.15.
  */
-public class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     /** Preference keys. Making */
     public static final String KEY_IS_NIGHT_MODE = "is_night_theme";
     public static final String KEY_COLOR_IN_MESSAGES = "color_in_messages";
@@ -72,6 +72,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     public static final String KEY_RESEND_FAILED_MESSAGES = "resend_failed_msg";
     public static final String KEY_ENCRYPT_MESSAGES = "encrypt_messages";
     public static final String KEY_CHECK_UPDATE = "auto_update";
+    public static final String KEY_USE_ALTERNATIVE_UPDATE_MESSAGES = "use_alternative_update_messages";
 
     /** Web url for check updates this app */
     public static final String UPDATE_URL = "http://timeteam.3dn.ru/timevk_up.txt";
@@ -80,7 +81,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     boolean isSetListView;
     PreferenceScreen rootScreen;
 
-    public PrefsFragment() {
+    public SettingsFragment() {
     }
 
     @Override

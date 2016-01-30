@@ -7,7 +7,7 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
-import ru.euphoriadev.vk.PrefsFragment;
+import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
@@ -23,7 +23,7 @@ public class ProgressBarPreference extends MaterialPreference implements Refresh
         super(context);
 
         seekBar = new AppCompatSeekBar(context);
-        RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
+        RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_BLUR_RADIUS);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ProgressBarPreference extends MaterialPreference implements Refresh
 
     @Override
     public void onRefresh(String prefKey) {
-        String value = PrefManager.getString(PrefsFragment.KEY_MAKING_DRAWER_HEADER);
+        String value = PrefManager.getString(SettingsFragment.KEY_MAKING_DRAWER_HEADER);
         setEnabled(value.equalsIgnoreCase("2"));
     }
 }

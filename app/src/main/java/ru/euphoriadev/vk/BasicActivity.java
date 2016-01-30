@@ -116,7 +116,7 @@ public class BasicActivity extends BaseThemedActivity implements
             trackStats();
             joinInGroup();
         }
-        RefreshManager.registerForChangePreferences(this, PrefsFragment.KEY_BLUR_RADIUS);
+        RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_BLUR_RADIUS);
         startService(new Intent(this, LongPollService.class));
     }
 
@@ -399,7 +399,7 @@ public class BasicActivity extends BaseThemedActivity implements
             Picasso.with(this)
                     .load(account.photo)
                     .placeholder(R.drawable.ic_launcher)
-                    .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(PrefsFragment.KEY_BLUR_RADIUS, 20)))
+                    .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(SettingsFragment.KEY_BLUR_RADIUS, 20)))
                     .into(drawerBackground);
         }
         drawerTitle.setText(account.fullName);
@@ -427,7 +427,7 @@ public class BasicActivity extends BaseThemedActivity implements
         } else if (backPressedTime + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
 
-            if (!PrefManager.getBoolean(PrefsFragment.KEY_ENABLE_NOTIFY, true)) {
+            if (!PrefManager.getBoolean(SettingsFragment.KEY_ENABLE_NOTIFY, true)) {
                 stopService(new Intent(this, LongPollService.class));
                 appLoader.getHandler().postDelayed(new Runnable() {
                     @Override
@@ -452,7 +452,7 @@ public class BasicActivity extends BaseThemedActivity implements
 
         System.gc();
         RefreshManager.unregisterForChangePreferences(this);
-        if (!PrefManager.getBoolean(PrefsFragment.KEY_ENABLE_NOTIFY, true))
+        if (!PrefManager.getBoolean(SettingsFragment.KEY_ENABLE_NOTIFY, true))
             stopService(new Intent(this, LongPollService.class));
     }
 
@@ -491,7 +491,7 @@ public class BasicActivity extends BaseThemedActivity implements
         Log.w("BasicActivity", "onRefresh: " + prefKey);
         // Change blur radius of NavigationView....
 
-        if (prefKey.equals(PrefsFragment.KEY_BLUR_RADIUS)) {
+        if (prefKey.equals(SettingsFragment.KEY_BLUR_RADIUS)) {
             isInitedDrawer = false;
         }
     }

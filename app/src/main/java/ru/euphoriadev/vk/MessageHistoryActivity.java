@@ -153,7 +153,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 sendMessage(etMessageText.getText().toString());
             }
         });
-        if (!PrefManager.getBoolean(PrefsFragment.KEY_USE_CAT_ICON_SEND)) {
+        if (!PrefManager.getBoolean(SettingsFragment.KEY_USE_CAT_ICON_SEND)) {
             fabSend.setImageResource(R.drawable.ic_keyboard_arrow_right);
         }
 
@@ -288,6 +288,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             ViewUtil.setFilter(buttonAttachment, ThemeManager.getPrimaryLightTextColor());
         }
 
+        canLoadOldMessages = false;
         new LoadMessagesTask(30, 0, from_saved).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         loadWallpaperFromSD();
     }
@@ -1151,7 +1152,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     invalidateOptionsMenu();
                 }
             });
-            canLoadOldMessages = false;
         }
 
         @Override
@@ -1225,11 +1225,16 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 users.put(user.user_id, user);
             }
 
-            synchronized (history) {
+            boolean catSet = history.size() == messages.size();
+            if (!catSet) {
                 history.clear();
-                // Reverse adding
-                for (int i = messages.size() - 1; i >= 0; i--) {
-                    VKMessage message = messages.get(i);
+            }
+            // Reverse adding
+            for (int i = messages.size() - 1; i >= 0; i--) {
+                VKMessage message = messages.get(i);
+                if (catSet) {
+                    history.set(i, new MessageItem(message, users.get(message.uid)));
+                } else {
                     history.add(new MessageItem(message, users.get(message.uid)));
                 }
             }
@@ -1266,11 +1271,13 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
             } else if (adapter != lvHistory.getAdapter()) {
                 lvHistory.setAdapter(adapter);
-            } else {
+            } else if (!PrefManager.getBoolean(SettingsFragment.KEY_USE_ALTERNATIVE_UPDATE_MESSAGES)){
                 adapter.notifyDataSetChanged();
+            } else {
+                lvHistory.setAdapter(adapter);
             }
             // sets the currently selected item
-            lvHistory.setSelection(adapter.getCount());
+            lvHistory.setSelection(lvHistory.getCount());
 
             // enables fast scroll indicator
             if (adapter.getCount() > 500) {

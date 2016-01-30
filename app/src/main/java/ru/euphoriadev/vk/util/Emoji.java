@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import ru.euphoriadev.vk.PrefsFragment;
+import ru.euphoriadev.vk.SettingsFragment;
 
 /**
  * Created by Igor on 27.01.16.
@@ -198,7 +198,7 @@ public class Emoji {
 
 
     public static void parseEmoji(TextView view) {
-        if (PrefManager.getBoolean(PrefsFragment.KEY_USE_SYSTEM_EMOJI, true)) {
+        if (PrefManager.getBoolean(SettingsFragment.KEY_USE_SYSTEM_EMOJI, true)) {
             // enables "use system emoji"
             return;
         }

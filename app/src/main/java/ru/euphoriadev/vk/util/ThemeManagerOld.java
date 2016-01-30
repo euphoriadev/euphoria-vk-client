@@ -10,8 +10,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.widget.ListView;
 
-import ru.euphoriadev.vk.PrefsFragment;
 import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.SettingsFragment;
 
 /**
  * Created by Igor on 27.03.15.
@@ -246,7 +246,7 @@ public class ThemeManagerOld {
         return mColour.equalsIgnoreCase("BLACK");
     }
     public boolean isShowDivider() {
-        return sPrefs.getBoolean(PrefsFragment.KEY_SHOW_DIVIDER, false);
+        return sPrefs.getBoolean(SettingsFragment.KEY_SHOW_DIVIDER, false);
     }
 
 }

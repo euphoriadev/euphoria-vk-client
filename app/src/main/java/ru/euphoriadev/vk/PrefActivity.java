@@ -36,7 +36,7 @@ public class PrefActivity extends BaseThemedActivity {
         AndroidUtils.setStatusBarColor(this, statusBarView);
 
         getFragmentManager().beginTransaction()
-                .replace(R.id.container_prefs, new PrefsFragment()).commit();
+                .replace(R.id.container_prefs, new SettingsFragment()).commit();
 
     }
 

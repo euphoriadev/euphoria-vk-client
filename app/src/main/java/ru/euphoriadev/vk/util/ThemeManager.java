@@ -21,8 +21,8 @@ import java.util.Locale;
 
 import ru.euphoriadev.vk.BaseThemedActivity;
 import ru.euphoriadev.vk.BasicActivity;
-import ru.euphoriadev.vk.PrefsFragment;
 import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.SettingsFragment;
 
 /**
  * Created by Igor on 23.12.15.
@@ -34,10 +34,10 @@ public class ThemeManager {
     public static final int DEFAULT_ACCENT_COLOR = 0xff00897b; // Teal 500
 
     public static final String PREF_KEY_THEME_COLOUR = "color_theme";
-    public static final String PREF_KEY_FORCED_LOCALE = PrefsFragment.KEY_FORCED_LOCALE;
-    public static final String PREF_KEY_IS_DARK_THEME = PrefsFragment.KEY_IS_NIGHT_MODE;
-    public static final String PREF_KEY_DRAWER_HEADER = PrefsFragment.KEY_MAKING_DRAWER_HEADER;
-    public static final String PREF_KEY_BLUR_RADIUS = PrefsFragment.KEY_BLUR_RADIUS;
+    public static final String PREF_KEY_FORCED_LOCALE = SettingsFragment.KEY_FORCED_LOCALE;
+    public static final String PREF_KEY_IS_DARK_THEME = SettingsFragment.KEY_IS_NIGHT_MODE;
+    public static final String PREF_KEY_DRAWER_HEADER = SettingsFragment.KEY_MAKING_DRAWER_HEADER;
+    public static final String PREF_KEY_BLUR_RADIUS = SettingsFragment.KEY_BLUR_RADIUS;
     public static final String PREF_KEY_MESSAGE_WALLPAPER_PATH = "message_wallpaper_path";
 
     /** Drawer header states **/
