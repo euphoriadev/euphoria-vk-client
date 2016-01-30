@@ -1,4 +1,4 @@
-# Euphoria Cleint for VK
+# Euphoria for Android
 The Open Source material design client for VK.
 Euphoria is app for social network Vkontakte on Android with a focus on speed. We try to make it as simple and convenient to use
 
@@ -20,7 +20,7 @@ We use the library from app Kate Mobile by thest1: https://github.com/thest1/And
 Picasso for load images from network: https://github.com/square/picasso
 
 # Development
-This app is developed by only 2 peoples in their spare time. Therefore, the development process can be very long. 
+This app is developing by only 2 peoples in their spare time. Therefore, the development process can be very long. 
 if you like to work on a new feature, please create an issue so we could discuss it together with you.
 Also, you can contact us by email: igmorozkin@gmail.com or psyx.off@gmail.com
 
