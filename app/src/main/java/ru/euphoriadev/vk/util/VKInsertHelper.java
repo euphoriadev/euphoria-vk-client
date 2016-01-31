@@ -20,7 +20,6 @@ public class VKInsertHelper {
     /** Will use a single object for inserting to save memory */
     public static final ContentValues sValues = new ContentValues(16);
 
-
     /**
      * Insert one dialog into SQLite database
      *
@@ -212,6 +211,13 @@ public class VKInsertHelper {
             database.setTransactionSuccessful();
             database.endTransaction();
         }
+    }
+
+    /**
+     * Removes all values from {@link VKInsertHelper#sValues};
+     */
+    public static void clearValues() {
+        sValues.clear();
     }
 
     private static void prepareContentValuesForMessage(VKMessage message) {

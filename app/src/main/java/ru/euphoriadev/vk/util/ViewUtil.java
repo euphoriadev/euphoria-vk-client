@@ -1,6 +1,5 @@
 package ru.euphoriadev.vk.util;
 
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -45,7 +44,7 @@ public class ViewUtil {
             ImageView iv = (ImageView) view;
             iv.getDrawable().setColorFilter(colorFilter);
         } else {
-            final Drawable drawable = view.getBackground();
+            Drawable drawable = view.getBackground();
             if (drawable != null) drawable.setColorFilter(colorFilter);
         }
     }
@@ -166,10 +165,7 @@ public class ViewUtil {
      * @return dark pressed color
      */
     public static int getPressedColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] = (0.7F * hsv[2]);
-        return Color.HSVToColor(hsv);
+        return ThemeManager.darkenColor(color);
     }
 
     public static void setColors(Menu menu, Toolbar toolbar) {

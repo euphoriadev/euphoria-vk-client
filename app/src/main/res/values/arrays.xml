@@ -30,6 +30,14 @@
         <item>Размытый аватар</item>
     </string-array>
 
+    <string-array name="prefs_bubbles_array">
+        <item>Euphoria</item>
+        <item>Telegram</item>
+        <item>QKSMS</item>
+        <item>Hangouts</item>
+        <item>iOS</item>
+    </string-array>
+
     <string-array name="tabs_material_of_dialog_array">
         <item>Изображения</item>
         <item>Видео</item>

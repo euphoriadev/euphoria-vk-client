@@ -1,6 +1,5 @@
 package ru.euphoriadev.vk.helper;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -10,6 +9,7 @@ import android.util.Log;
 
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.util.VKInsertHelper;
 
 /**
  * Created by Igor on 06.03.15.
@@ -19,6 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "euphoria.db";
     private static final int DATABASE_VERSION = 82;
 
+    /** Tables */
     public static final String USERS_TABLE = "users";
     public static final String FRIENDS_TABLE = "friends";
     public static final String DIALOGS_TABLE = "dialogs";
@@ -31,7 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String STATS_MESSAGES_TABLE= "stats_messages";
     public static final String FAILED_MESSAGES_TABLE= "failed_messages";
 
-
+    /** Columns */
     public static final String _ID = "_id";
     public static final String USER_ID = "user_id";
     public static final String OWNER_ID = "owner_id";
@@ -283,33 +284,16 @@ public class DBHelper extends SQLiteOpenHelper {
         if (mDatabase == null || !mDatabase.isOpen()) {
             mDatabase = DBHelper.get(mContext).getWritableDatabase();
         }
-        ContentValues cv = new ContentValues();
-        cv.put(DBHelper.USER_ID, profile.user_id);
-        cv.put(DBHelper.FIRST_NAME, profile.first_name);
-        cv.put(DBHelper.LAST_NAME, profile.last_name);
-        cv.put(DBHelper.PHOTO_50, profile.photo_50);
-        //  cv.put(DBHelper.PHOTO_100, profile.photo_100);
-        if (mDatabase.update(DBHelper.USERS_TABLE, cv, "user_id = " + profile.user_id, null) == 0)
-            mDatabase.insert(DBHelper.USERS_TABLE, null, cv);
-
-        cv.clear();
+        VKInsertHelper.clearValues();
+        VKInsertHelper.updateUser(mDatabase, profile);
     }
 
     public void addMessageToDB(VKMessage message) {
         if (mDatabase == null || !mDatabase.isOpen()) {
             mDatabase = DBHelper.get(mContext).getWritableDatabase();
         }
-        ContentValues cv = new ContentValues();
-        cv.put(DBHelper.MESSAGE_ID, message.mid);
-        cv.put(DBHelper.USER_ID, message.uid);
-        cv.put(DBHelper.CHAT_ID, message.chat_id);
-        cv.put(DBHelper.BODY, message.body);
-        cv.put(DBHelper.DATE, message.date);
-        cv.put(DBHelper.READ_STATE, message.read_state);
-        cv.put(DBHelper.IS_OUT, message.is_out);
-        mDatabase.insert(DBHelper.MESSAGES_TABLE, null, cv);
-
-        cv.clear();
+        VKInsertHelper.clearValues();
+        VKInsertHelper.insertMessage(mDatabase, message);
     }
 
     public VKUser getUserFromDB(long uid) {

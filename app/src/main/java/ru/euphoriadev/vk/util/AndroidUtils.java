@@ -12,6 +12,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -355,7 +359,7 @@ public class AndroidUtils {
         client.execute(request, new AsyncHttpClient.HttpRequest.OnResponseListener() {
             @Override
             public void onResponse(AsyncHttpClient client, AsyncHttpClient.HttpResponse response) {
-                PrefManager.putLong(SettingsFragment.KEY_CHECK_UPDATE, System.currentTimeMillis());
+                PrefManager.putLong(SettingsFragment.LAST_UPDATE_TIME, System.currentTimeMillis());
 
                 JSONObject json = response.getContentAsJson();
                 if (BuildConfig.VERSION_CODE >= json.optInt("version_code")) {
@@ -401,6 +405,22 @@ public class AndroidUtils {
         builder.create().show();
     }
 
+    public static Drawable getDrawable(Context context, int drawableRed) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return context.getResources().getDrawable(drawableRed, context.getTheme());
+        } else {
+            return context.getResources().getDrawable(drawableRed);
+        }
+    }
+
+    public static int getColor(Context context, int colorRed) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return context.getResources().getColor(colorRed, context.getTheme());
+        } else {
+            return context.getResources().getColor(colorRed);
+        }
+    }
+
     public static class PicassoBlurTransform implements Transformation {
         public int radius;
 
@@ -418,6 +438,48 @@ public class AndroidUtils {
             return "blur_photo";
         }
     }
+
+    public static class RoundedTransformation implements Transformation {
+        int pixels;
+
+        public RoundedTransformation(int pixels) {
+            this.pixels = pixels;
+        }
+
+        @Override
+        public Bitmap transform(Bitmap source) {
+            Bitmap output = Bitmap.createBitmap(source.getWidth(), source
+                    .getHeight(), source.getConfig());
+            Canvas canvas = new Canvas(output);
+
+            final int color = 0xff424242;
+            final Paint paint = new Paint();
+            final Rect rect = new Rect(0, 0, source.getWidth(), source.getHeight());
+            final RectF rectF = new RectF(rect);
+            final float roundPx = pixels;
+
+            paint.setAntiAlias(true);
+            canvas.drawARGB(0, 0, 0, 0);
+            paint.setColor(color);
+            canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(source, rect, rect, paint);
+
+            if (source != output) {
+                source.recycle();
+                source = null;
+            }
+
+            return output;
+        }
+
+        @Override
+        public String key() {
+            return "round";
+        }
+    }
+
 }
 
 	 

@@ -44,6 +44,7 @@ import ru.euphoriadev.vk.view.pref.ProgressBarPreference;
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     /** Preference keys. Making */
     public static final String KEY_IS_NIGHT_MODE = "is_night_theme";
+    public static final String KEY_OLD_BUBBLE_STYLE = "old_bubble_style";
     public static final String KEY_COLOR_IN_MESSAGES = "color_in_messages";
     public static final String KEY_COLOR_OUT_MESSAGES = "color_out_messages";
     public static final String KEY_MAKING_DRAWER_HEADER = "drawer_header";
@@ -187,6 +188,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         categoryUI.addPreference(boxColorBubble2);
 
+//        ListPreference bubblePreference = new MaterialListPreference(getActivity());
+//        bubblePreference.setTitle("Стиль пузырьков");
+//        bubblePreference.setKey(KEY_BUBBLE_STYLE);
+//        bubblePreference.setEntries(R.array.prefs_bubbles_array);
+//        bubblePreference.setEntryValues(new String[]{"0", "1", "2", "3"});
+//        bubblePreference.setDefaultValue("0");
+//
+//        categoryUI.addPreference(bubblePreference);
+
+        CheckBoxPreference useOldMessageStyle = new MaterialCheckBoxPreference(getActivity());
+        useOldMessageStyle.setTitle("Old style bubble of message");
+        useOldMessageStyle.setKey(KEY_OLD_BUBBLE_STYLE);
+//        useOldMessageStyle.setSummary("Так же не рекомендуется использовать, ибо есть проблемы с разметкой на маленьких экранах");
+        useOldMessageStyle.setDefaultValue(false);
+
+        categoryUI.addPreference(useOldMessageStyle);
 
         ListPreference listHeaderDrawer = new MaterialListPreference(getActivity());
         listHeaderDrawer.setTitle(getResources().getString(R.string.prefs_drawer));

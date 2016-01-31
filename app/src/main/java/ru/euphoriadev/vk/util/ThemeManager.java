@@ -553,7 +553,7 @@ public class ThemeManager {
     }
 
     /**
-     * Set alpha to color on 35%
+     * Set alpha to color on 10%
      *
      * @param color the color to set alpha
      * @return a new color which is alpha of specified color
@@ -565,7 +565,7 @@ public class ThemeManager {
         int green = Color.green(color);
         int blue = Color.blue(color);
 
-        return Color.argb((int) (alpha * 0.75f), red, green, blue);
+        return Color.argb((int) (alpha * 0.90f), red, green, blue);
     }
 
 

@@ -6,21 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -35,10 +28,10 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +39,7 @@ import java.util.Date;
 
 import ru.euphoriadev.vk.ForwardMessagesActivity;
 import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKAttachment;
 import ru.euphoriadev.vk.api.model.VKMessage;
@@ -55,6 +49,7 @@ import ru.euphoriadev.vk.helper.MediaPlayerHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
+import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
@@ -65,8 +60,8 @@ import ru.euphoriadev.vk.view.CircleImageView;
  */
 public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements LongPollService.VKOnDialogListener {
 
-    private static final int DEFAULT_COLOR = Color.parseColor("#424242");
-    private static final int DEFAULT_DARK_COLOR = ThemeManager.darkenColor(DEFAULT_COLOR);
+    public static final int DEFAULT_COLOR = Color.parseColor("#424242");
+    public static final int DEFAULT_DARK_COLOR = ThemeManager.darkenColor(DEFAULT_COLOR);
     private final Object mLock = new Object();
     public boolean isScrolling;
     public boolean mShowTime;
@@ -96,9 +91,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     private int primaryDarkColorLight;
     private int primaryDarkColorDark;
 
-    public MessageAdapter(Context context, ArrayList<MessageItem> values) {
-        super(context, values);
-    }
 
     public MessageAdapter(Context context, ArrayList<MessageItem> items, long uid, long chat_id) {
         super(context, items);
@@ -109,13 +101,13 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
         this.sdf = new SimpleDateFormat("HH:mm");
 
-        isColorInMessages = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("color_in_messages", true);
-        isColorOutMessages = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("color_out_messages", false);
+        isColorInMessages = PrefManager.getBoolean(SettingsFragment.KEY_COLOR_IN_MESSAGES, true);
+        isColorOutMessages = PrefManager.getBoolean(SettingsFragment.KEY_COLOR_OUT_MESSAGES, false);
         isNightTheme = getThemeManager().isNightTheme();
         isBlackTheme = getThemeManager().isBlackTheme();
 
-        dBubbleOutgoing = mContext.getResources().getDrawable(R.drawable.msg_bubble_outgoing);
-        dBubbleIncoming = mContext.getResources().getDrawable(R.drawable.msg_bubble_incoming);
+        dBubbleOutgoing = AndroidUtils.getDrawable(mContext, R.drawable.msg_bubble_outgoing);
+        dBubbleIncoming = AndroidUtils.getDrawable(mContext, R.drawable.msg_bubble_incoming);
 
         if (isColorInMessages) {
             colorInMessages = getThemeManager().getBasicColorOfTheme();
@@ -125,8 +117,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 colorInMessages = DEFAULT_COLOR;
                 colorNotReadingInMessages = DEFAULT_DARK_COLOR;
             } else {
-                colorNotReadingInMessages = mContext.getResources().getColor(R.color.secondary_text_default_material_dark);
-                colorInMessages = mContext.getResources().getColor(R.color.white);
+                colorNotReadingInMessages = AndroidUtils.getColor(mContext, R.color.secondary_text_default_material_dark);
+                colorInMessages = AndroidUtils.getColor(mContext, R.color.white);
             }
         }
 
@@ -138,8 +130,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 colorOutMessages = DEFAULT_COLOR;
                 colorNotReadingOutMessages = DEFAULT_DARK_COLOR;
             } else {
-                colorNotReadingOutMessages = mContext.getResources().getColor(R.color.secondary_text_default_material_dark);
-                colorOutMessages = mContext.getResources().getColor(R.color.white);
+                colorNotReadingOutMessages = AndroidUtils.getColor(mContext, R.color.secondary_text_default_material_dark);
+                colorOutMessages = AndroidUtils.getColor(mContext, R.color.white);
             }
         }
         boolean isWallpaperBackground = ThemeManager.getWallpaperPath(mContext) != null;
@@ -149,11 +141,11 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         }
         widthDisplay = context.getResources().getDisplayMetrics().widthPixels;
 
-        primaryDarkColorDark = mContext.getResources().getColor(R.color.primary_text_default_material_light);
-        primaryDarkColorLight = mContext.getResources().getColor(R.color.primary_text_default_material_dark);
+        primaryDarkColorDark = AndroidUtils.getColor(mContext, R.color.primary_text_default_material_light);
+        primaryDarkColorLight = AndroidUtils.getColor(mContext, R.color.primary_text_default_material_dark);
 
-        secondaryTextColorDark = mContext.getResources().getColor(R.color.secondary_text_default_material_light);
-        secondaryTextColorLight = mContext.getResources().getColor(R.color.secondary_text_default_material_dark);
+        secondaryTextColorDark = AndroidUtils.getColor(mContext, R.color.secondary_text_default_material_light);
+        secondaryTextColorLight = AndroidUtils.getColor(mContext, R.color.secondary_text_default_material_dark);
 
 
         this.date = new Date(System.currentTimeMillis());
@@ -205,8 +197,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //    long startTime = System.currentTimeMillis();
-        final ViewHolder holder;
+        ViewHolder holder;
         View view = convertView;
 
         if (view == null) {
@@ -227,6 +218,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
         if (isInMultiSelectMode()) {
             holder.ivSelected.setVisibility(View.VISIBLE);
+            holder.spaceSelected.setVisibility(item.message.is_out ? View.GONE : View.VISIBLE);
             if (isSelectedItem(item)) {
                 holder.ivSelected.setImageResource(R.drawable.ic_selected);
                 holder.ivSelected.setColorFilter(getThemeManager().getFabColor());
@@ -240,7 +232,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
             holder.ivSelected.setVisibility(View.GONE);
         }
         if (item.message.is_out) {
-            holder.llMessageContainer.setGravity(Gravity.END);
+            holder.llMainContainer.setGravity(Gravity.END);
 
             holder.ivPhoto.setVisibility(View.GONE);
             if (isColorOutMessages) {
@@ -253,24 +245,25 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 }
             }
 
-            holder.llAttachContainer.setBackgroundDrawable(getDrawable(R.drawable.msg_bubble_outgoing));
+//            holder.llContainer.setBackgroundDrawable(getDrawable(R.drawable.msg_bubble_outgoing));
+            holder.llContainer.setBackgroundDrawable(getDrawable(R.drawable.message_sent));
             if (item.message.read_state) {
                 if (isBlackTheme) {
-                    holder.llAttachContainer.getBackground().setColorFilter(mContext.getResources().getColor(R.color.md_grey_900), PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(mContext.getResources().getColor(R.color.md_grey_900), PorterDuff.Mode.MULTIPLY);
                 } else {
-                    holder.llAttachContainer.getBackground().setColorFilter(colorOutMessages, PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(colorOutMessages, PorterDuff.Mode.MULTIPLY);
                 }
             } else {
                 if (isBlackTheme) {
-                    holder.llAttachContainer.getBackground().setColorFilter(Color.parseColor("#FF0B0B0B"), PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(Color.parseColor("#FF0B0B0B"), PorterDuff.Mode.MULTIPLY);
                 } else {
-                    holder.llAttachContainer.getBackground().setColorFilter(colorNotReadingOutMessages, PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(colorNotReadingOutMessages, PorterDuff.Mode.MULTIPLY);
                 }
             }
 
 
         } else {
-            holder.llMessageContainer.setGravity(Gravity.START);
+            holder.llMainContainer.setGravity(Gravity.START);
             holder.ivPhoto.setVisibility(View.VISIBLE);
             if (isColorInMessages) {
                 holder.tvBody.setTextColor(Color.WHITE);
@@ -281,20 +274,19 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                     holder.tvBody.setTextColor(primaryDarkColorDark);
                 }
             }
-            holder.llAttachContainer.setBackgroundDrawable(getDrawable(R.drawable.msg_bubble_incoming));
+//            holder.llContainer.setBackgroundDrawable(getDrawable(R.drawable.msg_bubble_incoming));
+            holder.llContainer.setBackgroundDrawable(getDrawable(R.drawable.message_received));
             if (item.message.read_state) {
                 if (isBlackTheme) {
-                    holder.llAttachContainer.getBackground().setColorFilter(mContext.getResources().getColor(R.color.md_grey_900), PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(mContext.getResources().getColor(R.color.md_grey_900), PorterDuff.Mode.MULTIPLY);
                 } else
-                    holder.llAttachContainer.getBackground().setColorFilter(colorInMessages, PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(colorInMessages, PorterDuff.Mode.MULTIPLY);
             } else {
                 if (isBlackTheme) {
-                    holder.llAttachContainer.getBackground().setColorFilter(Color.parseColor("#FF0B0B0B"), PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(Color.parseColor("#FF0B0B0B"), PorterDuff.Mode.MULTIPLY);
                 } else
-                    holder.llAttachContainer.getBackground().setColorFilter(colorNotReadingInMessages, PorterDuff.Mode.MULTIPLY);
+                    holder.llContainer.getBackground().setColorFilter(colorNotReadingInMessages, PorterDuff.Mode.MULTIPLY);
             }
-
-
         }
 
         if (item.message.isChat() && !item.message.is_out) {
@@ -306,6 +298,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
         } else {
             holder.ivPhoto.setVisibility(View.GONE);
+            holder.ivPhoto.setImageDrawable(null);
         }
 
         int primaryTextColor = 0;
@@ -328,10 +321,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         }
 
         holder.tvBody.setMaxWidth(widthDisplay - (widthDisplay / 4));
-//        holder.tvBody.setTextColor(isNightTheme ? primaryDarkColorLight : primaryDarkColorDark);
         holder.tvBody.setTextColor(primaryTextColor);
         holder.tvDate.setTextColor(ThemeManager.getSecondaryTextColor());
-
 
         if (TextUtils.isEmpty(item.message.body) && !item.message.emoji && !item.message.attachments.isEmpty()) {
             holder.tvBody.setVisibility(View.GONE);
@@ -360,60 +351,30 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
         switch (item.status) {
             case SENT:
-//                if (item.message.isChat()) {
-//                    //     tvDate.setText(item.user.toString() + ", ");
-//                    //     tvDate.append(sdf.format(item.message.date * 1000));
-//                } else {
                 if (mShowTime)
                 holder.tvDate.setText(sdf.format(item.date));
-//                holder.tvDateOneLine.setText(sdf.format(item.date));
                 break;
 
             case SENDING:
                 holder.tvDate.setText(mContext.getString(R.string.sending));
-//                holder.tvDateOneLine.setText(mContext.getString(R.string.sending));
                 break;
 
             case ERROR:
-//                holder.tvDateOneLine.setText(mContext.getString(R.string.error));
                 holder.tvDate.setText(mContext.getString(R.string.error));
-
-//                holder.tvDateOneLine.setTextColor(mContext.getResources().getColor(R.color.md_red_500));
                 holder.tvDate.setTextColor(mContext.getResources().getColor(R.color.md_red_500));
                 break;
         }
 
 
-        if (holder.llImageContainer.getChildCount() != 0) {
-            holder.llImageContainer.removeAllViewsInLayout();
-        }
-        if (holder.llImageContainer.getVisibility() == View.VISIBLE) {
-            holder.llImageContainer.setVisibility(View.GONE);
-        }
-        if (holder.llAudioContainer.getChildCount() != 0) {
-            holder.llAudioContainer.removeAllViewsInLayout();
-        }
-        if (holder.llFwdMessagesContainer.getChildCount() != 0) {
-            holder.llFwdMessagesContainer.removeAllViewsInLayout();
-        }
-
-        if (holder.llAudioContainer.getVisibility() == View.VISIBLE) {
-            holder.llAudioContainer.setVisibility(View.GONE);
-        }
-        if (holder.llDocContainer.getChildCount() != 0) {
-            holder.llDocContainer.removeAllViewsInLayout();
-        }
-        if (holder.llDocContainer.getVisibility() == View.VISIBLE) {
-            holder.llDocContainer.setVisibility(View.GONE);
-        }
-        if (holder.llFwdMessagesContainer.getVisibility() == View.VISIBLE) {
-            holder.llFwdMessagesContainer.setVisibility(View.GONE);
+        if (holder.llAttachContainer.getChildCount() != 0) {
+            holder.llAttachContainer.removeAllViewsInLayout();
         }
 
         if (item.message.emoji) {
             Emoji.parseEmoji(holder.tvBody);
         }
         if (!item.message.attachments.isEmpty()) {
+            holder.llAttachContainer.setVisibility(View.GONE);
             int fwdMessageCount = 0;
             boolean hasAttach = false;
             // если пересланных сообщений не слишком много
@@ -433,8 +394,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
             for (final VKAttachment att : item.message.attachments) {
                 switch (att.type) {
                     case VKAttachment.TYPE_MESSAGE:
-                        if (holder.llFwdMessagesContainer.getVisibility() == View.GONE)
-                            holder.llFwdMessagesContainer.setVisibility(View.VISIBLE);
+                        if (holder.llAttachContainer.getVisibility() == View.GONE)
+                            holder.llAttachContainer.setVisibility(View.VISIBLE);
 
                         if (holder.tvBody.getVisibility() == View.GONE) {
                             holder.tvBody.setVisibility(View.VISIBLE);
@@ -483,15 +444,15 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                         View fwdMessageView = cacheMessages.get(item.message.hashCode() + att.message.hashCode());
                         if (fwdMessageView != null) {
                             if (fwdMessageView.getParent() != null) {
-                                holder.llFwdMessagesContainer.removeView(fwdMessageView);
+                                holder.llAttachContainer.removeView(fwdMessageView);
                                 cacheMessages.remove(item.message.hashCode() + att.message.hashCode());
                             }
-                            holder.llFwdMessagesContainer.addView(fwdMessageView);
+                            holder.llAttachContainer.addView(fwdMessageView);
                             break;
                         }
 
                         // если нет - создаем view.
-                        fwdMessageView = getInflater().inflate(R.layout.forward_message_layout, holder.llFwdMessagesContainer, false);
+                        fwdMessageView = getInflater().inflate(R.layout.forward_message_layout, holder.llAttachContainer, false);
 
 
                         final TextView tvNameFwd = (TextView) fwdMessageView.findViewById(R.id.tvNameFwdMessage);
@@ -519,7 +480,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                         }
                         tvBodyFwd.setText(att.message.body);
 
-                        holder.llFwdMessagesContainer.addView(fwdMessageView);
+                        holder.llAttachContainer.addView(fwdMessageView);
                         cacheMessages.put(item.message.hashCode() + att.message.hashCode(), fwdMessageView);
 //                        cacheForwardedMessages.append(String.valueOf(att.message.uid).concat(att.message.body).hashCode(), fwdMessageView);
 
@@ -569,16 +530,16 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                         final ImageView iv = new ImageView(mContext);
                         iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         iv.setLayoutParams(params);
-                        holder.llImageContainer.addView(iv);
+                        holder.llAttachContainer.addView(iv);
 //                        iv.setClipToOutline(true);
-                        if (holder.llImageContainer.getVisibility() == View.GONE) {
-                            holder.llImageContainer.setVisibility(View.VISIBLE);
+                        if (holder.llAttachContainer.getVisibility() == View.GONE) {
+                            holder.llAttachContainer.setVisibility(View.VISIBLE);
                         }
 
                         Picasso.with(mContext)
                                 .load(att.photo.src_big)
                                 .fit()
-                                .transform(new RoundedTransformation(6))
+                                .transform(new AndroidUtils.RoundedTransformation(6))
                                 .placeholder(new ColorDrawable(Color.GRAY))
                                 .config(Bitmap.Config.RGB_565)
                                 .into(iv);
@@ -587,8 +548,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
                     case VKAttachment.TYPE_AUDIO:
 
-                        if (holder.llAudioContainer.getVisibility() == View.GONE)
-                            holder.llAudioContainer.setVisibility(View.VISIBLE);
+                        if (holder.llAttachContainer.getVisibility() == View.GONE)
+                            holder.llAttachContainer.setVisibility(View.VISIBLE);
 
                         View audioitem = View.inflate(mContext, R.layout.attachment_audio_item, null);
 //                        audioitem.setPadding(6, 0, 6, 0);
@@ -609,7 +570,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                         ViewUtil.setTypeface(tvTitle);
                         ViewUtil.setTypeface(tvDes);
 
-                        holder.llAudioContainer.addView(audioitem);
+                        holder.llAttachContainer.addView(audioitem);
 
 //                        btnPlay.setImageDrawable(iconPlay);
 
@@ -643,10 +604,10 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
                         final ImageView ivSticker = new ImageView(mContext);
                         ivSticker.setLayoutParams(layoutParams);
-                        holder.llImageContainer.addView(ivSticker);
+                        holder.llAttachContainer.addView(ivSticker);
 
-                        if (holder.llImageContainer.getVisibility() == View.GONE)
-                            holder.llImageContainer.setVisibility(View.VISIBLE);
+                        if (holder.llAttachContainer.getVisibility() == View.GONE)
+                            holder.llAttachContainer.setVisibility(View.VISIBLE);
 
                         holder.llAttachContainer.setBackgroundColor(Color.TRANSPARENT);
 
@@ -665,10 +626,10 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
                         final ImageView ivGift = new ImageView(mContext);
                         ivGift.setLayoutParams(params1);
-                        holder.llImageContainer.addView(ivGift);
+                        holder.llAttachContainer.addView(ivGift);
 
-                        if (holder.llImageContainer.getVisibility() == View.GONE)
-                            holder.llImageContainer.setVisibility(View.VISIBLE);
+                        if (holder.llAttachContainer.getVisibility() == View.GONE)
+                            holder.llAttachContainer.setVisibility(View.VISIBLE);
 
 
                         Picasso.with(mContext)
@@ -686,8 +647,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
                     case VKAttachment.TYPE_DOC:
 
-                        if (holder.llDocContainer.getVisibility() == View.GONE) {
-                            holder.llDocContainer.setVisibility(View.VISIBLE);
+                        if (holder.llAttachContainer.getVisibility() == View.GONE) {
+                            holder.llAttachContainer.setVisibility(View.VISIBLE);
                         }
 
                         View docItem = View.inflate(mContext, R.layout.doc_list_item, null);
@@ -695,7 +656,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                         TextView tvDocTitle = (TextView) docItem.findViewById(R.id.tvDocTitle);
                         TextView tvDocSize = (TextView) docItem.findViewById(R.id.tvDocSize);
 //                        ImageView ivDocIcon = (ImageView) docItem.findViewById(R.id.ivDocIcon);
-                        holder.llDocContainer.addView(docItem);
+                        holder.llAttachContainer.addView(docItem);
 
                         tvDocTitle.setTextColor(primaryTextColor);
                         tvDocSize.setTextColor(secondaryTextColor);
@@ -740,16 +701,14 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
 
             }
+        } else {
+            holder.llAttachContainer.setVisibility(View.GONE);
         }
         return view;
     }
 
     private Drawable getDrawable(int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return mContext.getResources().getDrawable(id, mContext.getTheme());
-        } else {
-            return mContext.getResources().getDrawable(id);
-        }
+        return AndroidUtils.getDrawable(mContext, id);
     }
 
     private void addUserToDatabase(final int uid, final OnVKUserLoaded l) {
@@ -765,10 +724,10 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                         return;
                     }
                     final VKUser finalProfile = profile;
+                    mHelper.addUserToDB(finalProfile);
                     ((Activity) mContext).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mHelper.addUserToDB(finalProfile);
                             l.onLoaded(finalProfile);
                         }
                     });
@@ -851,78 +810,27 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     }
 
     private static class ViewHolder {
-
+        public LinearLayout llContainer;
+        public LinearLayout llMainContainer;
         public LinearLayout llAttachContainer;
-        public LinearLayout llBaseContainer;
-        public LinearLayout llMessageContainer;
-        public LinearLayout llImageContainer;
-        public LinearLayout llAudioContainer;
-        public LinearLayout llDocContainer;
-        public LinearLayout llFwdMessagesContainer;
         public TextView tvBody;
         public TextView tvDate;
-        //        public TextView tvDateOneLine;
         public CircleImageView ivPhoto;
         public ImageView ivSelected;
+        public Space spaceSelected;
 
         public ViewHolder(View v) {
-            llAttachContainer = (LinearLayout) v.findViewById(R.id.container_message);
-            llBaseContainer = (LinearLayout) v.findViewById(R.id.base_container_message);
-            llMessageContainer = (LinearLayout) v.findViewById(R.id.llMessageContainer);
-            llImageContainer = (LinearLayout) v.findViewById(R.id.imageContainer_message);
-            llAudioContainer = (LinearLayout) v.findViewById(R.id.audioContainer_message);
-            llDocContainer = (LinearLayout) v.findViewById(R.id.docContainer_message);
-            llFwdMessagesContainer = (LinearLayout) v.findViewById(R.id.fwdMessagesContainer_message);
-
-            tvBody = (TextView) v.findViewById(R.id.tvBody_message);
-            tvDate = (TextView) v.findViewById(R.id.tvDate_message);
+            llContainer = (LinearLayout) v.findViewById(R.id.llMessageContainer);
+            llMainContainer = (LinearLayout) v.findViewById(R.id.llMessageMainContainer);
+            llAttachContainer = (LinearLayout) v.findViewById(R.id.llMessageAttachments);
+            tvBody = (TextView) v.findViewById(R.id.tvMessageText);
+            tvDate = (TextView) v.findViewById(R.id.tvMessageDate);
+            ivPhoto = (CircleImageView) v.findViewById(R.id.ivMessagePhoto);
             ivSelected = (ImageView) v.findViewById(R.id.ivMessageSelected);
-//            tvDateOneLine = (TextView) v.findViewById(R.id.tvDate_message_one_line);
-
-            ivPhoto = (CircleImageView) v.findViewById(R.id.ivPhoto_message);
+            spaceSelected = (Space) v.findViewById(R.id.spaceSelected);
         }
     }
 
-    public static class RoundedTransformation implements Transformation {
-        int pixels;
-
-        public RoundedTransformation(int pixels) {
-            this.pixels = pixels;
-        }
-
-        @Override
-        public Bitmap transform(Bitmap source) {
-            Bitmap output = Bitmap.createBitmap(source.getWidth(), source
-                    .getHeight(), source.getConfig());
-            Canvas canvas = new Canvas(output);
-
-            final int color = 0xff424242;
-            final Paint paint = new Paint();
-            final Rect rect = new Rect(0, 0, source.getWidth(), source.getHeight());
-            final RectF rectF = new RectF(rect);
-            final float roundPx = pixels;
-
-            paint.setAntiAlias(true);
-            canvas.drawARGB(0, 0, 0, 0);
-            paint.setColor(color);
-            canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(source, rect, rect, paint);
-
-            if (source != output) {
-                source.recycle();
-                source = null;
-            }
-
-            return output;
-        }
-
-        @Override
-        public String key() {
-            return "round";
-        }
-    }
 
     /**
      * Кеш пересланных сообщений
