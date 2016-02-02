@@ -44,7 +44,7 @@ public class CreateChatActivity extends BaseThemedActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.create_chat_activity);
+        setContentView(R.layout.activity_create_chat);
 
         setStatusBarColor(ThemeUtils.getThemeAttrColor(this, R.attr.colorPrimary));
 

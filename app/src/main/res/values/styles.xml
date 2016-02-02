@@ -5,19 +5,12 @@
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
         <item name="android:windowBackground">@color/cardview_dark_background</item>
 
-        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
-        <!--<item name="android:windowTranslucentStatus">true</item>-->
-        <!--<item name="alertDialogTheme">@style/AlertDialogDark</item>-->
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:textColorPrimary">@color/primary_text_default_material_dark</item>
         <item name="android:textColorSecondary">@color/secondary_text_default_material_dark</item>
     </style>
 
     <style name="AppThemeLight" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
-
-        <!--<item name="android:colorBackground">@android:color/white</item>-->
         <item name="android:windowBackground">@color/md_grey_200</item>
         <item name="android:windowContentOverlay">@null</item>
 
@@ -32,6 +25,7 @@
     <style name="AlertDialogDark" parent="@android:style/Theme.Dialog">
         <item name="android:windowBackground">@color/cardview_dark_background</item>
     </style>
+
 
 
     <style name="AppTheme.Red">

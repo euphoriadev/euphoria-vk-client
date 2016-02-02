@@ -22,6 +22,8 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ru.euphoriadev.vk.http.AsyncHttpClient;
+
 
 /**
  * Created by Igor on 27.07.15.

@@ -38,7 +38,7 @@ public class ThemeManager {
     public static final String PREF_KEY_IS_DARK_THEME = SettingsFragment.KEY_IS_NIGHT_MODE;
     public static final String PREF_KEY_DRAWER_HEADER = SettingsFragment.KEY_MAKING_DRAWER_HEADER;
     public static final String PREF_KEY_BLUR_RADIUS = SettingsFragment.KEY_BLUR_RADIUS;
-    public static final String PREF_KEY_MESSAGE_WALLPAPER_PATH = "message_wallpaper_path";
+    public static final String PREF_KEY_MESSAGE_WALLPAPER_PATH = SettingsFragment.KEY_WALLPAPER_PATH;
 
     /** Drawer header states **/
     public static final int DRAWER_HEADER_DEFAULT = 0;
@@ -550,6 +550,19 @@ public class ThemeManager {
         hsv[2] *= 0.75f;
         color = Color.HSVToColor(hsv);
         return color;
+    }
+
+    /**
+     * Lighten color on 10%
+     *
+     * @param color the color to lighten
+     * @return a new color which is lighten of specified color
+     */
+    public static int lightenColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 1.1f;
+        return Color.HSVToColor(hsv);
     }
 
     /**

@@ -61,7 +61,7 @@ public class ColorPickerDialog extends DialogFragment implements ColorPickerSwat
 		}
 		if (bundle != null) {
 			this.mColors = bundle.getIntArray("colors");
-			this.mSelectedColor = ((Integer) bundle.getSerializable("selected_color")).intValue();
+			this.mSelectedColor = bundle.getInt("selected_color");
 		}
 	}
 
@@ -77,10 +77,15 @@ public class ColorPickerDialog extends DialogFragment implements ColorPickerSwat
 		return this.mAlertDialog;
 	}
 
+	@Override
+	public Dialog getDialog() {
+		return mAlertDialog;
+	}
+
 	public void onSaveInstanceState(Bundle bundle) {
 		super.onSaveInstanceState(bundle);
 		bundle.putIntArray("colors", this.mColors);
-		bundle.putSerializable("selected_color", Integer.valueOf(this.mSelectedColor));
+		bundle.putInt("selected_color", this.mSelectedColor);
 	}
 
 	public void setArguments(int titleId, int columns, int size) {

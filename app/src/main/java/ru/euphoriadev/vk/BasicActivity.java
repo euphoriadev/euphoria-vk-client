@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -30,6 +31,7 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.io.IOException;
 
 import ru.euphoriadev.vk.api.Api;
@@ -49,10 +51,9 @@ import ru.euphoriadev.vk.util.ViewUtil;
 
 public class BasicActivity extends BaseThemedActivity implements
         NavigationView.OnNavigationItemSelectedListener, Refreshable {
+    static final int OFFICIAL_GROUP_ID = 59383198;
 
-    private ActionBarDrawerToggle toggle;
     private AppLoader appLoader;
-    private FragmentManager fragmentManager;
     private Fragment currentFragment;
     private NavigationView navigationView;
     private DrawerLayout drawer;
@@ -69,25 +70,22 @@ public class BasicActivity extends BaseThemedActivity implements
         appLoader = AppLoader.getLoader(getApplicationContext());
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.activity_main);
         if (checkNotLogged()) {
             return;
         }
-//        setStatusBarColor();
-//        MenuItemCompat.setActionView()
 
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         setStatusBarColor();
-        hideSpinner();
         setTitle(R.string.messages);
 
 
         ViewUtil.setTypeface(toolbar);
 
         drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
-        toggle = new ActionBarDrawerToggle(BasicActivity.this,
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(BasicActivity.this,
                 drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
         drawer.setDrawerListener(toggle);
@@ -117,14 +115,14 @@ public class BasicActivity extends BaseThemedActivity implements
             joinInGroup();
         }
         RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_BLUR_RADIUS);
+        RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_WALLPAPER_PATH);
         startService(new Intent(this, LongPollService.class));
+        loadWallpaper();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        initDrawerHeader();
     }
 
     public Toolbar getToolbar() {
@@ -171,14 +169,6 @@ public class BasicActivity extends BaseThemedActivity implements
      */
     private void selectItem(final int id) {
         // Update the main content by replacing fragments
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (id != R.id.navPrefs) {
-                    getSupportActionBar().setSubtitle(null);
-                }
-            }
-        });
         switch (id) {
 
             case R.id.navFriends:
@@ -252,7 +242,7 @@ public class BasicActivity extends BaseThemedActivity implements
 
         // Insert the fragment by replacing any existing fragment
         if (currentFragment != null) {
-            fragmentManager = getSupportFragmentManager();
+            FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.content_frame, currentFragment).commit();
 
@@ -302,8 +292,21 @@ public class BasicActivity extends BaseThemedActivity implements
         });
     }
 
+    private void loadWallpaper() {
+        String wallpaperPath = ThemeManager.getWallpaperPath(this);
+        if (TextUtils.isEmpty(wallpaperPath)) {
+            return;
+        }
+        ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
+        ivWallpaper.setVisibility(View.VISIBLE);
+
+        Picasso.with(this)
+                .load(new File(wallpaperPath))
+                .into(ivWallpaper);
+    }
+
     private void joinInGroup() {
-        int isJoinGroup = PrefManager.getInt("is_join_group", 0);
+        int isJoinGroup = PrefManager.getInt(SettingsFragment.KEY_IS_JOIN_GROUP, 0);
 
         // Если уже в группе/ откахались вступить
         if (isJoinGroup == -1) {
@@ -311,7 +314,7 @@ public class BasicActivity extends BaseThemedActivity implements
         }
         // если еще нет, то увеличиваем счетчик
         if (isJoinGroup <= 5) {
-            PrefManager.putInt("is_join_group", ++isJoinGroup);
+            PrefManager.putInt(SettingsFragment.KEY_IS_JOIN_GROUP, ++isJoinGroup);
             return;
         }
         // Просим вступить в группу, после 5х запуска
@@ -320,12 +323,12 @@ public class BasicActivity extends BaseThemedActivity implements
             public void run() {
                 try {
                     Thread.sleep(2000);
-                    final Boolean isMemberGroup = api.isGroupMember(59383198, api.getUserId());
+                    final Boolean isMemberGroup = api.isGroupMember(OFFICIAL_GROUP_ID, api.getUserId());
                     // если пользовать не в группе - вызываем диалог
 
                     if (isMemberGroup) {
                         // если мы уже в группе
-                        PrefManager.putInt("is_join_group", -1);
+                        PrefManager.putInt(SettingsFragment.KEY_IS_JOIN_GROUP, -1);
                         Log.w("BasicActivity", "IsMemberOfGroup");
                     } else
                     runOnUiThread(new Runnable() {
@@ -348,16 +351,16 @@ public class BasicActivity extends BaseThemedActivity implements
                 .setPositiveButton("Join", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        joinInGroup(59383198);
+                        joinInGroup(OFFICIAL_GROUP_ID);
                         Toast.makeText(BasicActivity.this, R.string.thank_you, Toast.LENGTH_LONG).show();
-                        PrefManager.putInt("is_join_group", -1);
+                        PrefManager.putInt(SettingsFragment.KEY_IS_JOIN_GROUP, -1);
 
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        PrefManager.putInt("is_join_group", -1);
+                        PrefManager.putInt(SettingsFragment.KEY_IS_JOIN_GROUP, -1);
                     }
                 });
         final AlertDialog dialog = builder.create();
@@ -437,7 +440,7 @@ public class BasicActivity extends BaseThemedActivity implements
                 }, 800);
             }
         } else {
-            Toast.makeText(this, "Press once again to exit",
+            Toast.makeText(this, R.string.exit_message,
                     Toast.LENGTH_SHORT).show();
             backPressedTime = System.currentTimeMillis();
         }
@@ -491,8 +494,13 @@ public class BasicActivity extends BaseThemedActivity implements
         Log.w("BasicActivity", "onRefresh: " + prefKey);
         // Change blur radius of NavigationView....
 
+        ThemeManager.updateThemeValues();
         if (prefKey.equals(SettingsFragment.KEY_BLUR_RADIUS)) {
             isInitedDrawer = false;
+            initDrawerHeader();
+        }
+        if (prefKey.equals(SettingsFragment.KEY_WALLPAPER_PATH)) {
+            loadWallpaper();
         }
     }
 }

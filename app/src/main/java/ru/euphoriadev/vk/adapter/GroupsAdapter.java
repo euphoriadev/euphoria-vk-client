@@ -39,7 +39,7 @@ public class GroupsAdapter extends BaseArrayAdapter<VKGroup> {
         View view = convertView;
         ViewHolder holder;
         if (view == null) {
-            view = getInflater().inflate(R.layout.group_list_item, parent, false);
+            view = getInflater().inflate(R.layout.list_item_group, parent, false);
 
             holder = new ViewHolder(view);
             view.setTag(holder);

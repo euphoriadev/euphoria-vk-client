@@ -37,7 +37,7 @@ public class ChoiceUserAdapter extends BaseArrayAdapter<VKUser> implements View.
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
         if (convertView == null) {
-            convertView = getInflater().inflate(R.layout.easy_user_list_item, parent, false);
+            convertView = getInflater().inflate(R.layout.list_item_easy_user, parent, false);
 
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);

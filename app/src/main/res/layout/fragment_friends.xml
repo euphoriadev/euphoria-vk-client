@@ -3,8 +3,27 @@
     android:id="@+id/swipe_container_friends"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
+
+    <!--<android.support.design.widget.TabLayout-->
+        <!--android:id="@+id/materials_tablayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="?attr/actionBarSize"-->
+        <!--android:background="?colorPrimary"-->
+        <!--app:layout_scrollFlags="scroll|enterAlways"-->
+        <!--app:tabIndicatorColor="?colorAccent"-->
+        <!--app:tabIndicatorHeight="4dp"-->
+        <!--app:tabTextColor="@android:color/white">-->
+
+    <!--</android.support.design.widget.TabLayout>-->
+
+    <!--<android.support.v4.view.ViewPager-->
+        <!--android:id="@+id/viewPager"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="?android:windowBackground"/>-->
 
     <ListView
             android:id="@+id/lvFriends"

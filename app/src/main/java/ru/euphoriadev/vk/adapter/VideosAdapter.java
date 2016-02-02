@@ -32,7 +32,7 @@ public class VideosAdapter extends ArrayAdapter<VideosAdapter.VideoItem> {
     private AppLoader loader;
 
     public VideosAdapter(Context context, ArrayList<VideoItem> videos) {
-        super(context, R.layout.video_list_item, videos);
+        super(context, R.layout.list_item_video, videos);
 
         inflater = LayoutInflater.from(context);
         picasso = Picasso.with(context);
@@ -48,7 +48,7 @@ public class VideosAdapter extends ArrayAdapter<VideosAdapter.VideoItem> {
 
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.video_list_item, parent, false);
+            convertView = inflater.inflate(R.layout.list_item_video, parent, false);
             holder = new ViewHolder(convertView);
 
             convertView.setTag(holder);

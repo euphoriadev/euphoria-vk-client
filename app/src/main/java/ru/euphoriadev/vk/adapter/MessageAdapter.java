@@ -201,7 +201,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         View view = convertView;
 
         if (view == null) {
-            view = getInflater().inflate(R.layout.message_list_item, parent, false);
+            view = getInflater().inflate(R.layout.list_item_message, parent, false);
 
             holder = new ViewHolder(view);
             view.setTag(holder);
@@ -651,7 +651,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                             holder.llAttachContainer.setVisibility(View.VISIBLE);
                         }
 
-                        View docItem = View.inflate(mContext, R.layout.doc_list_item, null);
+                        View docItem = View.inflate(mContext, R.layout.list_item_doc, null);
 
                         TextView tvDocTitle = (TextView) docItem.findViewById(R.id.tvDocTitle);
                         TextView tvDocSize = (TextView) docItem.findViewById(R.id.tvDocSize);

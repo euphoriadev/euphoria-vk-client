@@ -32,7 +32,7 @@ public class FriendsAdapter extends BaseArrayAdapter<VKUser> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = getInflater().inflate(R.layout.friends_list_item, parent, false);
+            view = getInflater().inflate(R.layout.list_item_friends, parent, false);
         }
 
         final VKUser user = getItem(position);

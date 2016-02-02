@@ -43,7 +43,7 @@ public class NoteAdapter extends BaseArrayAdapter<VKNote> {
         ViewHolder holder;
 
         if (view == null) {
-            view = getInflater().inflate(R.layout.note_list_item, parent, false);
+            view = getInflater().inflate(R.layout.list_item_note, parent, false);
             holder = new ViewHolder(view);
 
             view.setTag(holder);

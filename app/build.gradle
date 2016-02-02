@@ -8,7 +8,7 @@ android {
         applicationId "ru.euphoriadev.vk"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 842
+        versionCode 856
         versionName "0.9 Beta"
     }
 
@@ -85,6 +85,7 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+//    compile 'com.getbase:floatingactionbutton:1.10.1'
     // Apache commons io
     compile 'commons-io:commons-io:2.4'
 

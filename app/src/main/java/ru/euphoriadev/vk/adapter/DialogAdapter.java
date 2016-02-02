@@ -214,7 +214,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         final ViewHolder holder;
         View view = convertView;
         if (view == null) {
-            view = inflater.inflate(R.layout.dialog_list_item, parent, false);
+            view = inflater.inflate(R.layout.list_item_dialog, parent, false);
 
             holder = new ViewHolder(view);
             view.setTag(holder);

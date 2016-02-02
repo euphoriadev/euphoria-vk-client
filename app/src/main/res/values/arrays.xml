@@ -45,6 +45,12 @@
         <item>Документы</item>
     </string-array>
 
+    <string-array name="tabs_friends">
+        <item>Все</item>
+        <item>Оффлайн</item>
+        <item>Онлайн</item>
+    </string-array>
+
     <string-array name="friends_sort_array">
         <item>Все друзья</item>
         <item>Онлайн</item>

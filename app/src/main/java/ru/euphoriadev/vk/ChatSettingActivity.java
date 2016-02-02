@@ -38,7 +38,7 @@ public class ChatSettingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.chat_settings_activity);
+        setContentView(R.layout.activity_chat_settings);
 
         tvTitle = (EditText) findViewById(R.id.tvChatTitle);
         ivPhoto = (ImageView) findViewById(R.id.tvChatIcon);

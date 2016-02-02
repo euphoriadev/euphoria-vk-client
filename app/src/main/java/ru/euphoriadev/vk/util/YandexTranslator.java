@@ -4,6 +4,12 @@ import android.content.Context;
 
 import java.io.Closeable;
 
+import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpParams;
+import ru.euphoriadev.vk.http.HttpRequest;
+import ru.euphoriadev.vk.http.HttpResponse;
+import ru.euphoriadev.vk.http.HttpResponseCodeException;
+
 
 /**
  * Created by Igor on 11.11.15.
@@ -33,14 +39,14 @@ public class YandexTranslator implements Closeable {
      */
     public String translate(String message, String languageFrom, String languageTo) {
 
-        AsyncHttpClient.HttpParams params = new AsyncHttpClient.HttpParams();
+        HttpParams params = new HttpParams();
         params.addParam("key", apiKey);
         params.addParam("text", message);
         params.addParam("lang", (languageFrom.equals(Language.AUTO_DETECT.toString()) ? languageTo : languageFrom + "-" + languageTo));
 
-        AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
+        HttpRequest request = new HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
         try {
-            AsyncHttpClient.HttpResponse response = client.execute(request);
+            HttpResponse response = client.execute(request);
             return response.getContentAsJson().optJSONArray("text").optString(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,22 +63,22 @@ public class YandexTranslator implements Closeable {
      * @param listener
      */
     public void translateAsync(final String message, final String languageFrom, final String languageTo, final OnCompleteListener listener) {
-        AsyncHttpClient.HttpParams params = new AsyncHttpClient.HttpParams();
+        HttpParams params = new HttpParams();
         params.addParam("key", apiKey);
         params.addParam("text", message);
         params.addParam("lang", (languageFrom.equals(Language.AUTO_DETECT.toString()) ? languageTo : languageFrom + "-" + languageTo));
 
-        final AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
-        client.execute(request, new AsyncHttpClient.HttpRequest.OnResponseListener() {
+        final HttpRequest request = new HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
+        client.execute(request, new HttpRequest.OnResponseListener() {
             @Override
-            public void onResponse(AsyncHttpClient client, AsyncHttpClient.HttpResponse response) {
+            public void onResponse(AsyncHttpClient client, HttpResponse response) {
                 if (listener != null) {
                     listener.onCompleteTranslate(YandexTranslator.this, response.getContentAsJson().optJSONArray("text").optString(0));
                 }
             }
 
             @Override
-            public void onError(AsyncHttpClient client, AsyncHttpClient.HttpResponseCodeException exception) {
+            public void onError(AsyncHttpClient client, HttpResponseCodeException exception) {
             }
         });
     }

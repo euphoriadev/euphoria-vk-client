@@ -18,7 +18,7 @@ public class LoginActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_webview);
+        setContentView(R.layout.activity_login_webview);
 
         webview = (WebView) findViewById(R.id.vkontakteview);
         webview.getSettings().setJavaScriptEnabled(true);

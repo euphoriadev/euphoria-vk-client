@@ -27,9 +27,7 @@ import java.util.WeakHashMap;
  * A simple utils for {@link android.view.View}
  */
 public class ViewUtil {
-    /**
-     * Views for update typefaces
-     */
+    /** Views set for update typefaces */
     private static final Set<TextView> sSetViews = Collections.newSetFromMap(new WeakHashMap<TextView, Boolean>());
 
     /**
@@ -46,6 +44,23 @@ public class ViewUtil {
         } else {
             Drawable drawable = view.getBackground();
             if (drawable != null) drawable.setColorFilter(colorFilter);
+        }
+    }
+
+    /**
+     * Specify an optional color for the view
+     *
+     * @param group a {@link ViewGroup} which it is necessary to apply color
+     * @param color the color for set to view
+     */
+    public static void setColor(ViewGroup group, int color) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                setColor((ViewGroup) child, color);
+            } else if (child instanceof TextView) {
+                ((TextView) child).setTextColor(color);
+            }
         }
     }
 

@@ -15,7 +15,6 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKAttachment;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
@@ -34,7 +33,6 @@ public class DialogMaterialsActivity extends BaseThemedActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ThemeManagerOld.get(this).setBasicTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_materials_layout);
 

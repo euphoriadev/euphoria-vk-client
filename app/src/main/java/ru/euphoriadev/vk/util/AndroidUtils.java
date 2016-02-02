@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -49,10 +48,12 @@ import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.FileHelper;
+import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpRequest;
+import ru.euphoriadev.vk.http.HttpResponse;
+import ru.euphoriadev.vk.http.HttpResponseCodeException;
 
 public class AndroidUtils {
-
-    SharedPreferences sPrefs;
 
     // Укороченный вид Toast"а
     public static void showToast(Context c, String text, boolean longLength) {
@@ -354,11 +355,11 @@ public class AndroidUtils {
         }
 
         AsyncHttpClient client = new AsyncHttpClient(context);
-        AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest(SettingsFragment.UPDATE_URL);
+        HttpRequest request = new HttpRequest(SettingsFragment.UPDATE_URL);
 
-        client.execute(request, new AsyncHttpClient.HttpRequest.OnResponseListener() {
+        client.execute(request, new HttpRequest.OnResponseListener() {
             @Override
-            public void onResponse(AsyncHttpClient client, AsyncHttpClient.HttpResponse response) {
+            public void onResponse(AsyncHttpClient client, HttpResponse response) {
                 PrefManager.putLong(SettingsFragment.LAST_UPDATE_TIME, System.currentTimeMillis());
 
                 JSONObject json = response.getContentAsJson();
@@ -379,7 +380,7 @@ public class AndroidUtils {
             }
 
             @Override
-            public void onError(AsyncHttpClient client, final AsyncHttpClient.HttpResponseCodeException exception) {
+            public void onError(AsyncHttpClient client, final HttpResponseCodeException exception) {
                 runOnUi(new Runnable() {
                     @Override
                     public void run() {
@@ -403,6 +404,10 @@ public class AndroidUtils {
                 });
 
         builder.create().show();
+    }
+
+    public static void post(Runnable runnable) {
+        AppLoader.getLoader().getHandler().post(runnable);
     }
 
     public static Drawable getDrawable(Context context, int drawableRed) {

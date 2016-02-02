@@ -81,7 +81,7 @@ public class AudioAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = inflater.inflate(R.layout.audio_list_item, parent, false);
+            view = inflater.inflate(R.layout.list_item_audio, parent, false);
         }
 
         final VKAudio item = getItem(position);

@@ -110,7 +110,7 @@ public class NewsFragment extends Fragment {
 
             View view = convertView;
             if (view == null) {
-                view = inflater.inflate(R.layout.news_list_item, parent, false);
+                view = inflater.inflate(R.layout.list_item_news, parent, false);
             }
 
             NewsItem item = newsfeed.items.get(position);

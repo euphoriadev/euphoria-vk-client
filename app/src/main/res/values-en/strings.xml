@@ -161,7 +161,7 @@
     <string name="prefs_font_family">Font family</string>
     <string name="delete">Delete</string>
     <string name="attach">Attach</string>
-    <string name="set_wallpaper">Set wallpaper on chat</string>
+    <string name="set_wallpaper">Wallpaper on chat</string>
     <string name="pref_blur_radius">Blur radius of Drawer Header</string>
     <string name="pref_blur_radius_description">The blur radius of main profile photo in Navigation Drawer Header</string>
     <string name="show_and_hide_time">Show/hide time</string>
@@ -170,4 +170,7 @@
     <string name="prefs_use_system_emoji_description">As a rule, the system displays the emoticons much faster</string>
     <string name="prefs_check_auto_update">Auto update</string>
     <string name="prefs_check_auto_update_description">Check for updates once a day</string>
+    <string name="wallpaper_change">Change wallpaper</string>
+    <string name="wallpaper_remove">Remove wallpaper</string>
+    <string name="exit_message">Press once again to exit</string>
 </resources>

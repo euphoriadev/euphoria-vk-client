@@ -31,7 +31,7 @@ public class ChatMemberAdapter extends BaseArrayAdapter<ChatMember> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = inflater.inflate(R.layout.chat_member_list_item, parent, false);
+            view = inflater.inflate(R.layout.list_item_chat_member, parent, false);
         }
 
         ChatMember member = getItem(position);

@@ -9,8 +9,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpRequest;
+import ru.euphoriadev.vk.http.HttpResponse;
+import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.AsyncHttpClient;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.ThemeManager;
 
@@ -134,6 +137,17 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonClear);
 
+//        FloatingActionsMenu menu = new FloatingActionsMenu(this);
+//
+//        FloatingActionButton button = new FloatingActionButton(this);
+//        button.setIcon(R.drawable.ic_keyboard_arrow_right);
+//        button.setColorNormal(ThemeManager.getColorAccent(this));
+//        button.setColorPressed(ThemeManager.darkenColor(ThemeManager.getColorAccent(this)));
+//        button.setSize(FloatingActionButton.SIZE_MINI);
+//
+//        menu.addButton(button);
+//        rootLayout.addView(menu);
+
     }
 
     private void connectToGoogle() {
@@ -141,10 +155,10 @@ public class TestActivity extends BaseThemedActivity {
             @Override
             public void run() {
                 AsyncHttpClient client = new AsyncHttpClient(TestActivity.this);
-                AsyncHttpClient.HttpRequest request = new AsyncHttpClient.HttpRequest("https://www.google.com/");
+                HttpRequest request = new HttpRequest("https://www.google.com/");
 
                 try {
-                    final AsyncHttpClient.HttpResponse response = client.execute(request);
+                    final HttpResponse response = client.execute(request);
                     Log.w(AsyncHttpClient.TAG, response.getContentAsString());
                     runOnUiThread(new Runnable() {
                         @Override
@@ -153,7 +167,7 @@ public class TestActivity extends BaseThemedActivity {
                             tvResult.append("Response code: " + response.responseCode + "\n");
                         }
                     });
-                } catch (final AsyncHttpClient.HttpResponseCodeException e) {
+                } catch (final HttpResponseCodeException e) {
                     e.printStackTrace();
                     runOnUiThread(new Runnable() {
                         @Override

@@ -89,7 +89,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         tm = new ThemeManagerOld(activity);
 
         ((BasicActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
-        ((BasicActivity) getActivity()).hideSpinner();
         ((BaseThemedActivity) getActivity())
                 .getSupportActionBar()
                 .setSubtitle(activity.getString(R.string.dialogs_number) + PrefManager.getInt("message_count", 0));
@@ -228,6 +227,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 //            Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), R.string.check_internet, Snackbar.LENGTH_LONG).show();
         }
     }
+
 
     private void downloadDialog(final int id, final int chatid, final String userName) {
         if (chatid != 0) {
@@ -484,7 +484,9 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 }
                 int messageCount = response.optInt("count");
                 PrefManager.putInt("message_count", messageCount);
-
+                if (getActivity() == null || ((BasicActivity) getActivity()).getSupportActionBar() == null) {
+                    return;
+                }
                         ((BaseThemedActivity) getActivity())
                         .getSupportActionBar()
                         .setSubtitle(activity.getString(R.string.dialogs_number) + messageCount);
@@ -880,6 +882,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onDestroy() {
+        ((BasicActivity) getActivity()).getSupportActionBar().setSubtitle(null);
         setRefreshing(false);
         if (adapter != null) {
             adapter.disconnectLongPoll();

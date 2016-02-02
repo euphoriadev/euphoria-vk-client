@@ -74,6 +74,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_ENCRYPT_MESSAGES = "encrypt_messages";
     public static final String KEY_CHECK_UPDATE = "auto_update";
     public static final String KEY_USE_ALTERNATIVE_UPDATE_MESSAGES = "use_alternative_update_messages";
+    public static final String KEY_WALLPAPER_PATH = "message_wallpaper_path";
+    public static final String KEY_IS_JOIN_GROUP = "is_join_group";
 
     /** Web url for check updates this app */
     public static final String UPDATE_URL = "http://timeteam.3dn.ru/timevk_up.txt";
@@ -111,10 +113,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             public boolean onPreferenceChange(Preference preference, Object o) {
                 ThemeManager.setDarkTheme((Boolean) o);
                 ThemeManager.updateThemeValues();
-                TaskStackBuilder.create(getActivity())
-                        .addNextIntent(new Intent(getActivity(), BasicActivity.class))
-                        .addNextIntent(getActivity().getIntent())
-                        .startActivities();
+                try {
+                    TaskStackBuilder.create(getActivity())
+                            .addNextIntent(new Intent(getActivity(), BasicActivity.class))
+                            .addNextIntent(getActivity().getIntent())
+                            .startActivities();
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    Toast.makeText(getActivity(), "Please restart application", Toast.LENGTH_LONG);
+                }
                 getActivity().overridePendingTransition(R.anim.alpha_out, R.anim.alpha_in);
                 return true;
             }
@@ -135,7 +143,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 //                int[] colors = manager.getThemeColors();
                 pickerDialog.initialize(R.string.pick_color, ThemeManager.PALETTE, ThemeManager.getPaletteColor(), 4, ThemeManager.PALETTE.length);
                 pickerDialog.show(((BaseThemedActivity) getActivity()).getSupportFragmentManager(), "colorpicker");
-
+                if (ThemeManager.isDarkTheme()) {
+                    // the master code in one line :D
+//                    pickerDialog.getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(AndroidUtils.getColor(getActivity(), R.color.cardview_dark_background)));
+                }
                 pickerDialog.setOnColorSelectedListener(new ColorPickerSwatch.OnColorSelectedListener() {
                     @Override
                     public void onColorSelected(int color) {

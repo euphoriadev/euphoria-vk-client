@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpRequest;
+import ru.euphoriadev.vk.http.HttpResponse;
 
 /**
  * Created by Igor on 27.01.16.
@@ -268,7 +271,7 @@ public class Emoji {
                 Log.i("Emoji", url);
 
                 try {
-                    AsyncHttpClient.HttpResponse response = client.execute(new AsyncHttpClient.HttpRequest(url));
+                    HttpResponse response = client.execute(new HttpRequest(url));
                     File file = new File(dir, String.valueOf(entry.getValue().hashCode()));
                     file.createNewFile();
 

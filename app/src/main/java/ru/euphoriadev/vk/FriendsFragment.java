@@ -7,10 +7,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -28,7 +30,6 @@ import java.util.ArrayList;
 import ru.euphoriadev.vk.adapter.FriendsAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
@@ -40,12 +41,9 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private static final int ORDER_BY_ONLINE = 1;
     private static final int ORDER_BY_OFFLINE = 2;
 
-    private Account account;
     private Api api;
-    private ThemeManagerOld tm;
     private ListView listView;
     private Activity activity;
-    private TabLayout tabLayout;
     private FriendsAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private ArrayList<VKUser> friends;
@@ -57,7 +55,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         activity = getActivity();
 
-        tm = ThemeManagerOld.get(activity);
+        ThemeManagerOld tm = ThemeManagerOld.get(activity);
         api = Api.get();
 
       //  tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout_friends);;
@@ -86,7 +84,17 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         String[] items = getActivity().getResources().getStringArray(R.array.friends_sort_array);
 
-        ArrayAdapter<String> sAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, items);
+        ArrayAdapter<String> sAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, items) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView =  (TextView) view.findViewById(android.R.id.text1);
+                if (textView != null) {
+                    textView.setTextColor(Color.WHITE);
+                }
+                return view;
+            }
+        };
         sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ((BasicActivity) getActivity()).addSpinnerAdapter(sAdapter, new AdapterView.OnItemSelectedListener() {
             @Override
@@ -205,11 +213,22 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onDestroy() {
+        ((BasicActivity) getActivity()).hideSpinner();
         if (adapter != null) {
             adapter.clear();
         }
 
         super.onDestroy();
+    }
 
+    public class FriendsPager extends ViewPager {
+
+        public FriendsPager(Context context) {
+            super(context);
+        }
+
+        public FriendsPager(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
     }
 }

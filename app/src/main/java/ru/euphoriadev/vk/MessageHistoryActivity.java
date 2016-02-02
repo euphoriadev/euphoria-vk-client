@@ -60,6 +60,7 @@ import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Encrypter;
@@ -104,7 +105,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.message_history_activity);
+        setContentView(R.layout.activity_message_history);
 
         String fullName = getIntent().getExtras().getString("fullName");
         uid = getIntent().getExtras().getInt("user_id");
@@ -369,6 +370,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
             case R.id.menuUpdateMessages:
                 adapter.clear();
+                adapter.notifyDataSetChanged();
                 new LoadMessagesTask(30, 0, false).execute();
                 break;
 
@@ -404,7 +406,34 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 break;
 
             case R.id.menuWallpaper:
-                pickImageFromGallery();
+                ThemeManager.updateThemeValues();
+                if (!TextUtils.isEmpty(ThemeManager.getWallpaperPath(this))) {
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MessageHistoryActivity.this);
+                    alertBuilder.setTitle(R.string.set_wallpaper);
+                    alertBuilder.setItems(new CharSequence[]{
+                            getResources().getString(R.string.wallpaper_change),
+                            getResources().getString(R.string.wallpaper_remove)
+
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                    pickImageFromGallery(); break;
+                                case 1:
+                                    PrefManager.putString(SettingsFragment.KEY_WALLPAPER_PATH, null);
+                                    ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
+                                    ivWallpaper.setImageDrawable(null);
+                                    ivWallpaper.setVisibility(View.GONE);
+                                    break;
+
+                            }
+                        }
+                    });
+                    alertBuilder.show();
+                } else {
+                    pickImageFromGallery();
+                }
                 break;
 
             case R.id.menuHideShowTime:
@@ -1020,37 +1049,33 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     if (text.equals("[error]")) {
                         // error. stopping translate
                         forceClose = true;
-                        AndroidUtils.runOnUi(new Runnable() {
+                        AndroidUtils.post(new RunnableToast(MessageHistoryActivity.this, R.string.check_internet, true));
+
+                        if (!TextUtils.isEmpty(text)) {
+                            item.message.body = text;
+                        }
+                        count++;
+                        final int finalCount = count;
+                        runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(MessageHistoryActivity.this, R.string.check_internet, Toast.LENGTH_LONG).show();
+                                dialog.setMessage(translateTextWait + "\n" + "Переведенно " + finalCount + " сообщений из " + history.size());
                             }
                         });
+                        translateAttachMessages(item.message, translator, languageTo);
                     }
-                    if (!TextUtils.isEmpty(text)) {
-                        item.message.body = text;
-                    }
-                    count++;
-                    final int finalCount = count;
+                    translator.close();
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            dialog.setMessage(translateTextWait + "\n" + "Переведенно " + finalCount + " сообщений из " + history.size());
+                            dialog.dismiss();
+                            if (adapter != null)
+                                adapter.notifyDataSetChanged();
                         }
                     });
-                    translateAttachMessages(item.message, translator, languageTo);
+
                 }
-                translator.close();
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.dismiss();
-                        if (adapter != null)
-                            adapter.notifyDataSetChanged();
-                    }
-                });
-
             }
         });
     }
@@ -1225,18 +1250,18 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 users.put(user.user_id, user);
             }
 
-            boolean catSet = history.size() == messages.size();
-            if (!catSet) {
-                history.clear();
-            }
+//            boolean catSet = history.size() == messages.size();
+//            if (!catSet) {
+//                history.clear();
+//            }
             // Reverse adding
             for (int i = messages.size() - 1; i >= 0; i--) {
                 VKMessage message = messages.get(i);
-                if (catSet) {
-                    history.set(i, new MessageItem(message, users.get(message.uid)));
-                } else {
+//                if (catSet) {
+//                    history.set(i, new MessageItem(message, users.get(message.uid)));
+//                } else {
                     history.add(new MessageItem(message, users.get(message.uid)));
-                }
+//                }
             }
 
             cursor.close();

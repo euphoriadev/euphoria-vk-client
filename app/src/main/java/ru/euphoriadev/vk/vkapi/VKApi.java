@@ -2,6 +2,7 @@ package ru.euphoriadev.vk.vkapi;
 
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -19,9 +20,15 @@ import java.util.Locale;
 import java.util.TreeMap;
 
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpParams;
+import ru.euphoriadev.vk.http.HttpRequest;
+import ru.euphoriadev.vk.http.HttpResponse;
+import ru.euphoriadev.vk.http.HttpResponseCodeException;
+import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.AsyncHttpClient;
+import ru.euphoriadev.vk.util.AppLoader;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
@@ -50,6 +57,18 @@ public class VKApi {
     public static final String BASE_URL = "https://api.vk.com/method/";
 //  public static final String API_VERSION = "5.14";
     public static final String API_VERSION = "5.44";
+
+    public static final VKOnResponseListener DEFAULT_RESPONSE_LISTENER = new VKOnResponseListener() {
+        @Override
+        public void onResponse(JSONObject responseJson) {
+            Log.i(TAG, responseJson.toString());
+        }
+
+        @Override
+        public void onError(VKException exception) {
+            AndroidUtils.post(new RunnableToast(AppLoader.appContext, exception.getMessage(), true));
+        }
+    };
 
     protected static volatile VKApi sInstante;
 
@@ -154,7 +173,7 @@ public class VKApi {
 
         final String url = "https://oauth.vk.com/token";
 
-        final AsyncHttpClient.HttpParams params = new AsyncHttpClient.HttpParams();
+        final HttpParams params = new HttpParams();
         params.addParam("grant_type", "password");
         params.addParam("client_id", client_id);
         params.addParam("client_secret", client_secret);
@@ -167,7 +186,7 @@ public class VKApi {
             @Override
             public void run() {
                 try {
-                    AsyncHttpClient.HttpResponse response = getInstance().mClient.execute(new AsyncHttpClient.HttpRequest(url, "GET", params));
+                    HttpResponse response = getInstance().mClient.execute(new HttpRequest(url, "GET", params));
                     JSONObject json = response.getContentAsJson();
                     VKUtil.checkErrors(url, json);
                     if (listener != null) {
@@ -2032,11 +2051,11 @@ public class VKApi {
          */
         public JSONObject execute() {
             String url = getSignedUrl();
-            AsyncHttpClient.HttpRequest request;
+            HttpRequest request;
 
-            request = new AsyncHttpClient.HttpRequest(url, isPost ? "POST" : "GET", null);
+            request = new HttpRequest(url, isPost ? "POST" : "GET", null);
 
-            AsyncHttpClient.HttpResponse response = null;
+            HttpResponse response = null;
             try {
                 response = getInstance().mClient.execute(request);
                 if (response != null) {
@@ -2046,7 +2065,7 @@ public class VKApi {
                         e.printStackTrace();
                     }
                 }
-            } catch (AsyncHttpClient.HttpResponseCodeException e) {
+            } catch (HttpResponseCodeException e) {
                 e.printStackTrace();
             }
             return null;

@@ -39,7 +39,7 @@ public class DocsAdapter extends BaseArrayAdapter<VKDocument> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = getInflater().inflate(R.layout.doc_list_item, parent, false);
+            view = getInflater().inflate(R.layout.list_item_doc, parent, false);
         }
         final VKDocument doc = getItem(position);
         TextCircleView iv = (TextCircleView) view.findViewById(R.id.ivDoc);

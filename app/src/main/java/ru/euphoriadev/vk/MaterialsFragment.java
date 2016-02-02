@@ -32,7 +32,7 @@ public class MaterialsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.materials_fragment_list, container, false);
+        view = inflater.inflate(R.layout.fragment_materials_list, container, false);
         ListView listView = (ListView) view.findViewById(R.id.lvMaterials);
 
         ArrayList<MessageItem> items = new ArrayList<>();

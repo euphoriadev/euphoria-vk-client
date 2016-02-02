@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginRight="8dp"
+            android:paddingRight="8dp"
             android:background="@android:color/transparent"
             android:gravity="center"
             android:orientation="horizontal"
@@ -112,9 +112,9 @@
             <ru.euphoriadev.vk.view.fab.FloatingActionButton
                 android:id="@+id/fabMessageSebd"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="20dp"
                 android:layout_gravity="top|right"
-                android:src="@drawable/ic_pets_white"
+                android:src="@drawable/ic_keyboard_arrow_right"
                 fab:fab_shadow="true"
                 fab:fab_type="mini"/>
 

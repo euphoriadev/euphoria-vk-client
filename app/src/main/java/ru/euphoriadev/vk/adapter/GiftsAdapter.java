@@ -70,7 +70,7 @@ public class GiftsAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = this.inflater.inflate(R.layout.gift_list_item, parent, false);
+            view = this.inflater.inflate(R.layout.list_item_gift, parent, false);
         }
         GiftItem item = gifts.get(position);
 

@@ -18,6 +18,7 @@ import ru.euphoriadev.vk.adapter.AudioAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 
@@ -119,12 +120,8 @@ public class AudioListFragment extends Fragment implements SwipeRefreshLayout.On
 
                 } catch (final Exception e) {
                     e.getStackTrace();
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    AndroidUtils.post(new RunnableToast(getActivity(), e.toString(), true));
+
                 } finally {
                     setRefreshing(false);
                 }

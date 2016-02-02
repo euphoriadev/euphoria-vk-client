@@ -19,7 +19,7 @@ public class PrefActivity extends BaseThemedActivity {
 //        AppLoader.getLoader().applyTheme(PrefActivity.this);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.prefs_activity);
+        setContentView(R.layout.activity_settings);
 
         getSupportActionBar().setTitle(R.string.prefs);
 
