@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
@@ -16,6 +17,8 @@ import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 15.07.15.
@@ -105,6 +108,36 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonGC);
 
+        AppCompatButton buttonVkApi = new AppCompatButton(this);
+        buttonVkApi.setText("VKApi: setActivity");
+        buttonVkApi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VKApi.init(VKApi.VKAccount.from(Api.get().getAccount()));
+                VKApi.messages().setActivity().userId(Api.get().getUserId()).execute(VKApi.DEFAULT_RESPONSE_LISTENER);
+            }
+        });
+        rootLayout.addView(buttonVkApi);
+
+        AppCompatButton buttonKateApi = new AppCompatButton(this);
+        buttonKateApi.setText("Kate Api: setActivity");
+        buttonKateApi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ThreadExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Api.get().setMessageActivity(Api.get().getUserId(), null, true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+        rootLayout.addView(buttonKateApi);
+
 //        AppCompatButton buttonNative = new AppCompatButton(this);
 //        buttonNative.setText("Native method");
 //        buttonNative.setOnClickListener(new View.OnClickListener() {
@@ -136,17 +169,6 @@ public class TestActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(buttonClear);
-
-//        FloatingActionsMenu menu = new FloatingActionsMenu(this);
-//
-//        FloatingActionButton button = new FloatingActionButton(this);
-//        button.setIcon(R.drawable.ic_keyboard_arrow_right);
-//        button.setColorNormal(ThemeManager.getColorAccent(this));
-//        button.setColorPressed(ThemeManager.darkenColor(ThemeManager.getColorAccent(this)));
-//        button.setSize(FloatingActionButton.SIZE_MINI);
-//
-//        menu.addButton(button);
-//        rootLayout.addView(menu);
 
     }
 
@@ -182,5 +204,6 @@ public class TestActivity extends BaseThemedActivity {
             }
         }).start();
     }
+
 
 }

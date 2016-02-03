@@ -89,7 +89,7 @@
             android:enabled="true"
             android:exported="true"/>
         <service
-            android:name=".service.EternallOnlineService"
+            android:name=".service.OnlineService"
             android:enabled="true"
             android:exported="true"/>
 

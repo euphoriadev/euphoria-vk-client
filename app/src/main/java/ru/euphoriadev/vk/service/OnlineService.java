@@ -7,10 +7,12 @@ import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
+import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.util.Account;
+import ru.euphoriadev.vk.util.PrefManager;
 
-public class EternallOnlineService extends Service {
+public class OnlineService extends Service {
 
     private Api api;
     private Account account;
@@ -18,7 +20,7 @@ public class EternallOnlineService extends Service {
     private boolean keepPhantomlOnline;
     private String lastAction = "";
 
-    public EternallOnlineService() {
+    public OnlineService() {
     }
 
     @Override
@@ -26,12 +28,12 @@ public class EternallOnlineService extends Service {
         super.onCreate();
 
         api = Api.get();
-
+        PrefManager.putBoolean(SettingsFragment.KEY_IS_LIVE_ONLINE_SERVICE, true);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.w("EternallOnlineService", "onStartCommand");
+        Log.w("OnlineService", "onStartCommand");
         final String action = intent != null ? intent.getStringExtra("online_status").toUpperCase() : "";
         if (lastAction.equals(action)) {
             // попытка запустить один и то же статус второй раз, ничего не делаем
@@ -100,7 +102,8 @@ public class EternallOnlineService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        PrefManager.putBoolean(SettingsFragment.KEY_IS_LIVE_ONLINE_SERVICE, true);
 
-        Log.w("EternallOnlineService", "onDestroy");
+        Log.w("OnlineService", "onDestroy");
     }
 }

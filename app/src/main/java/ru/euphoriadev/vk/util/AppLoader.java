@@ -183,7 +183,7 @@ public class AppLoader extends Application {
     public void updatePreferences() {
         isDarkTheme = sPrefs.getBoolean(SettingsFragment.KEY_IS_NIGHT_MODE, true);
         forcedLocale = sPrefs.getString(SettingsFragment.KEY_FORCED_LOCALE, Locale.getDefault().getLanguage());
-        writeLog = sPrefs.getBoolean(SettingsFragment.KEY_WRITE_LOG, true);
+        writeLog = sPrefs.getBoolean(SettingsFragment.KEY_ENABLE_LOG, true);
         makingDrawerHeader = sPrefs.getString(SettingsFragment.KEY_MAKING_DRAWER_HEADER, "Default");
     }
 

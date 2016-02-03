@@ -307,6 +307,6 @@
 
     <string name="prefs_bug_report">Баг-репорт</string>
     <string name="prefs_enable_log">Активувати логування</string>
-    <string name="prefs_enable_log_description">Зберігати дії програми у файл на SD\пможливо зниження продуктивності на найслабкіших пристроях</string>
+    <string name="prefs_enable_log_description">Зберегти файл з інформацією про помилки на SD при краше додаток</string>
     <string name="prefs_clear_log">Очистити логи</string>
 </resources>

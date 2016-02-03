@@ -28,14 +28,14 @@
 
         <ru.euphoriadev.vk.view.CircleImageView
             android:id="@+id/ivPhoto_message_toolbar"
-            app:border_color="@android:color/white"
-            app:border_width="2dp"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="left"
             android:layout_marginRight="6dp"
             android:src="@drawable/camera_b"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:border_color="@android:color/white"
+            app:border_width="2dp"/>
 
     </android.support.v7.widget.Toolbar>
 
@@ -75,11 +75,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:paddingRight="8dp"
             android:background="@android:color/transparent"
             android:gravity="center"
+            android:minHeight="00dp"
             android:orientation="horizontal"
             android:paddingBottom="12dp"
+            android:paddingRight="8dp"
             android:paddingTop="12dp">
 
             <ImageButton
@@ -96,6 +97,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:background="@drawable/message_sent"
                 android:hint="@string/write_message"
@@ -103,7 +105,6 @@
                 android:maxLines="7"
                 android:minHeight="40dp"
                 android:paddingLeft="6dp"
-                android:layout_marginRight="6dp"
                 tools:text="Test message!"
                 tools:textColor="@color/black"
                 />

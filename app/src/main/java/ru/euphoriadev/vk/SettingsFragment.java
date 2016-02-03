@@ -21,7 +21,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.service.EternallOnlineService;
+import ru.euphoriadev.vk.service.OnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.CrashManager;
@@ -44,16 +44,15 @@ import ru.euphoriadev.vk.view.pref.ProgressBarPreference;
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     /** Preference keys. Making */
     public static final String KEY_IS_NIGHT_MODE = "is_night_theme";
-    public static final String KEY_OLD_BUBBLE_STYLE = "old_bubble_style";
     public static final String KEY_COLOR_IN_MESSAGES = "color_in_messages";
     public static final String KEY_COLOR_OUT_MESSAGES = "color_out_messages";
     public static final String KEY_MAKING_DRAWER_HEADER = "drawer_header";
     public static final String KEY_BLUR_RADIUS = "blur_radius";
     public static final String KEY_SHOW_DIVIDER = "show_divider";
-    public static final String KEY_USE_TWO_PROFILE = "use_two_profile";
-    public static final String KEY_USE_CAT_ICON_SEND = "use_cat_icon_send";
+    public static final String KEY_USE_TWO_PROFILE = "second_profile";
+    public static final String KEY_USE_CAT_ICON_SEND = "cat_icon_send";
     public static final String KEY_FORCED_LOCALE = "forced_locale";
-    public static final String KEY_USE_SYSTEM_EMOJI = "use_system_emoji";
+    public static final String KEY_USE_SYSTEM_EMOJI = "system_emoji";
 
     /** Font keys */
     public static final String KEY_FONT_FAMILY = "font_family";
@@ -69,13 +68,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_ENABLE_NOTIFY_LED = "enable_notify_led";
 
     /** Other keys */
-    public static final String KEY_WRITE_LOG = "write_log";
+    public static final String KEY_ENABLE_LOG = "enable_log";
     public static final String KEY_RESEND_FAILED_MESSAGES = "resend_failed_msg";
     public static final String KEY_ENCRYPT_MESSAGES = "encrypt_messages";
     public static final String KEY_CHECK_UPDATE = "auto_update";
     public static final String KEY_USE_ALTERNATIVE_UPDATE_MESSAGES = "use_alternative_update_messages";
     public static final String KEY_WALLPAPER_PATH = "message_wallpaper_path";
     public static final String KEY_IS_JOIN_GROUP = "is_join_group";
+    public static final String KEY_IS_LIVE_ONLINE_SERVICE = "is_live_online_service";
 
     /** Web url for check updates this app */
     public static final String UPDATE_URL = "http://timeteam.3dn.ru/timevk_up.txt";
@@ -90,9 +90,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //    addPreferencesFromResource(R.xml.prefs);
-
-        //      FastPrefs prefs = new FastPrefs(getActivity())
 
         rootScreen = getPreferenceManager().createPreferenceScreen(getActivity());
         // говорим, что rootScreen - корневой экран
@@ -199,22 +196,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         categoryUI.addPreference(boxColorBubble2);
 
-//        ListPreference bubblePreference = new MaterialListPreference(getActivity());
-//        bubblePreference.setTitle("Стиль пузырьков");
-//        bubblePreference.setKey(KEY_BUBBLE_STYLE);
-//        bubblePreference.setEntries(R.array.prefs_bubbles_array);
-//        bubblePreference.setEntryValues(new String[]{"0", "1", "2", "3"});
-//        bubblePreference.setDefaultValue("0");
-//
-//        categoryUI.addPreference(bubblePreference);
-
-        CheckBoxPreference useOldMessageStyle = new MaterialCheckBoxPreference(getActivity());
-        useOldMessageStyle.setTitle("Old style bubble of message");
-        useOldMessageStyle.setKey(KEY_OLD_BUBBLE_STYLE);
-//        useOldMessageStyle.setSummary("Так же не рекомендуется использовать, ибо есть проблемы с разметкой на маленьких экранах");
-        useOldMessageStyle.setDefaultValue(false);
-
-        categoryUI.addPreference(useOldMessageStyle);
 
         ListPreference listHeaderDrawer = new MaterialListPreference(getActivity());
         listHeaderDrawer.setTitle(getResources().getString(R.string.prefs_drawer));
@@ -231,8 +212,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         blurRadiusPreference.setSummary(R.string.pref_blur_radius_description);
         blurRadiusPreference.setEnabled(PrefManager.getString(KEY_MAKING_DRAWER_HEADER).equalsIgnoreCase("2"));
         blurRadiusPreference.setKey(KEY_BLUR_RADIUS);
-        blurRadiusPreference.setDefaultValue(20);
-        blurRadiusPreference.getSeekBar().setMax(50);
+        blurRadiusPreference.setDefaultValue(19);
+        blurRadiusPreference.getSeekBar().setMax(49);
         blurRadiusPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -242,6 +223,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         categoryUI.addPreference(blurRadiusPreference);
+
 
         CheckBoxPreference boxDivider = new MaterialCheckBoxPreference(getActivity());
         boxDivider.setTitle(getActivity().getString(R.string.prefs_show_divider));
@@ -346,7 +328,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             public boolean onPreferenceChange(Preference preference, Object o) {
                 String s = (String) o;
                 Log.w(KEY_ONLINE_STATUS, s);
-                getActivity().startService(new Intent(getActivity(), EternallOnlineService.class).putExtra("online_status", (String) o));
+                getActivity().startService(new Intent(getActivity(), OnlineService.class).putExtra("online_status", (String) o));
                 return true;
             }
         });
@@ -411,7 +393,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         CheckBoxPreference boxEnableLog = new MaterialCheckBoxPreference(getActivity());
         boxEnableLog.setTitle(R.string.prefs_enable_log);
         boxEnableLog.setSummary(R.string.prefs_enable_log_description);
-        boxEnableLog.setKey(KEY_WRITE_LOG);
+        boxEnableLog.setKey(KEY_ENABLE_LOG);
         boxEnableLog.setDefaultValue(true);
 
         categoryLog.addPreference(boxEnableLog);
@@ -427,8 +409,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        categoryLog.addPreference(preferenceCleanUpLog);
+        Preference preferenceSendLogs = new MaterialPreference(getActivity());
+        preferenceSendLogs.setTitle("Send log to developers");
+        preferenceSendLogs.setEnabled(CrashManager.getLogsDir().listFiles().length != 0);
+        preferenceSendLogs.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                createGmailIntent();
+                return true;
+            }
+        });
 
+        categoryLog.addPreference(preferenceSendLogs);
 
         PreferenceCategory categoryOther = new MaterialPreferenceCategory(getActivity());
         categoryOther.setTitle(getActivity().getString(R.string.prefs_other));
@@ -603,7 +595,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    private void createGmailIntent() {
+        String filePath = CrashManager.getLogsDir().listFiles()[0].getAbsolutePath();
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        // set the type to 'email'
+        emailIntent .setType("vnd.android.cursor.dir/email");
+        String to[] = {"igmorozkin@gmail.com"};
+        emailIntent .putExtra(Intent.EXTRA_EMAIL, to);
+        // the attachment
+        emailIntent .putExtra(Intent.EXTRA_STREAM, filePath);
+        // the mail subject
+        emailIntent .putExtra(Intent.EXTRA_SUBJECT, "Subject");
+        startActivity(Intent.createChooser(emailIntent , "Send email..."));
+
+    }
 
     private void checkUpdate() {
         AndroidUtils.checkUpdate(getActivity(), true);
@@ -616,7 +629,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             // he should update views for typeface
             ViewUtil.refreshViewsForTypeface();
         }
-        Log.w("onSharedPreference", key);
+        if (key.equals(SettingsFragment.KEY_MAKING_DRAWER_HEADER)) {
+
+            Preference preference = findPreference(SettingsFragment.KEY_BLUR_RADIUS);
+            preference.setEnabled(preferences.getString(SettingsFragment.KEY_MAKING_DRAWER_HEADER, "0").equals("2"));
+        }
     }
 
 }

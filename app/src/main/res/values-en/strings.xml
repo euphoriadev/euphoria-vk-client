@@ -150,7 +150,7 @@
 
     <string name="prefs_bug_report">Bug report</string>
     <string name="prefs_enable_log">Enable log</string>
-    <string name="prefs_enable_log_description">Save actions to a file on SD card\nMay reduce performance on slower devices</string>
+    <string name="prefs_enable_log_description">Save file with information about errors on SD when crash app</string>
     <string name="prefs_clear_log">Cleanup logs</string>
     <string name="docs">Docs</string>
     <string name="notes">Notes</string>

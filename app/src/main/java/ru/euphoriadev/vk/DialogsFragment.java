@@ -525,6 +525,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
      */
     private void getDialogs(final boolean onlyUpdate) {
         setRefreshing(true);
+        AndroidUtils.setEdgeGlowColor(listView, ThemeManager.getThemeColor(getActivity()));
         ThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {

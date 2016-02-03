@@ -30,6 +30,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AbsListView;
+import android.widget.EdgeEffect;
 import android.widget.Toast;
 
 import com.squareup.picasso.Transformation;
@@ -41,6 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashSet;
 
 import ru.euphoriadev.vk.BuildConfig;
@@ -423,6 +426,41 @@ public class AndroidUtils {
             return context.getResources().getColor(colorRed, context.getTheme());
         } else {
             return context.getResources().getColor(colorRed);
+        }
+    }
+
+    public static void setEdgeGlowColor(AbsListView listView, int color) {
+        try {
+            Class<?> clazz = AbsListView.class;
+            Field fEdgeGlowTop = clazz.getDeclaredField("mEdgeGlowTop");
+            Field fEdgeGlowBottom = clazz.getDeclaredField("mEdgeGlowBottom");
+            fEdgeGlowTop.setAccessible(true);
+            fEdgeGlowBottom.setAccessible(true);
+            setEdgeEffectColor((EdgeEffect) fEdgeGlowTop.get(listView), color);
+            setEdgeEffectColor((EdgeEffect) fEdgeGlowBottom.get(listView), color);
+        } catch (Exception ignored) {
+
+        }
+    }
+
+    public static void setEdgeEffectColor(EdgeEffect edgeEffect, int color) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                edgeEffect.setColor(color);
+                return;
+            }
+            Field edgeField = EdgeEffect.class.getDeclaredField("mEdge");
+            Field glowField = EdgeEffect.class.getDeclaredField("mGlow");
+            edgeField.setAccessible(true);
+            glowField.setAccessible(true);
+            Drawable mEdge = (Drawable) edgeField.get(edgeEffect);
+            Drawable mGlow = (Drawable) glowField.get(edgeEffect);
+            mEdge.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            mGlow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            mEdge.setCallback(null); // free up any references
+            mGlow.setCallback(null); // free up any references
+        } catch (Exception ignored) {
+
         }
     }
 

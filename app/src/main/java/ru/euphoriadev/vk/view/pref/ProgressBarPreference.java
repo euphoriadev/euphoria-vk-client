@@ -46,13 +46,13 @@ public class ProgressBarPreference extends MaterialPreference implements Refresh
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getTitle());
-        builder.setMessage(getTitle() + ": " + seekBar.getProgress());
+        builder.setMessage(getTitle() + ": " + seekBar.getProgress() + 1);
         builder.setView(seekBar);
         builder.setNegativeButton("Cancel", null);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PrefManager.putInt(getKey(), seekBar.getProgress());
+                PrefManager.putInt(getKey(), seekBar.getProgress() + 1);
 
                 if (getOnPreferenceChangeListener() != null) {
                     getOnPreferenceChangeListener().onPreferenceChange(ProgressBarPreference.this, seekBar.getProgress());

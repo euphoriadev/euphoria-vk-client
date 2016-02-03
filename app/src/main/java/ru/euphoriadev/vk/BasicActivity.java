@@ -47,6 +47,7 @@ import ru.euphoriadev.vk.util.Refreshable;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
+import ru.euphoriadev.vk.vkapi.VKApi;
 
 
 public class BasicActivity extends BaseThemedActivity implements
@@ -62,8 +63,6 @@ public class BasicActivity extends BaseThemedActivity implements
     private Account account;
     private SharedPreferences sPrefs;
     private long backPressedTime;
-
-    private boolean isInitedDrawer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,7 +114,9 @@ public class BasicActivity extends BaseThemedActivity implements
             joinInGroup();
         }
         RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_BLUR_RADIUS);
+        RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_MAKING_DRAWER_HEADER);
         RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_WALLPAPER_PATH);
+
         startService(new Intent(this, LongPollService.class));
         loadWallpaper();
     }
@@ -124,6 +125,7 @@ public class BasicActivity extends BaseThemedActivity implements
     protected void onResume() {
         super.onResume();
     }
+
 
     public Toolbar getToolbar() {
         return toolbar;
@@ -381,9 +383,6 @@ public class BasicActivity extends BaseThemedActivity implements
     }
 
     private void initDrawerHeader() {
-        if (isInitedDrawer) {
-            return;
-        }
         View headerView = navigationView.getHeaderView(0);
         final ImageView drawerImageView = (ImageView) headerView.findViewById(R.id.drawerIvPhoto);
         final TextView drawerTitle = (TextView) headerView.findViewById(R.id.drawerTitle);
@@ -401,7 +400,7 @@ public class BasicActivity extends BaseThemedActivity implements
             drawerBackground.setImageDrawable(null);
             Picasso.with(this)
                     .load(account.photo)
-                    .placeholder(R.drawable.ic_launcher)
+                    .placeholder(R.drawable.camera_b)
                     .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(SettingsFragment.KEY_BLUR_RADIUS, 20)))
                     .into(drawerBackground);
         }
@@ -416,7 +415,6 @@ public class BasicActivity extends BaseThemedActivity implements
                 .load(account.photo)
                 .into(drawerImageView);
 
-        isInitedDrawer = true;
     }
 
     @Override
@@ -429,8 +427,7 @@ public class BasicActivity extends BaseThemedActivity implements
             drawer.closeDrawer(GravityCompat.START);
         } else if (backPressedTime + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
-
-            if (!PrefManager.getBoolean(SettingsFragment.KEY_ENABLE_NOTIFY, true)) {
+            if (!PrefManager.getBoolean(SettingsFragment.KEY_ENABLE_NOTIFY, true) || !PrefManager.getBoolean(SettingsFragment.KEY_IS_LIVE_ONLINE_SERVICE)) {
                 stopService(new Intent(this, LongPollService.class));
                 appLoader.getHandler().postDelayed(new Runnable() {
                     @Override
@@ -449,6 +446,9 @@ public class BasicActivity extends BaseThemedActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        VKApi.close();
+        RefreshManager.unregisterForChangePreferences(this);
+
         DBHelper helper = DBHelper.get(this);
         helper.close();
         helper = null;
@@ -495,10 +495,10 @@ public class BasicActivity extends BaseThemedActivity implements
         // Change blur radius of NavigationView....
 
         ThemeManager.updateThemeValues();
-        if (prefKey.equals(SettingsFragment.KEY_BLUR_RADIUS)) {
-            isInitedDrawer = false;
+        if (prefKey.equals(SettingsFragment.KEY_BLUR_RADIUS) || prefKey.equals(SettingsFragment.KEY_MAKING_DRAWER_HEADER)) {
             initDrawerHeader();
         }
+
         if (prefKey.equals(SettingsFragment.KEY_WALLPAPER_PATH)) {
             loadWallpaper();
         }

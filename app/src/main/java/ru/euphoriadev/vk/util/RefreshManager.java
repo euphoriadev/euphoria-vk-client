@@ -17,14 +17,13 @@ import java.util.ArrayList;
  * @see Refreshable
  */
 public class RefreshManager implements SharedPreferences.OnSharedPreferenceChangeListener {
-    /** Array of Registered items */
-    private static final ArrayList<RefreshItem> sRefreshables = new ArrayList<>();
-    private static RefreshManager sInstance;
+    private static final String TAG = "RefreshManager";
 
     /**
-     * Use if needed listen all changes of preferences,
+     * Array of Registered items
      */
-    public static final String PREF_ALL_KEYS = "all_keys";
+    private static final ArrayList<RefreshItem> sRefreshables = new ArrayList<>();
+    private static RefreshManager sInstance;
 
     /**
      * Initialize RefreshManager, once, when the class is loaded
@@ -42,8 +41,7 @@ public class RefreshManager implements SharedPreferences.OnSharedPreferenceChang
 
 
     /**
-     * Register Object for update preferences,
-     * Use {@link RefreshManager#PREF_ALL_KEYS} if needed listen all changes of preferences
+     * Register Object for update preferences
      *
      * @param object  Refreshable for called
      * @param prefKey a Preferences key wait for updates
@@ -88,20 +86,6 @@ public class RefreshManager implements SharedPreferences.OnSharedPreferenceChang
         }
     }
 
-    private static boolean checkIfEquals(String prefKey) {
-        if (sRefreshables.isEmpty()) {
-            return false;
-        }
-
-        for (int i = 0; i < sRefreshables.size(); i++) {
-            RefreshItem item = sRefreshables.get(i);
-            if (item.preferenceKey.equals(prefKey)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static boolean checkIfEquals(Refreshable refreshable) {
         if (sRefreshables.isEmpty()) {
             return false;
@@ -110,10 +94,8 @@ public class RefreshManager implements SharedPreferences.OnSharedPreferenceChang
         for (int i = 0; i < sRefreshables.size(); i++) {
             RefreshItem item = sRefreshables.get(i);
             Refreshable ref = item.reference.get();
-            if (ref != null) {
-                if (ref == refreshable) {
-                    return true;
-                }
+            if (ref != null && ref == refreshable) {
+                return true;
             }
         }
         return false;

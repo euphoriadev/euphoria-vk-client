@@ -213,6 +213,17 @@ public class VKApi {
         return new VKMethodSetter(new VKRequest(methodName, new VKParams()));
     }
 
+    /**
+     * Release resources, close HttpClient
+     */
+    public synchronized static void close() {
+        if (sInstante == null) {
+            return;
+        }
+        getInstance().mClient.close();
+    }
+
+
 
     /**
      * Account it store the necessary data to run the query on behalf of user
@@ -644,6 +655,38 @@ public class VKApi {
         public VKMessageMethodSetter editChat() {
             return new VKMessageMethodSetter(new VKRequest(("messages.editChat"), new VKParams()));
         }
+
+        /**
+         * Returns a list of IDs of users participating in a chat
+         *
+         * Result:
+         * Returns a list of IDs of chat participants.
+         *
+         * If fields is set, the user fields contains a list of user objects
+         * with an additional invited_by field containing the ID
+         * of the user who invited the current user to chat.
+         *
+         * http://vk.com/dev/messages.getChatUsers
+         */
+        public VKMessageMethodSetter getChatUsers() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getChatUsers"), new VKParams()));
+        }
+
+        /**
+         * Changes the status of a user as typing in a conversation
+         *
+         * Result:
+         * Returns 1.
+         * "User N is typing..." is shown for 10 seconds
+         * after the method is called, or until the message is sent.
+         *
+         * http://vk.com/dev/messages.setActivity
+         */
+        public VKMessageMethodSetter setActivity() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.setActivity"), new VKParams())).type(true);
+        }
+
+
     }
 
     /**
@@ -1652,6 +1695,17 @@ public class VKApi {
          */
         public final VKMessageMethodSetter title(String title) {
             this.request.params.put(VKConst.TITLE, title);
+            return this;
+        }
+
+
+        /** Setters for messages.messages.messages.setActivity */
+
+        /**
+         * typing — user has started to type
+         */
+        public final VKMessageMethodSetter type(boolean typing) {
+            this.request.params.put(VKConst.TYPE, typing ? "typing" : null);
             return this;
         }
     }

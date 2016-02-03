@@ -40,6 +40,7 @@
         • Оптимизация и исправление багов;\n
         • Автообновление;\n
         • Новый вид облака сообщения;\n
+        • Возможность отправить лог разработчикам;\n
         \n
         <u>0.8</u>\n
         • Заметки;\n
@@ -387,7 +388,7 @@
 
     <string name="prefs_bug_report">Баг-репорт</string>
     <string name="prefs_enable_log">Включить логирование</string>
-    <string name="prefs_enable_log_description">Сохранять действия приложения в файл на SD\nВозможно снижения производительности на слабых устройствах</string>
+    <string name="prefs_enable_log_description">Сохранить файл с информацией об ошибках на SD при краше приложение</string>
     <string name="prefs_clear_log">Очистить логи</string>
     <string name="docs">Документы</string>
     <string name="notes">Заметки</string>
@@ -400,7 +401,7 @@
     <string name="attach">Прикрепить</string>
     <string name="set_wallpaper">Фон сообщений</string>
     <string name="pref_blur_radius">Радиус размытия</string>
-    <string name="pref_blur_radius_description">Радиус размытиz главной фотографии профиля в боковой шторке</string>
+    <string name="pref_blur_radius_description">Радиус размытия главной фотографии профиля в боковой шторке</string>
     <string name="show_and_hide_time">Показать/скрыть время</string>
     <string name="dialogs_number">"всего диалогов: "</string>
     <string name="prefs_use_system_emoji">Использовать системные смайлы</string>
