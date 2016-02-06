@@ -196,14 +196,14 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-                // Если находимся в конце списка
-                if (visibleItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
-                    // то скрываем тень
-                    if (vshadow.getVisibility() == View.VISIBLE) vshadow.setVisibility(View.GONE);
-                } else {
-                    // а когда начинаем прокручивать, то она появляется
-                    if (vshadow.getVisibility() == View.GONE) vshadow.setVisibility(View.VISIBLE);
-                }
+//                // Если находимся в конце списка
+//                if (visibleItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
+//                    // то скрываем тень
+//                    if (vshadow.getVisibility() == View.VISIBLE) vshadow.setVisibility(View.GONE);
+//                } else {
+//                    // а когда начинаем прокручивать, то она появляется
+//                    if (vshadow.getVisibility() == View.GONE) vshadow.setVisibility(View.VISIBLE);
+//                }
 
 //                // если находися на 10 position списка - грузим старые сообщеньки
                 if (canLoadOldMessages && adapter != null && firstVisibleItem <= 20) {

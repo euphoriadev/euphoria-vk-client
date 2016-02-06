@@ -40,6 +40,7 @@ import ru.euphoriadev.vk.api.model.VKGroup;
 import ru.euphoriadev.vk.api.model.VKLink;
 import ru.euphoriadev.vk.api.model.VKLongPollServer;
 import ru.euphoriadev.vk.api.model.VKMessage;
+import ru.euphoriadev.vk.api.model.VKMessageAttachment;
 import ru.euphoriadev.vk.api.model.VKNote;
 import ru.euphoriadev.vk.api.model.VKNotifications;
 import ru.euphoriadev.vk.api.model.VKPhoto;
@@ -900,6 +901,22 @@ public class Api {
         JSONArray array = response.optJSONArray("items");
         return parseMessages(array);
     }
+
+    // http://vk.com/dev/messages.getHistoryAttachments
+    public ArrayList<VKMessageAttachment> getHistoryAttachments(int peer_id, String media_type, Integer offset, Integer count, Boolean photo_sizes) throws IOException, JSONException, KException {
+        VKParams params = new VKParams("messages.getHistoryAttachments");
+        params.put("peer_id", peer_id);
+        params.put("media_type", media_type);
+        params.put("offset", offset);
+        params.put("count", count);
+        params.put("count", count);
+        params.put("photo_sizes", photo_sizes);
+
+        JSONObject request = sendRequest(params);
+        JSONObject response = request.optJSONObject("response");
+        return VKMessageAttachment.parseArray(response.optJSONArray("items"), media_type, response.optInt("next_from"));
+    }
+
 
     //http://vk.com/dev/messages.getLongPollServer
     public VKLongPollServer getLongPollServer(String captcha_key, String captcha_sid) throws IOException, JSONException, KException {

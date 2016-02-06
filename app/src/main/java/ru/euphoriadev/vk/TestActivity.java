@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import org.json.JSONObject;
+
+import java.util.Random;
+
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
@@ -16,6 +20,7 @@ import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
+import ru.euphoriadev.vk.util.ResourcesLoader;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.vkapi.VKApi;
@@ -138,6 +143,43 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonKateApi);
 
+        AppCompatButton buttonSend = new AppCompatButton(this);
+        buttonSend.setText("VKApi: Send message to me");
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VKApi.init(VKApi.VKAccount.from(Api.get().getAccount()));
+                tvResult.append("Sending message...\n");
+                final long startTime = System.currentTimeMillis();
+
+                VKApi.messages()
+                        .send()
+                        .message("This is text message from Euphoria")
+                        .guid(new Random().nextInt())
+                        .userId(VKApi.getAccount().userId)
+                        .execute(new VKApi.VKOnResponseListener() {
+                            @Override
+                            public void onResponse(JSONObject responseJson) {
+                                long endTime = System.currentTimeMillis() - startTime;
+                                tvResult.append("Message is sent. ");
+                                tvResult.append("Time has passed: ");
+                                tvResult.append(String.valueOf(endTime));
+                                tvResult.append(" ms\n");
+                            }
+
+                            @Override
+                            public void onError(VKApi.VKException exception) {
+                                tvResult.append("Error sending message!\n");
+                                tvResult.append("Error code: " + exception.errorCode + "\n");
+                                tvResult.append("Error message: " + exception.errorMessage + "\n");
+                            }
+                        });
+            }
+        });
+        rootLayout.addView(buttonSend);
+
+
+
 //        AppCompatButton buttonNative = new AppCompatButton(this);
 //        buttonNative.setText("Native method");
 //        buttonNative.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +212,12 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonClear);
 
+        int array[][] = ResourcesLoader.getThemeColoursPalette(this);
+        for (int i = 0; i < ResourcesLoader.sColors.size(); i++) {
+            AppCompatButton button = new AppCompatButton(this);
+            button.setBackgroundColor(ResourcesLoader.sColors.valueAt(i));
+            rootLayout.addView(button);
+        }
     }
 
     private void connectToGoogle() {

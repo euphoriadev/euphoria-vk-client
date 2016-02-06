@@ -14,6 +14,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.IBinder;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -351,8 +352,21 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
         switch (item.status) {
             case SENT:
-                if (mShowTime)
-                holder.tvDate.setText(sdf.format(item.date));
+                if (mShowTime) {
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.tvDate.getLayoutParams();
+                    params.gravity = item.message.is_out ? Gravity.END : Gravity.START;
+                    holder.tvDate.setLayoutParams(params);
+                    holder.tvDate.setText("");
+                    if (item.message.isChat()) {
+                        if (!item.message.is_out) {
+                            holder.tvDate.setText(Html.fromHtml("<b>" + item.user.first_name + "</b>"));
+                                    holder.tvDate.append(",  ");
+                         }
+                        holder.tvDate.append(sdf.format(item.date));
+                    } else {
+                        holder.tvDate.setText(sdf.format(item.date));
+                    }
+                }
                 break;
 
             case SENDING:

@@ -604,17 +604,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void createGmailIntent() {
         String filePath = CrashManager.getLogsDir().listFiles()[0].getAbsolutePath();
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        // set the type to 'email'
-        emailIntent .setType("vnd.android.cursor.dir/email");
-        String to[] = {"igmorozkin@gmail.com"};
-        emailIntent .putExtra(Intent.EXTRA_EMAIL, to);
-        // the attachment
+
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Crash app");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Hey, Euphoria app is crashed, please fix");
+        emailIntent.setData(Uri.parse("mailto:igmorozkin@gmail.com"));
+
+//        emailIntent.setType("message/rfc822");
+//        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"igmorozkin@gmail.com"});
+//        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
+//        emailIntent.putExtra(Intent.EXTRA_TEXT, "Hey, Euphoria app is crashed, please fix!");
         emailIntent .putExtra(Intent.EXTRA_STREAM, filePath);
-        // the mail subject
-        emailIntent .putExtra(Intent.EXTRA_SUBJECT, "Subject");
-        startActivity(Intent.createChooser(emailIntent , "Send email..."));
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(getActivity(), "GMail client is not installed!", Toast.LENGTH_SHORT).show();
+        }
 
     }
 

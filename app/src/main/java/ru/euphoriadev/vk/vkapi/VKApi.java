@@ -36,7 +36,9 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
  * Created by Igor on 15.01.16.
  * <p/>
  * a Simple new VK Library for execute request.
- * This library is a "mixture" of "VK-SDK" and "VK-Android-SDK by Thest1" library
+ * This library is a "mixture" of "VK-SDK" and "VK-Android-SDK by Thest1" library.
+ * For more information about VK API - please, visit the official documentation
+ * https://vk.com/dev/main
  *
  * <p/>
  * Example to init api and execute users.get request:
@@ -55,9 +57,9 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
 public class VKApi {
     public static final String TAG = "Euphoria.VKApi";
     public static final String BASE_URL = "https://api.vk.com/method/";
-//  public static final String API_VERSION = "5.14";
     public static final String API_VERSION = "5.44";
 
+    public static final int OFFSET_PEER_ID = 2_000_000_000;
     public static final VKOnResponseListener DEFAULT_RESPONSE_LISTENER = new VKOnResponseListener() {
         @Override
         public void onResponse(JSONObject responseJson) {
@@ -66,11 +68,12 @@ public class VKApi {
 
         @Override
         public void onError(VKException exception) {
+            exception.printStackTrace();
             AndroidUtils.post(new RunnableToast(AppLoader.appContext, exception.getMessage(), true));
         }
     };
 
-    protected static volatile VKApi sInstante;
+    private static volatile VKApi instance;
 
     private VKAccount mAccount;
     private AsyncHttpClient mClient;
@@ -81,11 +84,11 @@ public class VKApi {
      * @param account the vk account,
      *                on behalf of which to send requests to server VK
      */
-    public static VKApi init(VKAccount account) {
-        if (sInstante == null) {
-            sInstante = new VKApi(account);
+    public static synchronized VKApi init(VKAccount account) {
+        if (instance == null) {
+            instance = new VKApi(account);
         }
-        return sInstante;
+        return instance;
     }
 
     /**
@@ -100,18 +103,19 @@ public class VKApi {
 
     /**
      * Get initialized VKApi
-     *
-     * @return vk api
      */
     public static VKApi getInstance() {
-        if (sInstante == null) {
+        if (instance == null) {
             throw new IllegalArgumentException("You must to initialize VKApi");
         }
-        return sInstante;
+        return instance;
     }
 
-    public VKAccount getAccount() {
-        return mAccount;
+    /**
+     * Return current account from api
+     */
+    public static VKAccount getAccount() {
+        return getInstance().mAccount;
     }
 
     /**
@@ -147,7 +151,12 @@ public class VKApi {
     public static JSONObject execute(String code) {
         VKRequest request = new VKRequest("execute");
         request.params.put(VKConst.CODE, code);
-        return request.execute();
+        try {
+            return request.execute();
+        } catch (HttpResponseCodeException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -217,7 +226,7 @@ public class VKApi {
      * Release resources, close HttpClient
      */
     public synchronized static void close() {
-        if (sInstante == null) {
+        if (instance == null) {
             return;
         }
         getInstance().mClient.close();
@@ -248,7 +257,7 @@ public class VKApi {
         /**
          * Current user id for this token
          */
-        public long userId;
+        public int userId;
 
         /**
          * Api id of standalone vk app
@@ -340,7 +349,7 @@ public class VKApi {
          */
         public VKAccount restore() {
             this.accessToken = PrefManager.getString(ACCESS_TOKEN);
-            this.userId = PrefManager.getLong(USER_ID);
+            this.userId = (int) PrefManager.getLong(USER_ID);
             this.apiId = PrefManager.getInt(API_ID);
             this.email = PrefManager.getString(EMAIL);
             return this;
@@ -367,7 +376,9 @@ public class VKApi {
             return this;
         }
 
-
+        /**
+         * Remove account properties from SharedPreferences
+         */
         public void clear() {
             PrefManager.remove(ACCESS_TOKEN);
             PrefManager.remove(USER_ID);
@@ -486,6 +497,19 @@ public class VKApi {
          */
         public VKMessageMethodSetter getHistory() {
             return new VKMessageMethodSetter(new VKRequest(("messages.getHistory"), new VKParams()));
+        }
+        /**
+         * Returns media files from the dialog or group chat
+         *
+         * Result:
+         * Returns a list of photo, video, audio or doc objects depending
+         * on media_type parameter value
+         * and additional next_from field containing new offset value
+         *
+         * http://vk.com/dev/messages.getHistoryAttachments
+         */
+        public VKMessageMethodSetter getHistoryAttachments() {
+            return new VKMessageMethodSetter(new VKRequest(("messages.getHistoryAttachments"), new VKParams()));
         }
 
         /**
@@ -1028,7 +1052,7 @@ public class VKApi {
         /**
          * Execute request and convert to {@link JSONObject}
          */
-        public JSONObject execute() {
+        public JSONObject execute() throws HttpResponseCodeException {
             return this.request.execute();
         }
 
@@ -1708,6 +1732,34 @@ public class VKApi {
             this.request.params.put(VKConst.TYPE, typing ? "typing" : null);
             return this;
         }
+
+
+        /** Setters for messages.messages.messages.getHistoryAttachments */
+
+        /**
+         * Type of media files to return:
+         * - photo;
+         * - video;
+         * - audio;
+         * - doc;
+         * - link.
+         * Use {@link VKConst}
+         */
+        public final VKMessageMethodSetter mediaType(String type) {
+            this.request.params.put(VKConst.MEDIA_TYPE, type);
+            return this;
+        }
+
+        /**
+         * true — to return photo sizes in
+         * a special format (https://vk.com/dev/photo_sizes)
+         */
+        public final VKMessageMethodSetter photoSizes(boolean photoSizes) {
+            this.request.params.put(VKConst.PHOTO_SIZES, photoSizes);
+            return this;
+        }
+
+
     }
 
     /**
@@ -2084,14 +2136,14 @@ public class VKApi {
         }
 
         private String getSignedUrl() {
-            if (!params.containsKey("access_token")) {
-                params.put("access_token", VKApi.getInstance().getAccount().accessToken);
+            if (!params.containsKey(VKConst.ACCESS_TOKEN)) {
+                params.put(VKConst.ACCESS_TOKEN, VKApi.getAccount().accessToken);
             }
-            if (!params.containsKey("v")) {
-                params.put("v", API_VERSION);
+            if (!params.containsKey(VKConst.VERSION)) {
+                params.put(VKConst.VERSION, API_VERSION);
             }
-            if (!params.containsKey("lang") && useSystemLanguage) {
-                params.put("lang", Locale.getDefault().getLanguage());
+            if (!params.containsKey(VKConst.LANG) && useSystemLanguage) {
+                params.put(VKConst.LANG, Locale.getDefault().getLanguage());
             }
 
             String args = "";
@@ -2103,23 +2155,16 @@ public class VKApi {
         /**
          * Execute request and convert to {@link JSONObject}
          */
-        public JSONObject execute() {
+        public JSONObject execute() throws HttpResponseCodeException {
             String url = getSignedUrl();
             HttpRequest request;
 
             request = new HttpRequest(url, isPost ? "POST" : "GET", null);
 
-            HttpResponse response = null;
+            HttpResponse response = getInstance().mClient.execute(request);
             try {
-                response = getInstance().mClient.execute(request);
-                if (response != null) {
-                    try {
-                        return new JSONObject(response.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (HttpResponseCodeException e) {
+                return new JSONObject(response.toString());
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
             return null;
@@ -2327,6 +2372,14 @@ public class VKApi {
         public static final String MSGS_LIMIT = "msgs_limit";
         public static final String MAX_MSG_ID = "max_msg_id";
         public static final String TITLE = "title";
+        public static final String MEDIA_TYPE = "media_type";
+
+        /** Media types for attachments */
+        public static final String MEDIA_TYPE_AUDIO = "audio";
+        public static final String MEDIA_TYPE_VIDEO = "video";
+        public static final String MEDIA_TYPE_PHOTO = "photo";
+        public static final String MEDIA_TYPE_LINK = "link";
+        public static final String MEDIA_TYPE_DOC = "photo";
 
         /** Friends */
         public static final String LIST_ID = "list_id";
@@ -2444,26 +2497,33 @@ public class VKApi {
 
         @Override
         protected JSONObject doInBackground(final VKRequest... params) {
-            final JSONObject response = params[0].execute();
-            checkError(params[0], response);
-            return response;
+            final JSONObject response;
+            try {
+                response = params[0].execute();
+                checkError(params[0], response);
+                return response;
+            } catch (final HttpResponseCodeException e) {
+                if (listener != null) {
+                    AndroidUtils.runOnUi(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (e instanceof VKException) {
+                                listener.onError((VKException) e);
+                            } else {
+                                listener.onError(new VKException(params[0].getSignedUrl(), e.responseMessage, e.responseCode));
+                            }
+                        }
+                    });
+                }
+            }
+            return null;
         }
 
-        private void checkError(final VKRequest request, final JSONObject json) {
-            AndroidUtils.runOnUi(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        VKUtil.checkErrors(request.getSignedUrl(), json);
-                    } catch (VKException e) {
-                        e.printStackTrace();
-
-                        if (listener != null) {
-                            listener.onError(e);
-                        }
-                    }
-                }
-            });
+        /**
+         * Check errors for vk
+         */
+        private void checkError(final VKRequest request, final JSONObject json) throws VKException {
+            VKUtil.checkErrors(request.getSignedUrl(), json);
         }
 
         @Override
@@ -2480,7 +2540,7 @@ public class VKApi {
      * Thrown when server vk could not handle the request
      * see website to get description of error codes: http://vk.com/dev/errors
      */
-    public static class VKException extends Exception {
+    public static class VKException extends HttpResponseCodeException {
         public String url;
         public String errorMessage;
         public int errorCode;
@@ -2509,7 +2569,7 @@ public class VKApi {
         public String redirectUri;
 
         public VKException(String url, String errorMessage, int errorCode) {
-            super(errorMessage);
+            super(errorMessage, errorCode);
             this.url = url;
             this.errorMessage = errorMessage;
             this.errorCode = errorCode;
@@ -2657,23 +2717,76 @@ public class VKApi {
      * Scope constants used for authorization, see http://vk.com/dev/permissions
      */
     public static class VKScope {
+        /**
+         * User allowed to send notifications to him/her
+         */
         public static final String NOTIFY = "notify";
+        /**
+         * Access to friends
+         */
         public static final String FRIENDS = "friends";
+        /**
+         * Access to photos
+         */
         public static final String PHOTOS = "photos";
+        /**
+         * Access to audios
+         */
         public static final String AUDIO = "audio";
+        /**
+         * Access to videos
+         */
         public static final String VIDEO = "video";
+        /**
+         * Access to documents
+         */
         public static final String DOCS = "docs";
+        /**
+         * Access to user notes
+         */
         public static final String NOTES = "notes";
+        /**
+         * Access to wiki pages
+         */
         public static final String PAGES = "pages";
+        /**
+         * Access to user status
+         */
         public static final String STATUS = "status";
+        /**
+         * Access to standard and advanced methods for the wall
+         */
         public static final String WALL = "wall";
+        /**
+         * Access to user groups
+         */
         public static final String GROUPS = "groups";
+        /**
+         * Access to advanced methods for messaging
+         */
         public static final String MESSAGES = "messages";
+        /**
+         * Access to notifications about answers to the user
+         */
         public static final String NOTIFICATIONS = "notifications";
+        /**
+         * Access to statistics of user groups and
+         * applications where he/she is an administrator
+         */
         public static final String STATS = "stats";
+        /**
+         * Access to advanced methods for Ads API
+         */
         public static final String ADS = "ads";
+        /**
+         * Access to API at any time
+         */
         public static final String OFFLINE = "offline";
         public static final String EMAIL = "email";
+        /**
+         * Possibility to make API requests without HTTPS.
+         * Note that this functionality is under testing and can be changed
+         */
         public static final String NOHTTPS = "nohttps";
         public static final String DIRECT = "direct";
 

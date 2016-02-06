@@ -92,6 +92,8 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         ((BaseThemedActivity) getActivity())
                 .getSupportActionBar()
                 .setSubtitle(activity.getString(R.string.dialogs_number) + PrefManager.getInt("message_count", 0));
+        ((BasicActivity) getActivity()).getToolbar();
+        ViewUtil.setColor(((BasicActivity) getActivity()).getToolbar(), ThemeManager.getPrimaryTextColorOnThemeColor(getActivity()));
 
         listView = (ListView) rootView.findViewById(R.id.lvMess);
         tm.initDivider(listView);
@@ -176,7 +178,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 //        fab.setImageDrawable(iconPlus);
         fab.setShadow(true);
         fab.setColorPressed(ViewUtil.getPressedColor(fab.getColorNormal()));
-        fab.setColorRipple(getActivity().getResources().getColor(R.color.ripple_material_dark));
         fab.attachToListView(listView, swipeLayout);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Handler;
@@ -42,6 +41,7 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
@@ -261,12 +261,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         }
         holder.tvDate.setText(sdf.format(item.date.getTime()));
 
-
-        if (tManager.isTheme("DARK") || tManager.isTheme("BLACK")) {
-            holder.tvUnreadCount.setTextColor(Color.BLACK);
-        } else
-            holder.tvUnreadCount.setTextColor(Color.WHITE);
-
+        holder.tvUnreadCount.setTextColor(ThemeManager.getPrimaryTextColorOnAccent(context));
         if (message.isChat()) {
 //            IconicsDrawable iconChat = new IconicsDrawable(context, GoogleMaterial.Icon.gmd_people);
 //            iconChat.sizeDp(20);
