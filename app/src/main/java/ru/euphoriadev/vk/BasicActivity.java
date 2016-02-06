@@ -248,10 +248,6 @@ public class BasicActivity extends BaseThemedActivity implements
             fragmentManager.beginTransaction()
                     .replace(R.id.content_frame, currentFragment).commit();
 
-            // Highlight the selected item, update the title, and close the drawer
-            //  mDrawerList.setItemChecked(position, true);
-            //  setTitle(mScreenTitles[position]);
-            // mDrawerLayout.closeDrawer(mDrawerList);
         } else {
             // Error
             Log.e(this.getClass().getName(), "Error. Fragment is not created");

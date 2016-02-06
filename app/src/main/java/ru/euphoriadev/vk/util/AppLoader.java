@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 16.11.15.
@@ -63,6 +64,7 @@ public class AppLoader extends Application {
         createAppDir();
 
         CrashManager.init();
+        VKApi.init(new VKApi.VKAccount().restore());
     }
 
     /**

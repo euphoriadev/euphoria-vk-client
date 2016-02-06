@@ -26,7 +26,7 @@ import ru.euphoriadev.vk.util.AndroidUtils;
  */
 public class AsyncHttpClient implements Closeable {
     public static final String TAG = "AsyncHttpClient";
-    public static final int DEFAULT_THREADS_SIZE = 1;
+    public static final int DEFAULT_THREADS_SIZE = 3;
     private Context mContent;
     private int mThreadsSize;
     private ExecutorService mExecutor;

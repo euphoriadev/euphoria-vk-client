@@ -20,7 +20,6 @@ import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
-import ru.euphoriadev.vk.util.ResourcesLoader;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.vkapi.VKApi;
@@ -179,18 +178,6 @@ public class TestActivity extends BaseThemedActivity {
         rootLayout.addView(buttonSend);
 
 
-
-//        AppCompatButton buttonNative = new AppCompatButton(this);
-//        buttonNative.setText("Native method");
-//        buttonNative.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                tvResult.append(NativeUtils.helloFromJni());
-//                System.gc();
-//            }
-//        });
-//        rootLayout.addView(buttonNative);
-
         AppCompatButton buttonDownEmoji = new AppCompatButton(this);
         buttonDownEmoji.setText("Download emojis now");
         buttonDownEmoji.setOnClickListener(new View.OnClickListener() {
@@ -212,12 +199,7 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonClear);
 
-        int array[][] = ResourcesLoader.getThemeColoursPalette(this);
-        for (int i = 0; i < ResourcesLoader.sColors.size(); i++) {
-            AppCompatButton button = new AppCompatButton(this);
-            button.setBackgroundColor(ResourcesLoader.sColors.valueAt(i));
-            rootLayout.addView(button);
-        }
+
     }
 
     private void connectToGoogle() {

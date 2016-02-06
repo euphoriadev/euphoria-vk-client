@@ -6,7 +6,7 @@ import java.util.Arrays;
  * Created by Igor on 05.02.16.
  * <p/>
  * Especially for {@link ResourcesLoader}.
- *
+ * <p/>
  * The thing is, SparseArray puts items randomly,
  * so I can't get the palette in the correct order
  * <p/>
@@ -63,9 +63,15 @@ public class SimpleSparseArray implements Cloneable {
         if (mSize > mKeys.length) {
             throw new RuntimeException("Capacity is overflow");
         }
+
+        int index = indexOf(key);
+        if (index >= 0) {
+            mValues[index] = value;
+            return;
+        }
+
         mKeys[mSize] = key;
         mValues[mSize] = value;
-
         mSize++;
     }
 
@@ -106,7 +112,7 @@ public class SimpleSparseArray implements Cloneable {
      * @param key the key to remove value
      */
     public void remove(int key) {
-        int index = ArrayUtil.linearSearch(mKeys, key);
+        int index = indexOf(key);
 
         if (index >= 0) {
             removeAt(index);
@@ -131,7 +137,7 @@ public class SimpleSparseArray implements Cloneable {
      * @return int value mapped from specified key
      */
     public int get(int key, int defValue) {
-        int index = ArrayUtil.linearSearch(mKeys, key);
+        int index = indexOf(key);
         if (index >= 0) {
             return mValues[index];
         }
@@ -144,6 +150,15 @@ public class SimpleSparseArray implements Cloneable {
      */
     public int size() {
         return mSize;
+    }
+
+    /**
+     * Get key at index
+     *
+     * @param index the index to find key
+     */
+    public int keyAt(int index) {
+        return mKeys[index];
     }
 
     /**
@@ -162,17 +177,27 @@ public class SimpleSparseArray implements Cloneable {
      * @return true, if this contains key
      */
     public boolean containsKey(int key) {
-        return ArrayUtil.linearSearch(mKeys, key) != ArrayUtil.VALUE_NOT_FOUND;
+        return indexOf(key) >= 0;
     }
 
     /**
-     * * Returns whether this map contains the specified value
+     * Returns whether this map contains the specified value
      *
      * @param value the value to search
      * @return true, if this contains value
      */
     public boolean containsValue(int value) {
-        return ArrayUtil.linearSearch(mValues, value) != ArrayUtil.VALUE_NOT_FOUND;
+        return ArrayUtil.linearSearch(mValues, value) >= 0;
+    }
+
+    /**
+     * Returns the index of first found key, or -1 if this not contains key
+     *
+     * @param key the key to get index
+     * @return the index of key
+     */
+    public int indexOf(int key) {
+        return ArrayUtil.linearSearch(mKeys, key);
     }
 
     /**
@@ -192,4 +217,25 @@ public class SimpleSparseArray implements Cloneable {
     }
 
 
+    @Override
+    public String toString() {
+        if (mSize <= 0) {
+            return "{}";
+        }
+
+        StringBuilder buffer = new StringBuilder(mSize * 16);
+        buffer.append('{');
+        for (int i=0; i<mSize; i++) {
+            if (i > 0) {
+                buffer.append(", ");
+            }
+            int key = keyAt(i);
+            buffer.append(key);
+            buffer.append('=');
+            int value = valueAt(i);
+            buffer.append(value);
+        }
+        buffer.append('}');
+        return buffer.toString();
+    }
 }

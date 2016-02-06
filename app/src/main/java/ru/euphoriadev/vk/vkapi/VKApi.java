@@ -1,6 +1,7 @@
 package ru.euphoriadev.vk.vkapi;
 
 import android.os.AsyncTask;
+import android.os.Process;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -18,6 +19,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
@@ -73,6 +76,8 @@ public class VKApi {
         }
     };
 
+    /** For execute requests on background */
+    private static final ExecutorService VK_SINGLE_EXECUTOR = Executors.newSingleThreadExecutor();
     private static volatile VKApi instance;
 
     private VKAccount mAccount;
@@ -98,7 +103,7 @@ public class VKApi {
      */
     private VKApi(VKAccount account) {
         this.mAccount = account;
-        this.mClient = new AsyncHttpClient(null);
+        this.mClient = new AsyncHttpClient(null, 1);
     }
 
     /**
@@ -169,7 +174,7 @@ public class VKApi {
     public static void execute(String code, VKOnResponseListener listener) {
         VKRequest request = new VKRequest("execute");
         request.params.put(VKConst.CODE, code);
-        new VKAsyncRequestTask(listener).execute(request);
+        new VKAsyncRequestTask(listener).executeOnExecutor(VK_SINGLE_EXECUTOR, request);
     }
 
     /**
@@ -230,6 +235,7 @@ public class VKApi {
             return;
         }
         getInstance().mClient.close();
+        VK_SINGLE_EXECUTOR.shutdown();
     }
 
 
@@ -1063,7 +1069,7 @@ public class VKApi {
          *                 Called in main (UI) thread
          */
         public void execute(VKOnResponseListener listener) {
-            new VKAsyncRequestTask(listener).execute(request);
+            new VKAsyncRequestTask(listener).executeOnExecutor(VK_SINGLE_EXECUTOR, request);
         }
 
     }
@@ -2497,6 +2503,7 @@ public class VKApi {
 
         @Override
         protected JSONObject doInBackground(final VKRequest... params) {
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             final JSONObject response;
             try {
                 response = params[0].execute();

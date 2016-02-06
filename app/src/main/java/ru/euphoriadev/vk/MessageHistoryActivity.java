@@ -73,6 +73,7 @@ import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.util.YandexTranslator;
 import ru.euphoriadev.vk.view.FixedListView;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
+import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 15.03.15.
@@ -98,7 +99,9 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     private long lastTypeNotification;
     private boolean forceClose;
     private boolean hideTyping;
-    /** can I load old messages, If false, then messages are loading */
+    /**
+     * can I load old messages, If false, then messages are loading
+     */
     private boolean canLoadOldMessages;
 
 
@@ -419,7 +422,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
                                 case 0:
-                                    pickImageFromGallery(); break;
+                                    pickImageFromGallery();
+                                    break;
                                 case 1:
                                     PrefManager.putString(SettingsFragment.KEY_WALLPAPER_PATH, null);
                                     ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
@@ -752,16 +756,11 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             return;
         }
         this.lastTypeNotification = System.currentTimeMillis();
-        ThreadExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    api.setMessageActivity(uid, chat_id, true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        VKApi.messages()
+                .setActivity()
+                .chatId(chat_id)
+                .userId(uid)
+                .execute(VKApi.DEFAULT_RESPONSE_LISTENER);
     }
 
     private void getChatMembers() {
@@ -1215,13 +1214,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             }
             if (!AndroidUtils.isInternetConnection(MessageHistoryActivity.this)) {
                 // if user not have internet connection
-                AndroidUtils.runOnUi(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MessageHistoryActivity.this, R.string.check_internet, Toast.LENGTH_SHORT).show();
-                    }
-                });
                 cursor.close();
+                AndroidUtils.post(new RunnableToast(MessageHistoryActivity.this, R.string.check_internet, true));
                 return null;
             }
             ArrayList<VKMessage> messages = loadMessagesFromNetwork();
@@ -1250,18 +1244,10 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 users.put(user.user_id, user);
             }
 
-//            boolean catSet = history.size() == messages.size();
-//            if (!catSet) {
-//                history.clear();
-//            }
             // Reverse adding
             for (int i = messages.size() - 1; i >= 0; i--) {
                 VKMessage message = messages.get(i);
-//                if (catSet) {
-//                    history.set(i, new MessageItem(message, users.get(message.uid)));
-//                } else {
-                    history.add(new MessageItem(message, users.get(message.uid)));
-//                }
+                history.add(new MessageItem(message, users.get(message.uid)));
             }
 
             cursor.close();
@@ -1296,7 +1282,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
             } else if (adapter != lvHistory.getAdapter()) {
                 lvHistory.setAdapter(adapter);
-            } else if (!PrefManager.getBoolean(SettingsFragment.KEY_USE_ALTERNATIVE_UPDATE_MESSAGES)){
+            } else if (!PrefManager.getBoolean(SettingsFragment.KEY_USE_ALTERNATIVE_UPDATE_MESSAGES)) {
                 adapter.notifyDataSetChanged();
             } else {
                 lvHistory.setAdapter(adapter);
@@ -1321,12 +1307,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 return Api.get().getMessagesHistory(uid, chat_id, this.offset, this.count, false);
             } catch (Exception e) {
                 e.printStackTrace();
-                AndroidUtils.runOnUi(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MessageHistoryActivity.this, R.string.check_internet, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                AndroidUtils.runOnUi(new RunnableToast(MessageHistoryActivity.this, R.string.check_internet, true));
             }
             return new ArrayList<>(0);
         }

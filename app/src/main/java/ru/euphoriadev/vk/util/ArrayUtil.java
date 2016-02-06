@@ -12,6 +12,10 @@ public class ArrayUtil {
     public static final int VALUE_NOT_FOUND = -1;
 
 
+    private ArrayUtil() {
+        /* empty */
+    }
+
     /**
      * Performs a linear search for value in the ascending array.
      * Beware that linear search returns only the first found element.

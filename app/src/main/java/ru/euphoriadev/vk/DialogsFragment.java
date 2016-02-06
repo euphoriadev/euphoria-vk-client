@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,7 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,6 +40,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import ru.euphoriadev.vk.adapter.DialogAdapter;
 import ru.euphoriadev.vk.adapter.DialogItem;
@@ -45,12 +49,14 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 import ru.euphoriadev.vk.vkapi.VKApi;
@@ -76,7 +82,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     SQLiteDatabase database = null;
     SharedPreferences preferences;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -170,7 +175,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container_messenges);
         swipeLayout.setOnRefreshListener(this);
         swipeLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN, Color.BLACK);
-
 
 
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -328,8 +332,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
      * @see ArrayList
      * @see Cursor
      */
-    private ArrayList<DialogItem> getDialogsFrom(SQLiteDatabase database) {
-        ArrayList<DialogItem> listDialogs = new ArrayList<>(30);
+    private void getDialogsFrom(SQLiteDatabase database) {
         Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.DIALOGS_TABLE +
                 " LEFT JOIN " + DBHelper.USERS_TABLE +
                 " ON " + DBHelper.DIALOGS_TABLE + "." + DBHelper.USER_ID +
@@ -338,7 +341,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         // Cursor is empty
         if (cursor.getCount() <= 0) {
             cursor.close();
-            return listDialogs;
+            return;
         }
 
         while (cursor.moveToNext()) {
@@ -374,10 +377,9 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             u.last_name = lastNameUser;
             u.photo_50 = photo50User;
 
-            listDialogs.add(new DialogItem(m, u));
+            dialogItems.add(new DialogItem(m, u));
         }
         cursor.close();
-        return listDialogs;
     }
 
     /**
@@ -386,69 +388,19 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
      * @param database база данных
      * @param users    список пользователей, которые улетят в бд
      */
-    private void insertUsersTo(SQLiteDatabase database, Collection<VKUser> users, boolean withTransaction) {
-        Log.w(TAG, "Insert users to database");
-        if (withTransaction) {
-            database.beginTransaction();
-        }
-        ContentValues cv = new ContentValues();
-        for (VKUser user : users) {
-
-            cv.put(DBHelper.USER_ID, user.user_id);
-            cv.put(DBHelper.FIRST_NAME, user.first_name);
-            cv.put(DBHelper.LAST_NAME, user.last_name);
-            cv.put(DBHelper.LAST_SEEN, user.last_name);
-//          cv.put(DBHelper.SCREEN_NAME, user.screen_name);
-            cv.put(DBHelper.ONLINE, user.online);
-            cv.put(DBHelper.ONLINE_MOBILE, user.online_mobile);
-            cv.put(DBHelper.STATUS, user.status);
-            cv.put(DBHelper.PHOTO_50, user.photo_50);
-//          cv.put(DBHelper.PHOTO_100, user.photo_50);
-
-            if (database.update(DBHelper.USERS_TABLE, cv, "user_id = ?", new String[]{String.valueOf(user.user_id)}) == 0)
-                database.insert(DBHelper.USERS_TABLE, null, cv);
-        }
-        if (withTransaction) {
-            database.setTransactionSuccessful();
-            database.endTransaction();
-        }
-        cv.clear();
+    private void insertUsersTo(SQLiteDatabase database, List<VKUser> users, boolean withTransaction) {
+        VKInsertHelper.updateUsers(database, users, withTransaction);
     }
 
     /**
      * Вставка сообщений в таблицу {@link DBHelper#DIALOGS_TABLE}
      *
-     * @param database бд
-     * @param messages список сообщений, которые необходимо занести в бд
+     * @param database        бд
+     * @param messages        список сообщений, которые необходимо занести в бд
      * @param withTransaction применить транзекцию, для более быстрой вставки
      */
     private void insertMessagesTo(SQLiteDatabase database, ArrayList<VKMessage> messages, boolean withTransaction) {
-        Log.w(TAG, "Insert messages to database");
-        ContentValues cv = new ContentValues();
-        if (withTransaction) {
-            database.beginTransaction();
-        }
-        for (int i = 0; i < messages.size(); i++) {
-            VKMessage m = messages.get(i);
-
-            cv.put(DBHelper.TITLE, m.title);
-            cv.put(DBHelper.BODY, m.body);
-            cv.put(DBHelper.USER_ID, m.uid);
-            cv.put(DBHelper.CHAT_ID, m.chat_id);
-            cv.put(DBHelper.UNREAD_COUNT, m.unread);
-            cv.put(DBHelper.DATE, m.date);
-            cv.put(DBHelper.PHOTO_50, m.photo_50);
-            cv.put(DBHelper.IS_OUT, m.is_out);
-            cv.put(DBHelper.USERS_COUNT, m.users_count);
-            cv.put(DBHelper.READ_STATE, m.read_state);
-
-            database.insert(DBHelper.DIALOGS_TABLE, null, cv);
-        }
-        if (withTransaction) {
-            database.setTransactionSuccessful();
-            database.endTransaction();
-        }
-        cv.clear();
+        VKInsertHelper.insertDialogs(database, messages, withTransaction);
     }
 
     /**
@@ -475,33 +427,32 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
     private void loadDialogs(final boolean onlyUpdate) {
-        VKApi.init(VKApi.VKAccount.from(account));
-        VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
-            @Override
-            public void onResponse(JSONObject responseJson) {
-                final JSONObject response = responseJson.optJSONObject("response");
-                if (response == null) {
-                    return;
+        if (AndroidUtils.isInternetConnection(getActivity())) {
+            VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
+                @Override
+                public void onResponse(JSONObject responseJson) {
+                    final JSONObject response = responseJson.optJSONObject("response");
+                    if (response == null) {
+                        return;
+                    }
+                    int messageCount = response.optInt("count");
+                    PrefManager.putInt("message_count", messageCount);
+                    if (getActivity() == null || ((BasicActivity) getActivity()).getSupportActionBar() == null) {
+                        return;
+                    }
+                    ((BaseThemedActivity) getActivity())
+                            .getSupportActionBar()
+                            .setSubtitle(activity.getString(R.string.dialogs_number) + messageCount);
                 }
-                int messageCount = response.optInt("count");
-                PrefManager.putInt("message_count", messageCount);
-                if (getActivity() == null || ((BasicActivity) getActivity()).getSupportActionBar() == null) {
-                    return;
+
+                @Override
+                public void onError(VKApi.VKException exception) {
+
                 }
-                        ((BaseThemedActivity) getActivity())
-                        .getSupportActionBar()
-                        .setSubtitle(activity.getString(R.string.dialogs_number) + messageCount);
-            }
+            });
+        }
 
-            @Override
-            public void onError(VKApi.VKException exception) {
-
-            }
-        });
-//        if (!AndroidUtils.isInternetConnection(getActivity())) {
-//            Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), R.string.check_internet, Snackbar.LENGTH_LONG).show();
-//        }
-        getDialogs(onlyUpdate);
+        new AsyncLoadDialogsTask().execute();
 
     }
 
@@ -520,160 +471,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         super.onDetach();
     }
 
-    /**
-     * Загрузка сообщений в список
-     * @param onlyUpdate если надо только обновить список
-     */
-    private void getDialogs(final boolean onlyUpdate) {
-        setRefreshing(true);
-        AndroidUtils.setEdgeGlowColor(listView, ThemeManager.getThemeColor(getActivity()));
-        ThreadExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (database == null || !database.isOpen()) {
-                        database = DBHelper.get(getActivity()).getWritableDatabase();
-                    }
-                    if (dialogItems == null) {
-                        dialogItems = new ArrayList<>(30);
-                    }
-
-                    // если попросили только обновить диалоги
-                    if (onlyUpdate && AndroidUtils.isInternetConnection(getActivity())) {
-                        Log.w(TAG, "Only update dialogs");
-
-                        ArrayList<VKMessage> vkDialogs = api.getMessagesDialogs(0, 30, null, null);
-                        deleteMessagesFrom(database);
-                        insertMessagesTo(database, vkDialogs, true);
-
-                        HashMap<Integer, VKUser> mapUsers = new HashMap<>();
-                        for (int i = 0; i < vkDialogs.size(); i++) {
-                            mapUsers.put(vkDialogs.get(i).uid, null);
-                        }
-
-                        ArrayList<VKUser> vkUsers = api.getProfiles(mapUsers.keySet(), null, null, null, null);
-                        insertUsersTo(database, vkUsers, true);
-
-                        mapUsers.clear();
-                        mapUsers = null;
-
-                        vkUsers.clear();
-                        vkUsers.trimToSize();
-                        vkUsers = null;
-
-                        vkDialogs.clear();
-                        vkDialogs.trimToSize();
-                        vkDialogs = null;
-
-                        ArrayList<DialogItem> dialogsDatabase = getDialogsFrom(database);
-                        if (!dialogsDatabase.isEmpty()) {
-                            dialogItems.clear();
-                            dialogItems.addAll(dialogsDatabase);
-//
-                            dialogsDatabase.clear();
-                            dialogsDatabase.trimToSize();
-                            dialogsDatabase = null;
-
-                            updateListView(dialogItems);
-                            setRefreshing(false);
-                        }
-                        return;
-                    }
-
-
-                    Log.w(TAG, "Get dialogs from database");
-                    ArrayList<DialogItem> dialogsFromDatabase = getDialogsFrom(database);
-                    if (dialogsFromDatabase.isEmpty()) {
-                        getDialogs(true);
-                        return;
-                    } else {
-                        dialogItems.addAll(dialogsFromDatabase);
-
-                        updateListView(dialogItems);
-
-                        dialogsFromDatabase.clear();
-                        dialogsFromDatabase.trimToSize();
-                        dialogsFromDatabase = null;
-                    }
-                    if (!AndroidUtils.isInternetConnection(getActivity())) {
-                        // no connection to internet...
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                        setRefreshing(false);
-                        return;
-                    }
-
-                    // получаем диалоги из вк
-                    ArrayList<VKMessage> vkDialogs = api.getMessagesDialogs(0, 30, null, null);
-                    HashMap<Integer, VKUser> mapUsers = new HashMap<>();
-
-                    for (int i = 0; i < vkDialogs.size(); i++) {
-                        mapUsers.put(vkDialogs.get(i).uid, null);
-                    }
-
-                    // получаем пользователей из сервера вк
-                    ArrayList<VKUser> vkUsers = api.getProfiles(mapUsers.keySet(), null, null, null, null);
-                    for (int i = 0; i < vkUsers.size(); i++) {
-                        VKUser u = vkUsers.get(i);
-                        mapUsers.put(u.user_id, u);
-                    }
-                    dialogItems.clear();
-                    for (int i = 0; i < vkDialogs.size(); i++) {
-                        VKMessage m = vkDialogs.get(i);
-                        VKUser u = mapUsers.get(m.uid);
-
-                        dialogItems.add(new DialogItem(m, u));
-                    }
-                    updateListView(dialogItems);
-                    setRefreshing(false);
-
-                    deleteMessagesFrom(database);
-                    insertMessagesTo(database, vkDialogs, true);
-                    insertUsersTo(database, mapUsers.values(), true);
-
-                    mapUsers.clear();
-                    mapUsers = null;
-
-                    vkDialogs.clear();
-                    vkDialogs.trimToSize();
-                    vkDialogs = null;
-
-                    vkUsers.clear();
-                    vkUsers.trimToSize();
-                    vkUsers = null;
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "Error get messages", e);
-                } finally {
-                    setRefreshing(false);
-                }
-            }
-        });
-    }
-
-    private void updateListView(final ArrayList<DialogItem> items) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.w(TAG, "Update Adapter");
-
-                if (adapter == null) {
-                    adapter = new DialogAdapter(getActivity(), items);
-                    listView.setAdapter(adapter);
-                } else {
-                    adapter.notifyDataSetChanged();
-                }
-                if (!adapter.isConnected()) {
-                    adapter.connectToLongPollService();
-                }
-            }
-        });
-    }
 
     private void loadOldDialogs(final int count) {
         swipeLayout.setRefreshing(true);
@@ -892,6 +689,133 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             adapter = null;
         }
         super.onDestroy();
+    }
+
+    private class AsyncLoadDialogsTask extends AsyncTask<Void, Boolean, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            setRefreshing(true);
+
+            if (dialogItems == null) {
+                dialogItems = new ArrayList<>(30);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            setRefreshing(false);
+
+            System.gc();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            database = DBHelper.get(getActivity()).getWritableDatabase();
+            ;
+
+            // get dialogs from database
+            getDialogsFrom(database);
+            if (!dialogItems.isEmpty()) {
+                publishProgress(null);
+            }
+
+            // if user not have internet connection
+            if (!AndroidUtils.isInternetConnection(getActivity())) {
+                AndroidUtils.runOnUi(new RunnableToast(getActivity(), R.string.check_internet, true));
+                return null;
+            }
+
+            // load messages from network;
+            ArrayList<VKMessage> newDialogs = getDialogsFromNet();
+            if (newDialogs.isEmpty()) {
+                return null;
+            }
+
+            SparseArray<VKUser> users = new SparseArray<>(30);
+            for (int i = 0; i < newDialogs.size(); i++) {
+                VKMessage dialog = newDialogs.get(i);
+                users.append(dialog.uid, null);
+            }
+
+            HashSet<Integer> keySet = AndroidUtils.keySet(users);
+            // load new users from network
+            ArrayList<VKUser> newUsers = getUsersFromNet(keySet);
+
+            users.clear();
+            for (int i = 0; i < newUsers.size(); i++) {
+                VKUser user = newUsers.get(i);
+                users.put(user.user_id, user);
+            }
+
+            // update items in ListView for show new content
+            dialogItems.clear();
+            for (int i = 0; i < newDialogs.size(); i++) {
+                VKMessage message = newDialogs.get(i);
+                dialogItems.add(new DialogItem(message, users.get(message.uid)));
+            }
+            publishProgress(null);
+
+            // update database
+            deleteMessagesFrom(database);
+            insertMessagesTo(database, newDialogs, true);
+            insertUsersTo(database, newUsers, true);
+
+            newDialogs.clear();
+            newDialogs.trimToSize();
+            newDialogs = null;
+
+            newUsers.clear();
+            newUsers.trimToSize();
+            newUsers = null;
+
+            keySet.clear();
+            keySet = null;
+
+            users.clear();
+            users = null;
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Boolean... values) {
+            super.onProgressUpdate(values);
+            updateAdapter();
+        }
+
+        private void updateAdapter() {
+            if (adapter == null) {
+                adapter = new DialogAdapter(getActivity(), dialogItems);
+                listView.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged();
+            }
+
+            if (!adapter.isConnected()) {
+                adapter.connectToLongPollService();
+            }
+        }
+
+        private ArrayList<VKMessage> getDialogsFromNet() {
+            try {
+                return Api.get().getMessagesDialogs(0, 30, null, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new ArrayList<>(0);
+        }
+
+        private ArrayList<VKUser> getUsersFromNet(Collection<Integer> uids) {
+            try {
+                return Api.get().getProfiles(uids, null, null, null, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new ArrayList<>(0);
+        }
+
     }
 
 }
