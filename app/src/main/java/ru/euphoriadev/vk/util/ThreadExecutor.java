@@ -10,8 +10,8 @@ import java.util.concurrent.Executor;
 public class ThreadExecutor {
     /** Number of processor cores available */
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    /** Thread executor fpr execute in new thread */
-//    private static final Executor EXECUTOR = Executors.newFixedThreadPool(CPU_COUNT * 2 + 1);
+    /** Thread executor fpr execute on background */
+//    public static final Executor EXECUTOR = Executors.newFixedThreadPool(CPU_COUNT * 2 + 1);
 
     /**
      * Execute runnable with {@link Executor}

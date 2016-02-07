@@ -41,7 +41,11 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
  * a Simple new VK Library for execute request.
  * This library is a "mixture" of "VK-SDK" and "VK-Android-SDK by Thest1" library.
  * For more information about VK API - please, visit the official documentation
- * https://vk.com/dev/main
+ * https://vk.com/dev/main.
+ *
+ * However, some methods and docs are hidden from users, but! this is not a problem,
+ * because their list can be obtained by following this link:
+ * https://vkapi.zf-projects.ru/methods-list
  *
  * <p/>
  * Example to init api and execute users.get request:
@@ -2503,7 +2507,7 @@ public class VKApi {
 
         @Override
         protected JSONObject doInBackground(final VKRequest... params) {
-            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             final JSONObject response;
             try {
                 response = params[0].execute();

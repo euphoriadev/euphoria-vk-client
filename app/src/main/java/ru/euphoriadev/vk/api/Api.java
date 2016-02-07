@@ -336,17 +336,11 @@ public class Api {
     }
 
     <T> String arrayToString(Collection<T> items) {
-        if (items == null) {
+        if (items == null || items.isEmpty()) {
             return null;
         }
-//        String str_cids = "";
-//        for (Object item : items) {
-//            if (str_cids.length() != 0) str_cids += ',';
-//            str_cids += item;
-//        }
-//        return str_cids;
 
-        StringBuffer buffer = new StringBuffer(32);
+        StringBuilder buffer = new StringBuilder(32);
         for (Object item : items) {
             buffer.append(item);
             buffer.append(',');

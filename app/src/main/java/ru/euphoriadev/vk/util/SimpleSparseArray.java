@@ -197,7 +197,7 @@ public class SimpleSparseArray implements Cloneable {
      * @return the index of key
      */
     public int indexOf(int key) {
-        return ArrayUtil.linearSearch(mKeys, key);
+        return ArrayUtil.binarySearch(mKeys, key);
     }
 
     /**

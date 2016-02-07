@@ -427,6 +427,8 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
     private void loadDialogs(final boolean onlyUpdate) {
+        new AsyncLoadDialogsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
         if (AndroidUtils.isInternetConnection(getActivity())) {
             VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
                 @Override
@@ -452,7 +454,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             });
         }
 
-        new AsyncLoadDialogsTask().execute();
 
     }
 
@@ -524,7 +525,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         });
     }
-
     /**
      * Удаление диалога
      * TODO: на метод наложено ограничение, за один вызов нельзя удалить больше 10000 сообщений
@@ -692,36 +692,41 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     private class AsyncLoadDialogsTask extends AsyncTask<Void, Boolean, Void> {
-
+        private final String TAG = "AsyncLoadDialogsTask";
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            Log.w(TAG, "onPreExecute: start");
             setRefreshing(true);
 
             if (dialogItems == null) {
                 dialogItems = new ArrayList<>(30);
             }
+            database = DBHelper.get(getActivity()).getWritableDatabase();;
+
+            // get dialogs from database
+            getDialogsFrom(database);
+            if (!dialogItems.isEmpty()) {
+                updateAdapter();
+            }
+            Log.w(TAG, "onPreExecute: end");
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            Log.w(TAG, "onPostExecute: start");
             setRefreshing(false);
 
             System.gc();
+            Log.w(TAG, "onPostExecute: end");
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            database = DBHelper.get(getActivity()).getWritableDatabase();
-            ;
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
-            // get dialogs from database
-            getDialogsFrom(database);
-            if (!dialogItems.isEmpty()) {
-                publishProgress(null);
-            }
-
+            Log.w(TAG, "doInBackground: start");
             // if user not have internet connection
             if (!AndroidUtils.isInternetConnection(getActivity())) {
                 AndroidUtils.runOnUi(new RunnableToast(getActivity(), R.string.check_internet, true));
@@ -729,7 +734,9 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
 
             // load messages from network;
+            Log.w(TAG, "download messages from net....");
             ArrayList<VKMessage> newDialogs = getDialogsFromNet();
+            Log.w(TAG, "downloading done.");
             if (newDialogs.isEmpty()) {
                 return null;
             }
@@ -742,7 +749,9 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
             HashSet<Integer> keySet = AndroidUtils.keySet(users);
             // load new users from network
+            Log.w(TAG, "download users from net...");
             ArrayList<VKUser> newUsers = getUsersFromNet(keySet);
+            Log.w(TAG, "download users done.");
 
             users.clear();
             for (int i = 0; i < newUsers.size(); i++) {
@@ -757,6 +766,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 dialogItems.add(new DialogItem(message, users.get(message.uid)));
             }
             publishProgress(null);
+            setRefreshing(false);
 
             // update database
             deleteMessagesFrom(database);

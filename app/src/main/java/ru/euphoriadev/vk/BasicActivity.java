@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Process;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -275,6 +276,8 @@ public class BasicActivity extends BaseThemedActivity implements
             @Override
             public void run() {
                 try {
+                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                     Thread.sleep(1000);
                     api.trackStatsVisitor();
                 } catch (final Exception e) {
