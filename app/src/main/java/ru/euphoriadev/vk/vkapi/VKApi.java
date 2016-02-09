@@ -22,6 +22,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpParams;
@@ -2327,8 +2328,20 @@ public class VKApi {
      */
     public static class VKJsonParser {
 
-        public static Collection<VKUser> parseUsers(JSONArray jsonUsers) {
-            return VKUser.parseUsers(jsonUsers);
+        public static Collection<VKUser> parseUsers(JSONArray items) {
+            return VKUser.parseUsers(items);
+        }
+
+        public static VKUser parseUsers(JSONObject response) {
+            return VKUser.parse(response);
+        }
+
+        public static Collection<VKMessage> parseMessages(JSONArray items) {
+            return VKMessage.parseArray(items);
+        }
+
+        public static VKMessage parseMessage(JSONObject response) {
+            return VKMessage.parse(response);
         }
 
     }
@@ -2493,6 +2506,19 @@ public class VKApi {
     }
 
     /**
+     * Execute codes for {@link VKApi#execute(String)} method
+     */
+    public static class VKExexutes {
+        public static final String CODE_GROUP_MEMBERS = "var members=API.groups.getMembers(" +
+                "{\"gid\":" + "%s" + "}); " +
+                "var u=members[1]; return API.users.get({\"user_ids\":u,\"fields\":\"" + "%s" + "\"});";
+
+        public static String getGroupMembersCode(String groupId, String fields) {
+            return String.format(CODE_GROUP_MEMBERS, groupId, fields);
+        }
+    }
+
+    /**
      * Task for Async execute
      *
      * @see AsyncTask
@@ -2640,6 +2666,14 @@ public class VKApi {
          * In test mode application should be disabled or user should be authorized
          */
         public static final int IN_TEST_MODE = 11;
+        /**
+         * For execute method. Unable to compile code
+         */
+        public static final int EXEXUTE_CODE_COMPILE_ERROR = 12;
+        /**
+         * For execute method. Runtime error occurred during code invocation
+         */
+        public static final int EXECUTE_CODE_RUNTIME_ERROR = 13;
         /**
          * Captcha needed
          */

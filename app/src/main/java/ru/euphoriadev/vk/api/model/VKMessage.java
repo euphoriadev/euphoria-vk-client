@@ -221,7 +221,7 @@ public class VKMessage implements Serializable {
         return message;
     }
 
-    public static ArrayList<VKMessage> parseArray(JSONArray array) throws JSONException {
+    public static ArrayList<VKMessage> parseArray(JSONArray array) {
         ArrayList<VKMessage> vkMessages = new ArrayList<>(array.length());
         for (int i = 0; i < array.length(); i++) {
             JSONObject item = array.optJSONObject(i);

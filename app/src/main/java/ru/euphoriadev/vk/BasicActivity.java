@@ -127,7 +127,6 @@ public class BasicActivity extends BaseThemedActivity implements
         super.onResume();
     }
 
-
     public Toolbar getToolbar() {
         return toolbar;
     }
@@ -332,12 +331,12 @@ public class BasicActivity extends BaseThemedActivity implements
                         PrefManager.putInt(SettingsFragment.KEY_IS_JOIN_GROUP, -1);
                         Log.w("BasicActivity", "IsMemberOfGroup");
                     } else
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showDialogJoinGroup();
-                        }
-                    });
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showDialogJoinGroup();
+                            }
+                        });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -382,6 +381,10 @@ public class BasicActivity extends BaseThemedActivity implements
     }
 
     private void initDrawerHeader() {
+        if (account == null) {
+            account = new Account(this).restore();
+        }
+
         View headerView = navigationView.getHeaderView(0);
         final ImageView drawerImageView = (ImageView) headerView.findViewById(R.id.drawerIvPhoto);
         final TextView drawerTitle = (TextView) headerView.findViewById(R.id.drawerTitle);
@@ -394,25 +397,27 @@ public class BasicActivity extends BaseThemedActivity implements
         final Drawable headerDrawable = ThemeManager.getDrawerHeader(this);
         if (headerDrawable != null) {
             drawerBackground.setImageDrawable(headerDrawable);
-//            drawerBackground.setBackground(headerDrawable);
         } else {
             drawerBackground.setImageDrawable(null);
-            Picasso.with(this)
-                    .load(account.photo)
-                    .placeholder(R.drawable.camera_b)
-                    .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(SettingsFragment.KEY_BLUR_RADIUS, 20)))
-                    .into(drawerBackground);
+            try {
+                Picasso.with(this)
+                        .load(account.photo)
+                        .placeholder(R.drawable.camera_b)
+                        .transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(SettingsFragment.KEY_BLUR_RADIUS, 20)))
+                        .into(drawerBackground);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         drawerTitle.setText(account.fullName);
         drawerStatus.setText(account.status);
-
-        if (account == null) {
-            account = new Account(this);
+        try {
+            Picasso.with(BasicActivity.this)
+                    .load(account.photo)
+                    .into(drawerImageView);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        account.restore();
-        Picasso.with(BasicActivity.this)
-                .load(account.photo)
-                .into(drawerImageView);
 
     }
 
@@ -426,6 +431,7 @@ public class BasicActivity extends BaseThemedActivity implements
             drawer.closeDrawer(GravityCompat.START);
         } else if (backPressedTime + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
+            VKApi.close();
             if (!PrefManager.getBoolean(SettingsFragment.KEY_ENABLE_NOTIFY, true) || !PrefManager.getBoolean(SettingsFragment.KEY_IS_LIVE_ONLINE_SERVICE)) {
                 stopService(new Intent(this, LongPollService.class));
                 appLoader.getHandler().postDelayed(new Runnable() {
@@ -445,7 +451,6 @@ public class BasicActivity extends BaseThemedActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        VKApi.close();
         RefreshManager.unregisterForChangePreferences(this);
 
         DBHelper helper = DBHelper.get(this);

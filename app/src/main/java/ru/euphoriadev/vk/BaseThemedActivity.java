@@ -23,6 +23,7 @@ public class BaseThemedActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
     }

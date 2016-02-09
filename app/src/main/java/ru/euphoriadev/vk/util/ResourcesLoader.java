@@ -254,7 +254,12 @@ public class ResourcesLoader {
         if (!isLoadedColors) {
             throw new IllegalArgumentException("Colors is not loaded!");
         }
-        return sColors.get(resId);
+        int color = sColors.get(resId);
+        if (color == -1) {
+            sColors.put(resId, getColor(AppLoader.appContext, resId));
+            return sColors.get(resId);
+        }
+        return color;
     }
 
 

@@ -5,6 +5,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.Collections;
@@ -27,7 +30,9 @@ import java.util.WeakHashMap;
  * A simple utils for {@link android.view.View}
  */
 public class ViewUtil {
-    /** Views set for update typefaces */
+    /**
+     * Views set for update typefaces
+     */
     private static final Set<TextView> sSetViews = Collections.newSetFromMap(new WeakHashMap<TextView, Boolean>());
 
     /**
@@ -181,6 +186,52 @@ public class ViewUtil {
      */
     public static int getPressedColor(int color) {
         return ThemeManager.darkenColor(color);
+    }
+
+
+    public static void setEdgeGlowColor(ListView listView, int color) {
+        AndroidUtils.setEdgeGlowColor(listView, color);
+    }
+
+    /**
+     * Sets the base elevation of this view, in pixels.
+     * If version < {@link android.os.Build.VERSION_CODES#LOLLIPOP}
+     * Adding dialog frame with shadow to view background
+     *
+     * @param view      the view to set elevation
+     * @param elevation the elevation value in px
+     */
+    public static void setElevation(View view, float elevation) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            view.setElevation(elevation);
+        }
+
+
+        Drawable resource = ThemeManager.isDarkTheme() ?
+                AndroidUtils.getDrawable(view.getContext(), android.R.drawable.dialog_holo_dark_frame)
+                : AndroidUtils.getDrawable(view.getContext(), android.R.drawable.dialog_holo_light_frame);
+
+        LayerDrawable shadowDrawable = new LayerDrawable(new Drawable[]{resource, view.getBackground()});
+        ViewUtil.setBackground(view, shadowDrawable);
+    }
+
+    /**
+     * Set the background to a given Drawable, or remove the background. If the
+     * background has padding, this View's padding is set to the background's
+     * padding. However, when a background is removed, this View's padding isn't
+     * touched. If setting the padding is desired, please use
+     * {@link View#setPadding(int, int, int, int)}.
+     *
+     * @param view       the View to set background
+     * @param background the Drawable to use as the background, or null to remove the
+     *                   background
+     */
+    public static void setBackground(View view, Drawable background) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
+            view.setBackground(background);
+        } else {
+            view.setBackgroundDrawable(background);
+        }
     }
 
     public static void setColors(Menu menu, Toolbar toolbar) {

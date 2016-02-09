@@ -37,8 +37,6 @@ public class GiftsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_gifts, container, false);
         activity = getActivity();
-        tm = ThemeManagerOld.get(activity);
-        tm.setBasicTheme();
 
         account = new Account(activity).restore();
         api = Api.init(account.access_token, Account.API_ID);

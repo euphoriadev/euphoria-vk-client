@@ -57,26 +57,26 @@
     <style name="AppTheme.Purple">
         <item name="colorPrimaryDark">@color/md_purple_800</item>
         <item name="colorPrimary">@color/md_purple_600</item>
-        <item name="colorAccent">@color/md_purple_500</item>
+        <item name="colorAccent">@color/md_cyan_500</item>
     </style>
 
     <style name="AppThemeLight.Purple">
         <item name="colorPrimaryDark">@color/md_purple_700</item>
         <item name="colorPrimary">@color/md_purple_500</item>
-        <item name="colorAccent">@color/md_purple_500</item>
+        <item name="colorAccent">@color/md_cyan_500</item>
     </style>
 
 
     <style name="AppThemeLight.DeepPurple">
         <item name="colorPrimaryDark">@color/md_deep_purple_700</item>
         <item name="colorPrimary">@color/md_deep_purple_500</item>
-        <item name="colorAccent">@color/md_deep_purple_500</item>
+        <item name="colorAccent">@color/md_cyan_500</item>
     </style>
 
     <style name="AppTheme.DeepPurple">
         <item name="colorPrimaryDark">@color/md_deep_purple_800</item>
         <item name="colorPrimary">@color/md_deep_purple_600</item>
-        <item name="colorAccent">@color/md_deep_purple_500</item>
+        <item name="colorAccent">@color/md_cyan_500</item>
     </style>
 
 
@@ -108,26 +108,26 @@
     <style name="AppThemeLight.LightBlue">
         <item name="colorPrimaryDark">@color/md_light_blue_700</item>
         <item name="colorPrimary">@color/md_light_blue_500</item>
-        <item name="colorAccent">@color/md_cyan_500</item>
+        <item name="colorAccent">@color/md_pink_500</item>
     </style>
 
     <style name="AppTheme.LightBlue">
         <item name="colorPrimaryDark">@color/md_light_blue_800</item>
         <item name="colorPrimary">@color/md_light_blue_600</item>
-        <item name="colorAccent">@color/md_cyan_500</item>
+        <item name="colorAccent">@color/md_pink_500</item>
     </style>
 
 
     <style name="AppThemeLight.Cyan">
         <item name="colorPrimaryDark">@color/md_cyan_700</item>
         <item name="colorPrimary">@color/md_cyan_500</item>
-        <item name="colorAccent">@color/md_pink_500</item>
+        <item name="colorAccent">@color/md_yellow_500</item>
     </style>
 
     <style name="AppTheme.Cyan">
         <item name="colorPrimaryDark">@color/md_cyan_800</item>
         <item name="colorPrimary">@color/md_cyan_600</item>
-        <item name="colorAccent">@color/md_pink_500</item>
+        <item name="colorAccent">@color/md_yellow_500</item>
     </style>
 
 
@@ -273,7 +273,7 @@
     <style name="AppTheme.Black">
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/white</item>
+        <item name="colorAccent">@color/md_blue_grey_50</item>
         <item name="android:windowBackground">@color/black</item>
     </style>
 

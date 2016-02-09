@@ -1,7 +1,10 @@
 package ru.euphoriadev.vk;
 
+import android.animation.LayoutTransition;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +14,8 @@ import android.widget.ScrollView;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Random;
 
 import ru.euphoriadev.vk.api.Api;
@@ -18,6 +23,7 @@ import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.http.HttpResponseCodeException;
+import ru.euphoriadev.vk.interfaces.OnTwiceClickListener;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.ThemeManager;
@@ -37,6 +43,7 @@ public class TestActivity extends BaseThemedActivity {
         ScrollView rootView = new ScrollView(this);
         setContentView(rootView);
 
+
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
         rootLayout.setLayoutParams(new LinearLayout.LayoutParams(
@@ -44,6 +51,11 @@ public class TestActivity extends BaseThemedActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
         rootLayout.setPadding(0, AndroidUtils.getStatusBarHeight(this), 0, 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            LayoutTransition transition = new LayoutTransition();
+            transition.enableTransitionType(LayoutTransition.CHANGING);
+            rootLayout.setLayoutTransition(transition);
+        }
         rootView.addView(rootLayout);
 
 
@@ -51,6 +63,29 @@ public class TestActivity extends BaseThemedActivity {
         tvResult.setTextColor(ThemeManager.getPrimaryTextColor());
         tvResult.setTextSize(18);
         rootLayout.addView(tvResult);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm.s", Locale.US);
+        String date = sdf.format(System.currentTimeMillis());
+
+        final AppCompatEditText editText = new AppCompatEditText(this);
+        editText.setHint("Execute code. Tap twice for run");
+        editText.setOnClickListener(new OnTwiceClickListener() {
+            @Override
+            public void onTwiceClick(View v) {
+                VKApi.execute(editText.getText().toString().trim(), new VKApi.VKOnResponseListener() {
+                    @Override
+                    public void onResponse(JSONObject responseJson) {
+                        tvResult.append("\nResponse:\n " + responseJson.toString());
+                    }
+
+                    @Override
+                    public void onError(VKApi.VKException exception) {
+                        tvResult.append("\nError:\n " + exception.errorMessage);
+                    }
+                });
+            }
+        });
+        rootLayout.addView(editText);
 
         // for testing api...
         AppCompatButton buttonCheckConnection = new AppCompatButton(this);
@@ -198,8 +233,6 @@ public class TestActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(buttonClear);
-
-
     }
 
     private void connectToGoogle() {

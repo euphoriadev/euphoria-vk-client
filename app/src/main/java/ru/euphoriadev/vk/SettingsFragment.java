@@ -4,6 +4,7 @@ package ru.euphoriadev.vk;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -94,7 +95,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         rootScreen = getPreferenceManager().createPreferenceScreen(getActivity());
         // говорим, что rootScreen - корневой экран
         setPreferenceScreen(rootScreen);
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         PreferenceCategory categoryUI = new MaterialPreferenceCategory(getActivity());
         categoryUI.setTitle(getActivity().getString(R.string.prefs_title_ui));
@@ -104,6 +104,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final MaterialSwitchPreference boxNightTheme = new MaterialSwitchPreference(getActivity());
         boxNightTheme.setTitle(getActivity().getString(R.string.prefs_night_theme));
         boxNightTheme.setDefaultValue(true);
+        boxNightTheme.setEnabled(ThemeManager.getThemeColor(getActivity()) != Color.BLACK);
         boxNightTheme.setKey(KEY_IS_NIGHT_MODE);
         boxNightTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -118,8 +119,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 } catch (Exception e) {
                     e.printStackTrace();
 
-                    Toast.makeText(getActivity(), "Please restart application", Toast.LENGTH_LONG);
+                    Toast.makeText(getActivity(), "Please restart application", Toast.LENGTH_LONG).show();
                 }
+
                 getActivity().overridePendingTransition(R.anim.alpha_out, R.anim.alpha_in);
                 return true;
             }
@@ -150,6 +152,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 //                        manager.putColor(color);
                         ThemeManager.updateColourTheme(color);
                         ThemeManager.updateThemeValues();
+                        if (color == Color.BLACK) {
+                            PrefManager.putBoolean(SettingsFragment.KEY_IS_NIGHT_MODE, true);
+                        }
 
                         if (getActivity().getResources().getColor(R.color.md_grey_900) == color) {
                             boxNightTheme.setChecked(true);
@@ -569,6 +574,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             });
             debugCategory.addPreference(debugPreference);
         }
+
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
     }
 

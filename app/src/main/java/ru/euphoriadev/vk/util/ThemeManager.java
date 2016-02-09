@@ -30,8 +30,11 @@ import ru.euphoriadev.vk.SettingsFragment;
  * A Simple Theme Manager
  */
 public class ThemeManager {
-    public static final int DEFAULT_COLOR = 0xffe51c23; // Red 500
-    public static final int DEFAULT_ACCENT_COLOR = 0xff00897b; // Teal 500
+    static {
+        ResourcesLoader.loadColors(AppLoader.appContext);
+    }
+    public static final int DEFAULT_COLOR = ResourcesLoader.getColor(R.color.md_red_500); // Red 500
+    public static final int DEFAULT_ACCENT_COLOR = ResourcesLoader.getColor(R.color.md_teal_500); // Teal 500
 
     public static final String PREF_KEY_THEME_COLOUR = "color_theme";
     public static final String PREF_KEY_FORCED_LOCALE = SettingsFragment.KEY_FORCED_LOCALE;
@@ -226,6 +229,8 @@ public class ThemeManager {
             0, 0, 0, 0, 1, 1, 1, 1, 1, 1
     }, {   // Full Black
             1,
+    }, {    // White
+            0
     }};
 
 

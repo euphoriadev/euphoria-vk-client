@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Process;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
@@ -101,6 +102,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         ViewUtil.setColor(((BasicActivity) getActivity()).getToolbar(), ThemeManager.getPrimaryTextColorOnThemeColor(getActivity()));
 
         listView = (ListView) rootView.findViewById(R.id.lvMess);
+        AndroidUtils.setEdgeGlowColor(listView, ThemeManager.getThemeColor(getActivity()));
         tm.initDivider(listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -725,6 +727,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         @Override
         protected Void doInBackground(Void... params) {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
 
             Log.w(TAG, "doInBackground: start");
             // if user not have internet connection
