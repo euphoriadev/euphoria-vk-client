@@ -1,5 +1,7 @@
 package ru.euphoriadev.vk.http;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -7,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 18.01.16.
@@ -41,6 +44,9 @@ public class HttpResponse {
         if (inputStreamAsString == null) {
             inputStreamAsString = AndroidUtils.convertStreamToString(inputStream);
             release();
+            if (VKApi.DEBUG) {
+                Log.i(VKApi.TAG, inputStreamAsString);
+            }
         }
         return inputStreamAsString;
     }

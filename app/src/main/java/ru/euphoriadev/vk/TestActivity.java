@@ -19,11 +19,14 @@ import java.util.Locale;
 import java.util.Random;
 
 import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.model.VKMessage;
+import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.interfaces.OnTwiceClickListener;
+import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.ThemeManager;
@@ -74,7 +77,7 @@ public class TestActivity extends BaseThemedActivity {
             public void onTwiceClick(View v) {
                 VKApi.execute(editText.getText().toString().trim(), new VKApi.VKOnResponseListener() {
                     @Override
-                    public void onResponse(JSONObject responseJson) {
+                    public void onResponse(VKApi.VKRequest request, JSONObject responseJson) {
                         tvResult.append("\nResponse:\n " + responseJson.toString());
                     }
 
@@ -158,6 +161,26 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonVkApi);
 
+        AppCompatButton buttonUsers = new AppCompatButton(this);
+        buttonUsers.setText("VKApi: users.get");
+        buttonUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VKApi.users()
+                        .get()
+                        .userIds(205387401)
+                        .fields(VKUser.FIELDS_DEFAULT)
+                        .asModel(new VKUser())
+                        .execute(new VKApi.VKResponseHandler<VKUser>() {
+                            @Override
+                            public void onResponse(VKUser result) {
+                                tvResult.append("Yes! Response: " + result.toString());
+                            }
+                        });
+            }
+        });
+        rootLayout.addView(buttonUsers);
+
         AppCompatButton buttonKateApi = new AppCompatButton(this);
         buttonKateApi.setText("Kate Api: setActivity");
         buttonKateApi.setOnClickListener(new View.OnClickListener() {
@@ -193,7 +216,7 @@ public class TestActivity extends BaseThemedActivity {
                         .userId(VKApi.getAccount().userId)
                         .execute(new VKApi.VKOnResponseListener() {
                             @Override
-                            public void onResponse(JSONObject responseJson) {
+                            public void onResponse(VKApi.VKRequest r, JSONObject responseJson) {
                                 long endTime = System.currentTimeMillis() - startTime;
                                 tvResult.append("Message is sent. ");
                                 tvResult.append("Time has passed: ");
@@ -233,6 +256,14 @@ public class TestActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(buttonClear);
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 
     private void connectToGoogle() {

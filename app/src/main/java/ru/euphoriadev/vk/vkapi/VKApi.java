@@ -13,6 +13,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +25,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ru.euphoriadev.vk.BuildConfig;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
@@ -43,11 +47,11 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
  * This library is a "mixture" of "VK-SDK" and "VK-Android-SDK by Thest1" library.
  * For more information about VK API - please, visit the official documentation
  * https://vk.com/dev/main.
- *
+ * <p/>
  * However, some methods and docs are hidden from users, but! this is not a problem,
  * because their list can be obtained by following this link:
  * https://vkapi.zf-projects.ru/methods-list
- *
+ * <p/>
  * <p/>
  * Example to init api and execute users.get request:
  * <pre>
@@ -66,11 +70,12 @@ public class VKApi {
     public static final String TAG = "Euphoria.VKApi";
     public static final String BASE_URL = "https://api.vk.com/method/";
     public static final String API_VERSION = "5.44";
+    public static final boolean DEBUG = BuildConfig.DEBUG;
 
     public static final int OFFSET_PEER_ID = 2_000_000_000;
     public static final VKOnResponseListener DEFAULT_RESPONSE_LISTENER = new VKOnResponseListener() {
         @Override
-        public void onResponse(JSONObject responseJson) {
+        public void onResponse(VKRequest request, JSONObject responseJson) {
             Log.i(TAG, responseJson.toString());
         }
 
@@ -81,7 +86,9 @@ public class VKApi {
         }
     };
 
-    /** For execute requests on background */
+    /**
+     * For execute requests on background
+     */
     private static final ExecutorService VK_SINGLE_EXECUTOR = Executors.newSingleThreadExecutor();
     private static volatile VKApi instance;
 
@@ -141,6 +148,7 @@ public class VKApi {
     public static VKMessages messages() {
         return new VKMessages();
     }
+
     /**
      * Methods for friends
      */
@@ -152,7 +160,7 @@ public class VKApi {
      * Execute request
      * A universal method for calling a sequence of other methods,
      * while saving and filtering interim results
-     *
+     * <p/>
      * TODO: Inside the code may contain no more than 25 references to API methods
      * Read more: http://vk.com/dev/execute
      *
@@ -164,7 +172,7 @@ public class VKApi {
         try {
             return request.execute();
         } catch (HttpResponseCodeException e) {
-            e.printStackTrace();
+            if (DEBUG) e.printStackTrace();
         }
         return null;
     }
@@ -209,15 +217,15 @@ public class VKApi {
                     JSONObject json = response.getContentAsJson();
                     VKUtil.checkErrors(url, json);
                     if (listener != null) {
-                        listener.onResponse(json);
+                        listener.onResponse(null, json);
                     }
                 } catch (VKException e) {
-                    e.printStackTrace();
+                    if (DEBUG) e.printStackTrace();
                     if (listener != null) {
                         listener.onError(e);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    if (DEBUG) e.printStackTrace();
                 }
             }
         });
@@ -242,7 +250,6 @@ public class VKApi {
         getInstance().mClient.close();
         VK_SINGLE_EXECUTOR.shutdown();
     }
-
 
 
     /**
@@ -327,7 +334,7 @@ public class VKApi {
 
                 return true;
             } catch (Exception e) {
-                e.printStackTrace();
+                if (DEBUG) e.printStackTrace();
                 return false;
             }
         }
@@ -347,7 +354,7 @@ public class VKApi {
 
                 FileUtils.write(file, json.toString());
             } catch (JSONException | IOException e) {
-                e.printStackTrace();
+                if (DEBUG) e.printStackTrace();
                 return false;
             }
             return true;
@@ -382,7 +389,7 @@ public class VKApi {
                 this.apiId = json.optInt(EMAIL);
 
             } catch (IOException | JSONException e) {
-                e.printStackTrace();
+                if (DEBUG) e.printStackTrace();
             }
             return this;
         }
@@ -406,6 +413,9 @@ public class VKApi {
     public static class VKUsers {
 
         /**
+         * Returns detailed information on users
+         *
+         * NOTE: This is an open method; it does not require an access_token
          * http://vk.com/dev/users.get
          */
         public VKUserMethodSetter get() {
@@ -413,6 +423,9 @@ public class VKApi {
         }
 
         /**
+         * Returns a list of users matching the search criteria
+         *
+         * NOTE: This method doesn't require any specific rights.
          * http://vk.com/dev/users.search
          */
         public VKUserSearchMethodSetter search() {
@@ -420,6 +433,9 @@ public class VKApi {
         }
 
         /**
+         * Returns information whether a user installed the application
+         *
+         * NOTE: This method doesn't require any specific rights
          * http://vk.com/dev/users.isAppUser
          */
         public VKUserMethodSetter isAppUser() {
@@ -427,6 +443,9 @@ public class VKApi {
         }
 
         /**
+         * Returns a list of IDs of users and communities followed by the user
+         *
+         * NOTE: This is an open method; it does not require an access_token.
          * http://vk.com/dev/users.getSubscriptions
          */
         public VKUserMethodSetter getSubscriptions() {
@@ -434,6 +453,10 @@ public class VKApi {
         }
 
         /**
+         * Returns a list of IDs of followers of the user in question,
+         * sorted by date added, most recent first.
+         *
+         * NOTE: This is an open method; it does not require an access_token
          * http://vk.com/dev/users.getFollowers
          */
         public VKUserMethodSetter getFollowers() {
@@ -441,6 +464,8 @@ public class VKApi {
         }
 
         /**
+         * Reports (submits a complain about) a user.
+         *
          * http://vk.com/dev/users.report
          */
         public VKUserMethodSetter report() {
@@ -448,6 +473,9 @@ public class VKApi {
         }
 
         /**
+         * The index of the current location of the user,
+         * and returns a list of users that are near
+         *
          * http://vk.com/dev/users.getNearby
          */
         public VKUserMethodSetter getNearby() {
@@ -509,14 +537,15 @@ public class VKApi {
         public VKMessageMethodSetter getHistory() {
             return new VKMessageMethodSetter(new VKRequest(("messages.getHistory"), new VKParams()));
         }
+
         /**
          * Returns media files from the dialog or group chat
-         *
+         * <p/>
          * Result:
          * Returns a list of photo, video, audio or doc objects depending
          * on media_type parameter value
          * and additional next_from field containing new offset value
-         *
+         * <p/>
          * http://vk.com/dev/messages.getHistoryAttachments
          */
         public VKMessageMethodSetter getHistoryAttachments() {
@@ -537,10 +566,10 @@ public class VKApi {
          * <p/>
          * Result:
          * After successful execution, returns the sent message ID (mid).
-         *
+         * <p/>
          * Error codes:
          * 900	Cannot send sticker to user from blacklist
-         *
+         * <p/>
          * http://vk.com/dev/messages.sendSticker
          */
         public VKMessageMethodSetter sendSticker() {
@@ -609,12 +638,12 @@ public class VKApi {
          * Returns data required for connection to a Long Poll server.
          * With Long Poll connection,
          * you can immediately know about incoming messages and other events.
-         *
+         * <p/>
          * Result:
          * Returns an object with key, server, ts fields.
          * With such data you can connect to an instant message server
          * to immediately receive incoming messages and other events
-         *
+         * <p/>
          * http://vk.com/dev/messages.getLongPollServer
          */
         public VKMessageMethodSetter getLongPollServer() {
@@ -628,23 +657,23 @@ public class VKApi {
          * a user's mobile device/desktop, to prevent re-receipt at each call.
          * With this method, you can synchronize a local copy of
          * the message list with the actual version.
-         *
+         * <p/>
          * Result:
          * Returns an object that contains the following fields:
          * 1 — history:     An array similar to updates field returned
-         *                  from the Long Poll server,
-         *                  with these exceptions:
-         *                  - For events with code 4 (addition of a new message),
-         *                  there are no fields except the first three.
-         *                  - There are no events with codes 8, 9 (friend goes online/offline)
-         *                  or with codes 61, 62 (typing during conversation/chat).
-         *
+         * from the Long Poll server,
+         * with these exceptions:
+         * - For events with code 4 (addition of a new message),
+         * there are no fields except the first three.
+         * - There are no events with codes 8, 9 (friend goes online/offline)
+         * or with codes 61, 62 (typing during conversation/chat).
+         * <p/>
          * 2 — messages:    An array of private message objects that were found
-         *                  among events with code 4 (addition of a new message)
-         *                  from the history field.
-         *                  Each object of message contains a set of fields described here.
-         *                  The first array element is the total number of messages
-         *
+         * among events with code 4 (addition of a new message)
+         * from the history field.
+         * Each object of message contains a set of fields described here.
+         * The first array element is the total number of messages
+         * <p/>
          * http://vk.com/dev/messages.getLongPollHistory
          */
         public VKMessageMethodSetter getLongPollHistory() {
@@ -653,13 +682,13 @@ public class VKApi {
 
         /**
          * Returns information about a chat
-         *
+         * <p/>
          * Returns a list of chat objects.
          * If the fields parameter is set,
          * the users field contains a list of user objects with
          * an additional invited_by field containing the ID of the user who
          * invited the current user to chat.
-         *
+         * <p/>
          * http://vk.com/dev/messages.getChat
          */
         public VKMessageMethodSetter getChat() {
@@ -668,9 +697,9 @@ public class VKApi {
 
         /**
          * Creates a chat with several participants
-         *
+         * <p/>
          * Returns the ID of the created chat (chat_id).
-         *
+         * <p/>
          * Errors:
          * 9	Flood control
          * http://vk.com/dev/messages.createChat
@@ -681,10 +710,10 @@ public class VKApi {
 
         /**
          * Edits the title of a chat
-         *
+         * <p/>
          * Result:
          * Returns 1
-         *
+         * <p/>
          * http://vk.com/dev/messages.editChat
          */
         public VKMessageMethodSetter editChat() {
@@ -693,14 +722,14 @@ public class VKApi {
 
         /**
          * Returns a list of IDs of users participating in a chat
-         *
+         * <p/>
          * Result:
          * Returns a list of IDs of chat participants.
-         *
+         * <p/>
          * If fields is set, the user fields contains a list of user objects
          * with an additional invited_by field containing the ID
          * of the user who invited the current user to chat.
-         *
+         * <p/>
          * http://vk.com/dev/messages.getChatUsers
          */
         public VKMessageMethodSetter getChatUsers() {
@@ -709,12 +738,12 @@ public class VKApi {
 
         /**
          * Changes the status of a user as typing in a conversation
-         *
+         * <p/>
          * Result:
          * Returns 1.
          * "User N is typing..." is shown for 10 seconds
          * after the method is called, or until the message is sent.
-         *
+         * <p/>
          * http://vk.com/dev/messages.setActivity
          */
         public VKMessageMethodSetter setActivity() {
@@ -733,7 +762,7 @@ public class VKApi {
 
         /**
          * Returns a list of user IDs or detailed information about a user's friends
-         *
+         * <p/>
          * http://vk.com/dev/friends.get
          */
         public VKFriendsMethodSetter get() {
@@ -742,7 +771,7 @@ public class VKApi {
 
         /**
          * Returns a list of user IDs of a user's friends who are online
-         *
+         * <p/>
          * http://vk.com/dev/friends.getOnline
          */
         public VKFriendsMethodSetter getOnline() {
@@ -751,7 +780,7 @@ public class VKApi {
 
         /**
          * Returns a list of user IDs of the mutual friends of two users
-         *
+         * <p/>
          * http://vk.com/dev/friends.getMutual
          */
         public VKFriendsMethodSetter getMutual() {
@@ -760,7 +789,7 @@ public class VKApi {
 
         /**
          * Returns a list of user IDs of the current user's recently added friends
-         *
+         * <p/>
          * http://vk.com/dev/friends.getRecent
          */
         public VKFriendsMethodSetter getRecent() {
@@ -769,7 +798,7 @@ public class VKApi {
 
         /**
          * Returns information about the current user's incoming and outgoing friend requests
-         *
+         * <p/>
          * http://vk.com/dev/friends.getRequests
          */
         public VKFriendsMethodSetter getRequests() {
@@ -784,17 +813,17 @@ public class VKApi {
          * the selected user to the current user's friend list.
          * Otherwise, this method creates a friend request from the current user to
          * the selected user.
-         *
+         * <p/>
          * Returns one of the following values:
          * 1 — Friend request sent.
          * 2 — Friend request from the user approved.
          * 4 — Request resending.
-         *
+         * <p/>
          * Errors:
          * 174	Cannot add user himself as friend
          * 175	Cannot add this user to friends as they have put you on their blacklist
          * 176  Cannot add this user to friends as you put him on blacklist
-         *
+         * <p/>
          * http://vk.com/dev/friends.add
          */
         public VKFriendsMethodSetter add() {
@@ -803,10 +832,10 @@ public class VKApi {
 
         /**
          * Edits the friend lists of the selected user
-         *
+         * <p/>
          * Result:
          * Returns 1.
-         *
+         * <p/>
          * http://vk.com/dev/friends.edit
          */
         public VKFriendsMethodSetter edit() {
@@ -820,19 +849,19 @@ public class VKApi {
          * this method declines the friend request.
          * Otherwise, this method deletes the specified user from the friend list
          * of the current user obtained using the friends.get method.
-         *
+         * <p/>
          * Returns one of the following values:
          * 1 — User deleted from the current user's friend list.
          * 2 — Friend request from the user declined.
          * 3 — Friend request suggestion for the user deleted.
-         *
+         * <p/>
          * Starting from version 5.28 returns object with fields:
          * success —             managed successfully remove other
          * friend_deleted —      has been removed each
          * out_request_deleted — cancelled outgoing request
          * in_request_deleted —  rejected the incoming request
          * suggestion_deleted —  rejected the recommendation of a friend
-         *
+         * <p/>
          * http://vk.com/dev/friends.delete
          */
         public VKFriendsMethodSetter delete() {
@@ -841,11 +870,11 @@ public class VKApi {
 
         /**
          * Returns a list of the current user's friend lists
-         *
+         * <p/>
          * Returns an array of list objects, each containing the following fields:
          * lid —  Friend list ID.
          * name — Friend list name.
-         *
+         * <p/>
          * http://vk.com/dev/friends.getLists
          */
         public VKFriendsMethodSetter getLists() {
@@ -854,9 +883,9 @@ public class VKApi {
 
         /**
          * Creates a new friend list for the current user
-         *
+         * <p/>
          * Returns the ID (lid) of the friend list that was created
-         *
+         * <p/>
          * http://vk.com/dev/friends.addList
          */
         public VKFriendsMethodSetter addList() {
@@ -865,9 +894,9 @@ public class VKApi {
 
         /**
          * Edits a friend list of the current user.
-         *
+         * <p/>
          * Returns 1.
-         *
+         * <p/>
          * http://vk.com/dev/friends.editList
          */
         public VKFriendsMethodSetter editList() {
@@ -876,9 +905,9 @@ public class VKApi {
 
         /**
          * Deletes a friend list of the current user.
-         *
+         * <p/>
          * Returns 1.
-         *
+         * <p/>
          * http://vk.com/dev/friends.deleteList
          */
         public VKFriendsMethodSetter deleteList() {
@@ -888,7 +917,7 @@ public class VKApi {
         /**
          * Returns a list of IDs of the current user's friends
          * who installed the application.
-         *
+         * <p/>
          * http://vk.com/dev/friends.getAppUsers
          */
         public VKFriendsMethodSetter getAppUsers() {
@@ -903,7 +932,7 @@ public class VKApi {
          * use the users.get method with user_ids=API_USER and
          * fields=has_mobile parameters where API_USER is equal
          * to the current user ID.
-         *
+         * <p/>
          * Result:
          * For users whose validated phone numbers are in the list,
          * returns information as an array of user objects,
@@ -912,7 +941,7 @@ public class VKApi {
          * regardless of the selected fields.
          * The phone field of each object contains a phone number from
          * the list of phone numbers intended for search.
-         *
+         * <p/>
          * http://vk.com/dev/friends.getByPhones
          */
         public VKFriendsMethodSetter getByPhones() {
@@ -921,10 +950,10 @@ public class VKApi {
 
         /**
          * Marks all incoming friend requests as viewed
-         *
+         * <p/>
          * Result:
          * Returns 1
-         *
+         * <p/>
          * http://vk.com/dev/friends.deleteAllRequests
          */
         public VKFriendsMethodSetter deleteAllRequests() {
@@ -935,13 +964,13 @@ public class VKApi {
          * Returns a list of profiles of users whom the current user may know.
          * For the method to return enough suggestions,
          * method account.importContacts will be called first.
-         *
+         * <p/>
          * Result:
          * Returns an array of user objects,
          * each containing a set of fields defined by the fields parameter.
          * The uid, first_name, last_name, lists,
          * and online fields are always returned, regardless of the selected fields
-         *
+         * <p/>
          * http://vk.com/dev/friends.getSuggestions
          */
         public VKFriendsMethodSetter getSuggestions() {
@@ -969,8 +998,26 @@ public class VKApi {
         /**
          * User IDs or screen names (screen_name). By default, current user ID.
          */
-        public VKMethodSetter userIds(Collection<Integer> uids) {
-            this.request.params.put(VKConst.USER_IDS, VKUtil.arrayToString(uids));
+        public VKMethodSetter userIds(Collection<Integer> ids) {
+            this.request.params.put(VKConst.USER_IDS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+
+        /**
+         * User IDs or screen names (screen_name). By default, current user ID.
+         * e.g "1, 2, 10"
+         */
+        public VKMethodSetter userIds(String ids) {
+            this.request.params.put(VKConst.USER_IDS, ids);
+            return this;
+        }
+
+        /**
+         * User ID, By default, current user ID
+         */
+        public VKMethodSetter userIds(int... ids) {
+            this.request.params.put(VKConst.USER_IDS, VKUtil.arrayToString(ids));
             return this;
         }
 
@@ -1057,6 +1104,14 @@ public class VKApi {
          */
         public VKMethodSetter captchaKey(String captchaKey) {
             this.request.params.put(VKConst.CAPTCHA_KEY, captchaKey);
+            return this;
+        }
+
+        /**
+         * Need for {@link VKResponseHandler}
+         */
+        public VKMethodSetter asModel(Object vkModel) {
+            this.request.model = vkModel;
             return this;
         }
 
@@ -1497,7 +1552,7 @@ public class VKApi {
          * <p/>
          * For group chat: 2000000000 + ID of conversation.
          * For community: -community ID
-         *
+         * <p/>
          * TODO: accessible for versions from 5.38
          */
         public VKMessageMethodSetter peerId(int peerId) {
@@ -1781,6 +1836,7 @@ public class VKApi {
         public static final String SORT_ORDER_RAMDOM = "random";
         public static final String SORT_ORDER_MOBILE = "mobile";
         public static final String SORT_ORDER_NAME = "name";
+
         /**
          * Create new VKMethodSetter
          *
@@ -1956,7 +2012,7 @@ public class VKApi {
          * IDs of the friend lists to which to add the user
          */
         public VKFriendsMethodSetter listIds(int id) {
-            request.params.put(VKConst.LIST_IDS, VKUtil.arrayToString(new int[] { id }));
+            request.params.put(VKConst.LIST_IDS, VKUtil.arrayToString(new int[]{id}));
             return this;
         }
 
@@ -2008,7 +2064,7 @@ public class VKApi {
          * User IDs to add to the friend list.
          */
         public VKFriendsMethodSetter addUserIds(int id) {
-            request.params.put(VKConst.ADD_USER_IDS, VKUtil.arrayToString(new int[] { id }));
+            request.params.put(VKConst.ADD_USER_IDS, VKUtil.arrayToString(new int[]{id}));
             return this;
         }
 
@@ -2035,7 +2091,7 @@ public class VKApi {
          * User IDs to delete from the friend list.
          */
         public VKFriendsMethodSetter deleteUserIds(int id) {
-            request.params.put(VKConst.DELETE_USER_IDS, VKUtil.arrayToString(new int[] { id }));
+            request.params.put(VKConst.DELETE_USER_IDS, VKUtil.arrayToString(new int[]{id}));
             return this;
         }
 
@@ -2044,7 +2100,7 @@ public class VKApi {
 
         /**
          * List of phone numbers in MSISDN format (maximum 1000).
-         *
+         * <p/>
          * Example:
          * +79219876543,+79111234567
          */
@@ -2055,7 +2111,7 @@ public class VKApi {
 
         /**
          * List of phone numbers in MSISDN format (maximum 1000).
-         *
+         * <p/>
          * Example:
          * +79219876543,+79111234567
          */
@@ -2081,12 +2137,12 @@ public class VKApi {
     }
 
 
-
     /**
      * Class for execution and configuration API-requests
      */
     public static class VKRequest {
 
+        public Object model;
         /**
          * Selected method name
          */
@@ -2176,7 +2232,7 @@ public class VKApi {
             try {
                 return new JSONObject(response.toString());
             } catch (JSONException e) {
-                e.printStackTrace();
+                if (DEBUG) e.printStackTrace();
             }
             return null;
         }
@@ -2328,20 +2384,195 @@ public class VKApi {
      */
     public static class VKJsonParser {
 
+        /**
+         * Deprecated, use {@link VKJsonParser#toJson(Object)}i
+         */
+        @Deprecated
         public static Collection<VKUser> parseUsers(JSONArray items) {
             return VKUser.parseUsers(items);
         }
 
+        /**
+         * Deprecated, use {@link VKJsonParser#toJson(Object)}i
+         */
+        @Deprecated
         public static VKUser parseUsers(JSONObject response) {
             return VKUser.parse(response);
         }
 
+        /**
+         * Deprecated, use {@link VKJsonParser#toJson(Object)}i
+         */
+        @Deprecated
         public static Collection<VKMessage> parseMessages(JSONArray items) {
             return VKMessage.parseArray(items);
         }
 
+        /**
+         * Deprecated, use {@link VKJsonParser#toJson(Object)}i
+         */
+        @Deprecated
         public static VKMessage parseMessage(JSONObject response) {
             return VKMessage.parse(response);
+        }
+
+        /**
+         * Convert object to JSON, uses {@link java.lang.reflect.Field}.
+         * The method is quite long,
+         * because reflection too much performs access checks.
+         *
+         * @param object the object for which Json representation
+         * @return {@link JSONObject} from {@link Object}
+         */
+        public static JSONObject toJson(Object object) {
+            Field[] fields = object.getClass().getFields();
+            JSONObject jsonObject = new JSONObject();
+            for (int i = 0; i < fields.length; i++) {
+                Field field = fields[i];
+                field.setAccessible(true);
+                try {
+                    jsonObject.put(field.getName(), field.get(object));
+                } catch (JSONException | IllegalAccessException e) {
+                    if (DEBUG) e.printStackTrace();
+                }
+            }
+            return jsonObject;
+        }
+
+        /**
+         * Parse object from JSON with Reflection.
+         * However, not everything is so simple,
+         * you need to follow the rules for proper parsing:
+         * <p/>
+         * 1. All fields must be public.
+         * 2. The field names must be fully equal to key name from json.
+         * 3. Not necessarily, but it is better to use
+         * primitive types (int, char) instead of wrappers (Integer, Long).
+         *
+         * NOTE: So far, this is an experimental feature, may not function properly
+         *
+         * @param source the json to parse value on object
+         * @param aClass the class of result object
+         * @param <E>    the class type of object for result
+         * @return a new Object, with filled fields from json
+         */
+        @SuppressWarnings("unchecked")
+        public static <E> E fromJson(JSONObject source, Class<E> aClass) {
+            if (source == null || source.length() == 0) {
+                return null;
+            }
+            if (source.has("response")) {
+                source = source.optJSONObject(VKConst.RESPONSE);
+            }
+            try {
+                Object object = aClass.getConstructor().newInstance();
+                Field[] fields = aClass.getFields();
+                for (int i = 0; i < fields.length; i++) {
+                    Field field = fields[i];
+                    field.setAccessible(true);
+
+                    String key = field.getName();
+                    Object value = source.opt(key);
+                    if (value == null) {
+                        continue;
+                    }
+
+                    Class<?> type = field.getType();
+                    if (type.isPrimitive()) {
+                        if (type == int.class) {
+                            field.setInt(object, Integer.parseInt(value.toString()));
+                        } else if (type == long.class) {
+                            field.setLong(object, Long.parseLong(value.toString()));
+                        } else if (type == float.class) {
+                            field.setFloat(object, Float.parseFloat(value.toString()));
+                        } else if (type == double.class) {
+                            field.setDouble(object, Double.parseDouble(value.toString()));
+                        }
+                    } else {
+                        if (type.isArray() && value instanceof JSONArray) {
+                            JSONArray array = (JSONArray) value;
+                            Object arrayFromJson = parseArray(type.getComponentType(), array);
+
+                            field.set(object, arrayFromJson);
+                        }
+                        if (type == String.class) {
+                            field.set(object, value);
+                        }
+                    }
+                }
+                return (E) object;
+            } catch (Exception e) {
+                if (DEBUG) e.printStackTrace();
+            }
+            return null;
+        }
+
+        /**
+         * Create object array and parse from {@link JSONObject}.
+         * Supports parsing of primitive types (int, long, double)
+         *
+         * @param componentType the component type of array item
+         * @param jsonArray     the json array to parse
+         * @return instance of array, to set to array field in class
+         *
+         * @see Field#getType()
+         * @see Class#isArray()
+         * @see Class#getComponentType()
+         */
+        public static Object parseArray(Class<?> componentType, JSONArray jsonArray) {
+            Object instanceArray = Array.newInstance(componentType, jsonArray.length());
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Object value = jsonArray.opt(i);
+                if (value == null) {
+                    continue;
+                }
+                if (componentType.isPrimitive()) {
+                    if (componentType == int.class) {
+                        Array.setInt(instanceArray, i, jsonArray.optInt(i));
+                    } else if (componentType == long.class) {
+                        Array.setLong(instanceArray, i, jsonArray.optLong(i));
+                    } else if (componentType == float.class) {
+                        Array.setFloat(instanceArray, i, Float.parseFloat(value.toString()));
+                    } else if (componentType == double.class) {
+                        Array.setDouble(instanceArray, i, jsonArray.optDouble(i));
+                    }
+                } else {
+                    Array.set(instanceArray, i, value);
+                }
+            }
+            return instanceArray;
+        }
+
+        /**
+         * Returns root JSONObject from server response
+         *
+         * @param source standard VK server response
+         */
+        public static JSONObject responseJson(JSONObject source) {
+            return source.optJSONObject(VKConst.RESPONSE);
+        }
+
+        /**
+         * Returns root JSONArray from server response
+         *
+         * @param source standard VK server response
+         */
+        public static JSONArray responseArray(JSONObject source) {
+            return source.optJSONArray(VKConst.RESPONSE);
+        }
+
+        public static <T> T newInstance(Class<T> c) {
+            try {
+                @SuppressWarnings("unchecked")
+                Constructor<T> constructor = c.getConstructor();
+                return constructor.newInstance();
+            } catch (java.lang.Exception e) {
+                if (DEBUG) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
         }
 
     }
@@ -2351,6 +2582,7 @@ public class VKApi {
      */
     public class VKConst {
         /** Commons */
+        public static final String RESPONSE = "response";
         public static final String USER_ID = "user_id";
         public static final String USER_IDS = "user_ids";
         public static final String OWNER_ID = "owner_id";
@@ -2526,6 +2758,7 @@ public class VKApi {
      */
     public static class VKAsyncRequestTask extends AsyncTask<VKRequest, Void, JSONObject> {
         private VKOnResponseListener listener;
+        private VKRequest request;
 
         public VKAsyncRequestTask(VKOnResponseListener listener) {
             this.listener = listener;
@@ -2535,11 +2768,15 @@ public class VKApi {
         protected JSONObject doInBackground(final VKRequest... params) {
             Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             final JSONObject response;
+            final VKRequest request = params[0];
+            this.request = request;
             try {
-                response = params[0].execute();
-                checkError(params[0], response);
+                response = request.execute();
+                checkError(request, response);
                 return response;
             } catch (final HttpResponseCodeException e) {
+                if (DEBUG) e.printStackTrace();
+
                 if (listener != null) {
                     AndroidUtils.runOnUi(new Runnable() {
                         @Override
@@ -2547,7 +2784,7 @@ public class VKApi {
                             if (e instanceof VKException) {
                                 listener.onError((VKException) e);
                             } else {
-                                listener.onError(new VKException(params[0].getSignedUrl(), e.responseMessage, e.responseCode));
+                                listener.onError(new VKException(request.getSignedUrl(), e.responseMessage, e.responseCode));
                             }
                         }
                     });
@@ -2568,7 +2805,7 @@ public class VKApi {
             super.onPostExecute(result);
 
             if (listener != null && result != null) {
-                listener.onResponse(result);
+                listener.onResponse(request, result);
             }
         }
     }
@@ -2576,6 +2813,8 @@ public class VKApi {
     /**
      * Thrown when server vk could not handle the request
      * see website to get description of error codes: http://vk.com/dev/errors
+     * <p/>
+     * Check {@link VKErrorCodes} for get descriptions of error codes
      */
     public static class VKException extends HttpResponseCodeException {
         public String url;
@@ -2751,8 +2990,9 @@ public class VKApi {
          */
         public static final int PERMISSION_DENIED = 600;
 
-        /** Message errors */
-
+        /**
+         * Message errors
+         */
         public static final int CANNOT_SEND_MESSAGE_BLACK_LIST = 900;
         public static final int CANNOT_SEND_MESSAGE_GROUP = 901;
 
@@ -2872,19 +3112,54 @@ public class VKApi {
     }
 
     /**
+     * The response handler, auto parse models
+     *
+     * @param <E> the class type of object for result
+     */
+    public static abstract class VKResponseHandler<E> implements VKOnResponseListener {
+
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void onResponse(VKRequest request, JSONObject responseJson) {
+            Object result = VKJsonParser.fromJson(responseJson.optJSONArray(VKConst.RESPONSE).optJSONObject(0), request.model.getClass());
+            onResponse((E) result);
+        }
+
+        @Override
+        public void onError(VKException exception) {
+
+        }
+
+        /**
+         * Called when successfully receiving the response from WEB
+         *
+         * @param result the parsed model object
+         */
+        public abstract void onResponse(E result);
+    }
+
+    /**
      * Callback for Async execute
      */
     public interface VKOnResponseListener {
         /**
          * Called when successfully receiving the response from WEB
          *
+         * @param request      the request, which was executed. May be null
          * @param responseJson json object from response
          */
-        void onResponse(JSONObject responseJson);
+        void onResponse(VKRequest request, JSONObject responseJson);
 
         /**
          * Called when an error occurs on the server side
+         * <p/>
          * Visit website to get description of error codes: http://vk.com/dev/errors
+         * and {@link VKErrorCodes}
+         * It is useful if the server requires you to enter a captcha
+         *
+         * @param exception the information of error, e.g.
+         *                  errorMessage, errorCode.
          */
         void onError(VKException exception);
     }

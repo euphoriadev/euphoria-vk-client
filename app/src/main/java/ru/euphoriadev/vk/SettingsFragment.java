@@ -54,6 +54,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_USE_CAT_ICON_SEND = "cat_icon_send";
     public static final String KEY_FORCED_LOCALE = "forced_locale";
     public static final String KEY_USE_SYSTEM_EMOJI = "system_emoji";
+    public static final String KEY_GRAVITY_DRAWER_HEADER = "drawer_header_gravity";
 
     /** Font keys */
     public static final String KEY_FONT_FAMILY = "font_family";
@@ -229,6 +230,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         categoryUI.addPreference(blurRadiusPreference);
 
+
+        CheckBoxPreference boxHeaderGravity = new MaterialCheckBoxPreference(getActivity());
+        boxHeaderGravity.setTitle("Изменить положение заголовка");
+        boxHeaderGravity.setKey(KEY_GRAVITY_DRAWER_HEADER);
+        boxHeaderGravity.setSummary("Установить заголовок боковой шторке по середине");
+        boxHeaderGravity.setDefaultValue(false);
+
+        categoryUI.addPreference(boxHeaderGravity);
 
         CheckBoxPreference boxDivider = new MaterialCheckBoxPreference(getActivity());
         boxDivider.setTitle(getActivity().getString(R.string.prefs_show_divider));

@@ -434,7 +434,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (AndroidUtils.isInternetConnection(getActivity())) {
             VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
                 @Override
-                public void onResponse(JSONObject responseJson) {
+                public void onResponse(VKApi.VKRequest request, JSONObject responseJson) {
                     final JSONObject response = responseJson.optJSONObject("response");
                     if (response == null) {
                         return;

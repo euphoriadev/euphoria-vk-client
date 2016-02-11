@@ -12,6 +12,7 @@
         android:src="@drawable/drawer_header_black"/>
 
     <LinearLayout
+        android:id="@+id/drawerHeaderContainer"
         android:layout_width="match_parent"
         android:layout_height="164dp"
         android:gravity="bottom"

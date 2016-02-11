@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Created by Igorek on 16.07.15.
+ * Created by Igor on 16.07.15.
  */
 public class VKUser implements Serializable {
 
@@ -23,7 +23,6 @@ public class VKUser implements Serializable {
     };
 
     /**
-     *
      * User ID.
      */
     public int user_id;
@@ -53,7 +52,6 @@ public class VKUser implements Serializable {
      * @see #toString()
      */
     private String fullName;
-
 
     /**
      * Information whether the user is online.

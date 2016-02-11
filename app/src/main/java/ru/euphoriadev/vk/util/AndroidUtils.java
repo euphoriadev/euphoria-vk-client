@@ -74,6 +74,9 @@ public class AndroidUtils {
     // Нужно добавить строчку в manifest:
     // <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     public static boolean isInternetConnection(Context c) {
+        if (c == null) {
+            return false;
+        }
         ConnectivityManager cm = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
         return (cm.getActiveNetworkInfo() != null &&
                 cm.getActiveNetworkInfo().isAvailable() &&

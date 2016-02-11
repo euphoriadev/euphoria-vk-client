@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +26,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -117,6 +119,7 @@ public class BasicActivity extends BaseThemedActivity implements
         RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_BLUR_RADIUS);
         RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_MAKING_DRAWER_HEADER);
         RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_WALLPAPER_PATH);
+        RefreshManager.registerForChangePreferences(this, SettingsFragment.KEY_GRAVITY_DRAWER_HEADER);
 
         startService(new Intent(this, LongPollService.class));
         loadWallpaper();
@@ -411,6 +414,10 @@ public class BasicActivity extends BaseThemedActivity implements
         }
         drawerTitle.setText(account.fullName);
         drawerStatus.setText(account.status);
+        if (PrefManager.getBoolean(SettingsFragment.KEY_GRAVITY_DRAWER_HEADER)) {
+            LinearLayout drawerContainer = (LinearLayout) headerView.findViewById(R.id.drawerHeaderContainer);
+            drawerContainer.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+        }
         try {
             Picasso.with(BasicActivity.this)
                     .load(account.photo)
@@ -499,7 +506,9 @@ public class BasicActivity extends BaseThemedActivity implements
         // Change blur radius of NavigationView....
 
         ThemeManager.updateThemeValues();
-        if (prefKey.equals(SettingsFragment.KEY_BLUR_RADIUS) || prefKey.equals(SettingsFragment.KEY_MAKING_DRAWER_HEADER)) {
+        if (prefKey.equals(SettingsFragment.KEY_BLUR_RADIUS)
+                || prefKey.equals(SettingsFragment.KEY_MAKING_DRAWER_HEADER)
+                || prefKey.equals(SettingsFragment.KEY_GRAVITY_DRAWER_HEADER)) {
             initDrawerHeader();
         }
 
