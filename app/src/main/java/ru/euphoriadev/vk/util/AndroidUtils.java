@@ -106,6 +106,17 @@ public class AndroidUtils {
         return inSampleSize;
     }
 
+    public static int getDisplayWidth(Activity activity) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics.widthPixels;
+    }
+
+    public static int getDisplayHeight(Activity activity) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics.heightPixels;
+    }
 
     public static Bitmap processingBitmap(Bitmap src) {
         Bitmap dest = Bitmap.createBitmap(

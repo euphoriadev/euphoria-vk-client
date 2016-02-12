@@ -19,14 +19,12 @@ import java.util.Locale;
 import java.util.Random;
 
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.interfaces.OnTwiceClickListener;
-import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.ThemeManager;
@@ -155,7 +153,7 @@ public class TestActivity extends BaseThemedActivity {
         buttonVkApi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VKApi.init(VKApi.VKAccount.from(Api.get().getAccount()));
+                VKApi.init(VKApi.VKUserAccount.from(Api.get().getAccount()));
                 VKApi.messages().setActivity().userId(Api.get().getUserId()).execute(VKApi.DEFAULT_RESPONSE_LISTENER);
             }
         });
@@ -205,7 +203,7 @@ public class TestActivity extends BaseThemedActivity {
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VKApi.init(VKApi.VKAccount.from(Api.get().getAccount()));
+                VKApi.init(VKApi.VKUserAccount.from(Api.get().getAccount()));
                 tvResult.append("Sending message...\n");
                 final long startTime = System.currentTimeMillis();
 

@@ -7,6 +7,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.euphoriadev.vk.api.Api;
@@ -28,47 +30,42 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
 /**
  * Created by Igor on 08.02.15.
  */
-public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
+public class WelcomeActivity extends BaseThemedActivity implements View.OnClickListener {
 
     private final int REQUEST_LOGIN = 1;
     Account account;
     Api api;
 
+    Button btnLogin;
+    Button buttonAnimate;
+    TextView tvTitle;
+    TextView tvDesctiption;
+    ImageView ivLogin;
+
+    private boolean isAmimationShowed;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        ThemeManager.applyTheme(this);
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        setTitle(R.string.authorization);
-
-
-//        // Стилизируем текст
-//        Spannable text = new SpannableString("Привет, человек!");
-//        text.setSpan(new StyleSpan(Typeface.BOLD_ITALIC), 7, 15,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//        text.setSpan(new ForegroundColorSpan(Color.GREEN), 7, 15,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-
         account = new Account(getApplicationContext());
-//        // Восстанавливаем сохраненную сесию
-//        account.restore();
 
-        //Если сессия есть, переходим на главную активити
-//        if (account.access_token != null) {
-//            startActivity(new Intent(this, BasicActivity.class));
-//            finish();
-//            return;
-//        }
+        tvTitle = (TextView) findViewById(R.id.tvTitle);
+        tvDesctiption = (TextView) findViewById(R.id.tvDescription);
+        btnLogin = (Button) findViewById(R.id.btnLogin);
+        Button buttonToken = (Button) findViewById(R.id.btnAccessToken);
 
-        Button btnLogin = (Button) findViewById(R.id.btnLogin);
-        Button btnAccessToken = (Button) findViewById(R.id.btnAccessToken);
-        ImageView ivLogin = (ImageView) findViewById(R.id.ivLogin);
-
-        ivLogin.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
-        btnAccessToken.setOnClickListener(this);
+        buttonToken.setOnClickListener(this);
 
 
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        animate();
     }
 
     @Override
@@ -128,8 +125,36 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 intent.setClass(this, LoginActivity.class);
                 startActivityForResult(intent, REQUEST_LOGIN);
                 break;
+
+//            case R.id.btnAnimate:
+//                animate();
+//                break;
+
         }
 
+    }
+
+    private void animate() {
+        if (isAmimationShowed) {
+            return;
+        }
+
+        CardView cardView = (CardView) findViewById(R.id.cardView);
+        LinearLayout cardViewContainer = (LinearLayout) findViewById(R.id.cardViewContainer);
+
+        float y = cardView.getY();
+
+        cardView.setY(AndroidUtils.getDisplayHeight(this));
+        cardView.setCardElevation(0);
+        cardViewContainer.setAlpha(0);
+
+        cardView.animate().y(y).z(25).setDuration(900).withLayer().start();
+        cardViewContainer.animate().alpha(1.0f).setDuration(900).withLayer().withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                isAmimationShowed = true;
+            }
+        }).start();
 
     }
 
@@ -169,7 +194,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         builder.setTitle(getString(R.string.login));
         builder.setMessage(getString(R.string.login_description));
         builder.setView(layout);
-        builder.setPositiveButton("Go!", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Go", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (TextUtils.isEmpty(etAccessToken.getText().toString().trim()) ||

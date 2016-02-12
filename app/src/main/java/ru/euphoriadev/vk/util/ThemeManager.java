@@ -435,7 +435,7 @@ public class ThemeManager {
             sMessageWallpaperPath = prefs.getString(PREF_KEY_MESSAGE_WALLPAPER_PATH, "");
             sColourTheme = Integer.parseInt(prefs.getString(PREF_KEY_THEME_COLOUR, String.valueOf(DEFAULT_COLOR)));
 //          sAccentColor = Integer.parseInt(prefs.getString(PREF_KEY_COLOR_ACCENT, String.valueOf(DEFAULT_ACCENT_COLOR)));
-            sIsDarkTheme = prefs.getBoolean(PREF_KEY_IS_DARK_THEME, true);
+            sIsDarkTheme = prefs.getBoolean(PREF_KEY_IS_DARK_THEME, false);
             sDrawerHeaderState = Integer.parseInt(prefs.getString(PREF_KEY_DRAWER_HEADER, String.valueOf(DRAWER_HEADER_DEFAULT)));
 
             sTextPrimaryDarkColor = ContextCompat.getColor(context, R.color.primary_text_default_material_dark);

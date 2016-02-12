@@ -36,10 +36,7 @@ public class Account {
         editor.putString("photo", photo);
         editor.putString("status", status);
 
-        //   editor.apply();
-//        if (Build.VERSION.SDK_INT < 16)
-            editor.commit();
-//        else editor.apply();
+        PrefManager.apply(editor);
     }
 
     /**

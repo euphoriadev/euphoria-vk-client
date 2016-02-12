@@ -64,7 +64,7 @@ public class AppLoader extends Application {
         createAppDir();
 
         CrashManager.init();
-        VKApi.init(new VKApi.VKAccount().restore());
+        VKApi.init(new VKApi.VKUserAccount().restore());
     }
 
     /**

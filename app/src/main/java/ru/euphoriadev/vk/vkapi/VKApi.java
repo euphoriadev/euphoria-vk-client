@@ -55,7 +55,7 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
  * <p/>
  * Example to init api and execute users.get request:
  * <pre>
- *      VKApi.init(VKApi.VKAccount.from(account));
+ *      VKApi.init(VKApi.VKUserAccount.from(account));
  *      String response = VKApi.users()
  *               .get()
  *               .userId(1)
@@ -92,7 +92,7 @@ public class VKApi {
     private static final ExecutorService VK_SINGLE_EXECUTOR = Executors.newSingleThreadExecutor();
     private static volatile VKApi instance;
 
-    private VKAccount mAccount;
+    private VKUserAccount mAccount;
     private AsyncHttpClient mClient;
 
     /**
@@ -101,7 +101,7 @@ public class VKApi {
      * @param account the vk account,
      *                on behalf of which to send requests to server VK
      */
-    public static synchronized VKApi init(VKAccount account) {
+    public static synchronized VKApi init(VKUserAccount account) {
         if (instance == null) {
             instance = new VKApi(account);
         }
@@ -111,9 +111,9 @@ public class VKApi {
     /**
      * Private constructor, Нou don't have use it
      *
-     * @see #init(VKAccount)
+     * @see #init(VKUserAccount)
      */
-    private VKApi(VKAccount account) {
+    private VKApi(VKUserAccount account) {
         this.mAccount = account;
         this.mClient = new AsyncHttpClient(null, 1);
     }
@@ -131,7 +131,7 @@ public class VKApi {
     /**
      * Return current account from api
      */
-    public static VKAccount getAccount() {
+    public static VKUserAccount getAccount() {
         return getInstance().mAccount;
     }
 
@@ -154,6 +154,13 @@ public class VKApi {
      */
     public static VKFriends friends() {
         return new VKFriends();
+    }
+
+    /**
+     * Methods for account
+     */
+    public static VKAccount account() {
+        return new VKAccount();
     }
 
     /**
@@ -256,7 +263,7 @@ public class VKApi {
      * Account it store the necessary data to run the query on behalf of user
      * such as the token, email, api id and user id
      */
-    public static class VKAccount {
+    public static class VKUserAccount {
         public static final String ACCESS_TOKEN = "access_token";
         public static final String USER_ID = "user_id";
         public static final String EMAIL = "email";
@@ -289,7 +296,7 @@ public class VKApi {
          * @param email       the email of current user (not necessarily)
          * @param userId      the user id of current user
          */
-        public VKAccount(String accessToken, @Nullable String email, int userId, int apiId) {
+        public VKUserAccount(String accessToken, @Nullable String email, int userId, int apiId) {
             this.accessToken = accessToken;
             this.email = email;
             this.userId = userId;
@@ -299,25 +306,25 @@ public class VKApi {
         /**
          * Empty Constructor
          */
-        public VKAccount() {
+        public VKUserAccount() {
 
         }
 
         /**
          * Create new vk account and restore properties from sd
          */
-        public VKAccount(File file) {
+        public VKUserAccount(File file) {
             this.restore(file);
         }
 
         /**
-         * Create new VKAccount from {@link Account}, this is to support
+         * Create new VKUserAccount from {@link Account}, this is to support
          *
          * @param account the old account to get properties (access_token, userId)
-         * @return new VKAccount with properties {@link Account}
+         * @return new VKUserAccount with properties {@link Account}
          */
-        public static VKAccount from(Account account) {
-            return new VKAccount(account.access_token, null, (int) account.user_id, Integer.parseInt(Account.API_ID));
+        public static VKUserAccount from(Account account) {
+            return new VKUserAccount(account.access_token, null, (int) account.user_id, Integer.parseInt(Account.API_ID));
         }
 
         /**
@@ -365,7 +372,7 @@ public class VKApi {
          *
          * @return this account
          */
-        public VKAccount restore() {
+        public VKUserAccount restore() {
             this.accessToken = PrefManager.getString(ACCESS_TOKEN);
             this.userId = (int) PrefManager.getLong(USER_ID);
             this.apiId = PrefManager.getInt(API_ID);
@@ -378,7 +385,7 @@ public class VKApi {
          *
          * @return this account
          */
-        public VKAccount restore(File file) {
+        public VKUserAccount restore(File file) {
             try {
                 String readText = FileUtils.readFileToString(file);
                 JSONObject json = new JSONObject(readText);
@@ -979,6 +986,41 @@ public class VKApi {
 
     }
 
+    public static class VKAccount {
+
+
+        /**
+         * Returns non-null values of user counters
+         * NOTE: This method doesn't require any specific rights.
+         */
+        public VKMethodSetter getCounters() {
+            return new VKMethodSetter(new VKRequest("account.getCounters"))
+                    .fields("friends, messages, photos, videos, notes, gifts, events, groups, notifications, sdk, app_requests");
+        }
+
+        /**
+         * Marks the current user as online for 15 minutes
+         */
+        public VKMethodSetter setOnline() {
+            return new VKMethodSetter(new VKRequest("account.setOnline"));
+        }
+
+        /**
+         * Marks a current user as Offline
+         */
+        public VKMethodSetter setOffline() {
+            return new VKMethodSetter(new VKRequest("account.setOffline"));
+        }
+
+        /**
+         * Gets settings of the current user in this application
+         */
+        public VKMethodSetter getAppPermissions() {
+            return new VKMethodSetter(new VKRequest("account.getAppPermissions"));
+        }
+
+
+    }
 
     /**
      * Common setters, e.g. fields, user_ids, offset
@@ -2417,6 +2459,70 @@ public class VKApi {
         }
 
         /**
+         * Parse boolean from server response.
+         *
+         * @param from server response like this format: {@code response: 1}
+         */
+        public static boolean parseBoolean(JSONObject from) {
+            return from.optInt("response", 0) == 1;
+        }
+
+        /**
+         * Parse boolean from JSONObject with given name.
+         *
+         * @param from server response like this format: {@code field: 1}
+         * @param name name of field to read
+         */
+        public static boolean parseBoolean(JSONObject from, String name) {
+            return from != null && from.optInt(name, 0) == 1;
+        }
+
+        /**
+         * Parse int from JSONObject with given name.
+         *
+         * @param from server response like this format: {@code field: 34}
+         * @param name name of field to read
+         */
+        public static int parseInt(JSONObject from, String name) {
+            if (from == null) return 0;
+            return from.optInt(name, 0);
+        }
+
+        /**
+         * Parse int from server response.
+         *
+         * @param from server response like this format: {@code response: 34}
+         */
+        public static int parseInt(JSONObject from) {
+            if (from == null) return 0;
+            return from.optInt("response");
+        }
+
+        /**
+         * Parse long from JSONObject with given name.
+         *
+         * @param from server response like this format: {@code field: 34}
+         * @param name name of field to read
+         */
+        public static long parseLong(JSONObject from, String name) {
+            if (from == null) return 0;
+            return from.optLong(name, 0);
+        }
+
+        /**
+         * Parse int array from JSONObject with given name.
+         *
+         * @param from int JSON array like this one {@code {11, 34, 42}}
+         */
+        public static int[] parseIntArray(JSONArray from) {
+            int[] result = new int[from.length()];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = from.optInt(i);
+            }
+            return result;
+        }
+
+        /**
          * Convert object to JSON, uses {@link java.lang.reflect.Field}.
          * The method is quite long,
          * because reflection too much performs access checks.
@@ -2461,9 +2567,34 @@ public class VKApi {
             if (source == null || source.length() == 0) {
                 return null;
             }
+            JSONArray jsonItems = null;
             if (source.has("response")) {
-                source = source.optJSONObject(VKConst.RESPONSE);
+                Object json = source.opt(VKConst.RESPONSE);
+                if (json instanceof JSONObject) {
+                    source = (JSONObject) json;
+                } else if (json instanceof JSONArray) {
+                    jsonItems = (JSONArray) json;
+                }
             }
+
+            if (jsonItems == null) {
+                jsonItems = source.optJSONArray(VKConst.ITEMS);
+            }
+
+            // if value in "items" array
+            if (jsonItems != null && jsonItems.length() > 0) {
+                JSONObject item = jsonItems.optJSONObject(0);
+                return fromJson(item, aClass);
+            }
+
+            // if format: {@code response: 1}
+            if (aClass == Integer.class || aClass == Long.class) {
+                return (E) Integer.valueOf(VKJsonParser.parseInt(source));
+            } else if (aClass == Boolean.class) {
+                return (E) Boolean.valueOf(VKJsonParser.parseBoolean(source));
+            }
+
+            // if a complex type class, e.g. VKUser, VKMessage,
             try {
                 Object object = aClass.getConstructor().newInstance();
                 Field[] fields = aClass.getFields();
@@ -2583,6 +2714,8 @@ public class VKApi {
     public class VKConst {
         /** Commons */
         public static final String RESPONSE = "response";
+        public static final String ITEMS = "items";
+
         public static final String USER_ID = "user_id";
         public static final String USER_IDS = "user_ids";
         public static final String OWNER_ID = "owner_id";
@@ -3117,12 +3250,10 @@ public class VKApi {
      * @param <E> the class type of object for result
      */
     public static abstract class VKResponseHandler<E> implements VKOnResponseListener {
-
-
         @Override
         @SuppressWarnings("unchecked")
         public void onResponse(VKRequest request, JSONObject responseJson) {
-            Object result = VKJsonParser.fromJson(responseJson.optJSONArray(VKConst.RESPONSE).optJSONObject(0), request.model.getClass());
+            Object result = VKJsonParser.fromJson(responseJson, request.model.getClass());
             onResponse((E) result);
         }
 

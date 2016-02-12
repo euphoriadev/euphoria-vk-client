@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
@@ -102,6 +103,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         ViewUtil.setColor(((BasicActivity) getActivity()).getToolbar(), ThemeManager.getPrimaryTextColorOnThemeColor(getActivity()));
 
         listView = (ListView) rootView.findViewById(R.id.lvMess);
+        ViewCompat.setLayerType(listView, ViewCompat.LAYER_TYPE_HARDWARE, null);
         AndroidUtils.setEdgeGlowColor(listView, ThemeManager.getThemeColor(getActivity()));
         tm.initDivider(listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

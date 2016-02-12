@@ -1,6 +1,7 @@
 package ru.euphoriadev.vk;
 
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +29,7 @@ import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.CrashManager;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
@@ -104,7 +106,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         final MaterialSwitchPreference boxNightTheme = new MaterialSwitchPreference(getActivity());
         boxNightTheme.setTitle(getActivity().getString(R.string.prefs_night_theme));
-        boxNightTheme.setDefaultValue(true);
+        boxNightTheme.setDefaultValue(false);
         boxNightTheme.setEnabled(ThemeManager.getThemeColor(getActivity()) != Color.BLACK);
         boxNightTheme.setKey(KEY_IS_NIGHT_MODE);
         boxNightTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -425,7 +427,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         Preference preferenceSendLogs = new MaterialPreference(getActivity());
         preferenceSendLogs.setTitle("Send log to developers");
-        preferenceSendLogs.setEnabled(CrashManager.getLogsDir().listFiles().length != 0);
+        try {
+            preferenceSendLogs.setEnabled(CrashManager.getLogsDir().listFiles().length != 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         preferenceSendLogs.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -495,16 +501,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         changelogSceen.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                final String title = getActivity().getResources().getString(R.string.change_log);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                        .setTitle(title)
-                        .setPositiveButton("OK", null)
-                        .setMessage(getActivity().getResources().getString(R.string.changelog));
-                final AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-
-                ViewUtil.setTypeface(alertDialog, title);
-                // FileHelper.downloadFileAsync("http://cs612426.vk.me/u157582555/docs/da1604b960ce/MaterialDrawer-develop-1.zip1?extra=Gh1hZtTUZNqFzUvGkF79SV3b6Dyn-AaGRJaUluSXj6ateHzyRIHhwJL0I-5Gxm8GBbtFC4zpvv6QZgWcVk1Rmt2z5DyJh9g&dl=1");
+                showChangeLog();
                 return false;
             }
         });
@@ -585,6 +582,37 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+    }
+
+    private void showChangeLog() {
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Loading change log...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.show();
+
+        ThreadExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final String title = getActivity().getResources().getString(R.string.change_log);
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.cancel();
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                                .setTitle(title)
+                                .setPositiveButton("OK", null)
+                                .setMessage(getActivity().getResources().getString(R.string.changelog));
+                        final AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
+                        ViewUtil.setTypeface(alertDialog, title);
+                    }
+                });
+            }
+        });
 
     }
 

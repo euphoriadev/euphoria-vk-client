@@ -1,33 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:gravity="center_horizontal"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:background="@color/md_red_700"
+              android:gravity="center"
+              android:orientation="vertical">
 
-    <ImageView android:layout_width="250dp"
-               android:id="@+id/ivLogin"
-               android:src="@drawable/ic_app_logo"
-               android:layout_marginTop="50dp"
-               android:layout_marginBottom="48dp"
-               android:layout_height="250dp"/>
 
-    <Button
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="10dp">
+
+        <LinearLayout
+            android:id="@+id/cardViewContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/authorization"
-            android:textSize="18sp"
-            style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/btnLogin"
-            android:layout_gravity="center_horizontal"/>
-    <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/login_with_token"
-            android:id="@+id/btnAccessToken"
-            android:textSize="18sp"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_gravity="center_horizontal"/>
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Euphoria"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="24sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:gravity="center"
+                android:text="The Open Source Material Design client for VK"
+                android:textColor="?android:textColorSecondary"
+                android:textSize="18sp"/>
+
+
+            <Button
+                android:id="@+id/btnLogin"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="6dp"
+                android:background="@android:drawable/dialog_holo_light_frame"
+                android:backgroundTint="@color/md_red_700"
+                android:padding="20dp"
+                android:text="@string/authorization"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
+            <Button
+                android:id="@+id/btnAccessToken"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/login_with_token"
+                android:textSize="12sp"/>
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+    <!--<ImageView-->
+    <!--android:id="@+id/ivLogin"-->
+    <!--android:layout_width="220dp"-->
+    <!--android:layout_height="220dp"-->
+    <!--android:layout_marginBottom="48dp"-->
+    <!--android:src="@drawable/ic_app_logo"/>-->
+
+
+    <!--<TextView-->
+    <!--android:id="@+id/tvTitle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Euphoria"-->
+    <!--android:textColor="?android:textColorPrimary"-->
+    <!--android:textSize="24sp"-->
+    <!--android:textStyle="bold"/>-->
+
+
+    <!--<TextView-->
+    <!--android:id="@+id/tvDescription"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="16dp"-->
+    <!--android:gravity="center"-->
+    <!--android:text="The Open Source Material Design client for VK"-->
+    <!--android:textColor="?android:textColorSecondary"-->
+    <!--android:textSize="18sp"/>-->
+
+    <!--<Button-->
+    <!--android:id="@+id/btnLogin"-->
+    <!--style="?android:attr/borderlessButtonStyle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:layout_marginTop="6dp"-->
+    <!--android:background="@android:drawable/dialog_holo_light_frame"-->
+    <!--android:padding="18dp"-->
+    <!--android:text="@string/authorization"-->
+    <!--android:textSize="18sp"/>-->
+
+
+    <!--<Button-->
+    <!--android:id="@+id/btnAnimate"-->
+    <!--style="?android:attr/borderlessButtonStyle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:layout_marginTop="6dp"-->
+    <!--android:background="@android:drawable/dialog_holo_light_frame"-->
+    <!--android:padding="18dp"-->
+    <!--android:text="Animation screen"-->
+    <!--android:textSize="18sp"/>-->
 
 
 </LinearLayout>

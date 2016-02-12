@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.PopupWindowCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -33,12 +34,16 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
+import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
@@ -383,6 +388,14 @@ public class BasicActivity extends BaseThemedActivity implements
         });
     }
 
+    private void getUserStatus(final Account account, final TextView textView) {
+        if (!TextUtils.isEmpty(account.status)) {
+            return;
+        }
+        textView.setText(account.status);
+
+    }
+
     private void initDrawerHeader() {
         if (account == null) {
             account = new Account(this).restore();
@@ -393,7 +406,6 @@ public class BasicActivity extends BaseThemedActivity implements
         final TextView drawerTitle = (TextView) headerView.findViewById(R.id.drawerTitle);
         final TextView drawerStatus = (TextView) headerView.findViewById(R.id.drawerStatus);
         final ImageView drawerBackground = (ImageView) headerView.findViewById(R.id.drawerBackgroundHeader);
-
         ViewUtil.setTypeface(drawerStatus);
         ViewUtil.setTypeface(drawerTitle);
 
@@ -413,7 +425,7 @@ public class BasicActivity extends BaseThemedActivity implements
             }
         }
         drawerTitle.setText(account.fullName);
-        drawerStatus.setText(account.status);
+        getUserStatus(account, drawerStatus);
         if (PrefManager.getBoolean(SettingsFragment.KEY_GRAVITY_DRAWER_HEADER)) {
             LinearLayout drawerContainer = (LinearLayout) headerView.findViewById(R.id.drawerHeaderContainer);
             drawerContainer.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
@@ -427,6 +439,7 @@ public class BasicActivity extends BaseThemedActivity implements
         }
 
     }
+
 
     @Override
     public void onBackPressed() {

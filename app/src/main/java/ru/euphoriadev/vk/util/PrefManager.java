@@ -165,10 +165,20 @@ public class PrefManager {
      * If build version < 9 - use old method {@link SharedPreferences.Editor#commit()}
      */
     private static void apply() {
+        apply(sEditor);
+    }
+
+    /**
+     * Apply changes to Preferences.
+     * If build version < 9 - use old method {@link SharedPreferences.Editor#commit()}
+     *
+     * @param editor the editor to use for apply
+     */
+    public static void apply(SharedPreferences.Editor editor) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            sEditor.apply();
+            editor.apply();
         } else {
-            sEditor.commit();
+            editor.commit();
         }
     }
 }
