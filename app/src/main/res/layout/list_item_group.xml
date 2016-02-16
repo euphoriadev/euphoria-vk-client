@@ -9,11 +9,11 @@
 
     <ImageView
         android:id="@+id/ivGroupSelected"
-        android:src="@drawable/ic_selected"
-        android:visibility="visible"
-        android:layout_marginRight="16dp"
         android:layout_width="24dp"
-        android:layout_height="24dp"/>
+        android:layout_height="24dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/ic_selected"
+        android:visibility="visible"/>
 
     <ru.euphoriadev.vk.view.CircleImageView
         android:id="@+id/ivGroupPhoto"

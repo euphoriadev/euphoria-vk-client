@@ -24,13 +24,13 @@
         2.3.3   10  Gingerbread
         2.3     9
         2.2     8   Froyo
-        2.1     7   Eclair
+        2.1     7
         2.0.1   6
-        2.0     5
+        2.0     5   Eclair
         1.6     4   Donut
         1.5     3   Cupcake
         1.1     2
-        1.0     1
+        1.0     1   Base
        <! -->
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -76,6 +76,7 @@
         <activity android:name=".UserProfileActivity"/>
         <activity android:name=".CreateChatActivity"/>
         <activity android:name=".MusicPlayerActivity"/>
+        <activity android:name=".PhotoViewerActivity"/>
         <activity
             android:name=".ImageViewerActivity"
             android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"/>

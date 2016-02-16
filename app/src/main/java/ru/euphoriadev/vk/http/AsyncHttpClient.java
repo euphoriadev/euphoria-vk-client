@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
@@ -27,7 +28,6 @@ import ru.euphoriadev.vk.util.AndroidUtils;
 public class AsyncHttpClient implements Closeable {
     public static final String TAG = "AsyncHttpClient";
     public static final int DEFAULT_THREADS_SIZE = 3;
-    private Context mContent;
     private int mThreadsSize;
     private ExecutorService mExecutor;
 
@@ -50,7 +50,7 @@ public class AsyncHttpClient implements Closeable {
         if (threadsCount <= 0) {
             threadsCount = DEFAULT_THREADS_SIZE;
         }
-        this.mContent = context;
+//        this.mContent = context;
         this.mThreadsSize = threadsCount;
     }
 
@@ -97,9 +97,6 @@ public class AsyncHttpClient implements Closeable {
             // MalformedURLException | ConnectException | UnsupportedEncodingException | ProtocolException | HttpResponseCodeException
         } catch (IOException e) {
             e.printStackTrace();
-            if (connection != null) {
-                IOUtils.closeQuietly(connection.getErrorStream());
-            }
 
             if (e instanceof HttpResponseCodeException) {
                 throw (HttpResponseCodeException) e;

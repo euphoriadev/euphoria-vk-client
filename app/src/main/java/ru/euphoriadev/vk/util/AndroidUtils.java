@@ -1,6 +1,8 @@
 package ru.euphoriadev.vk.util;
 
 
+import android.animation.Animator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
@@ -30,6 +32,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.EdgeEffect;
@@ -112,11 +115,30 @@ public class AndroidUtils {
         return metrics.widthPixels;
     }
 
+
     public static int getDisplayHeight(Activity activity) {
         DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics.heightPixels;
     }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void circularReveal(View rootLayout) {
+        int cx = rootLayout.getWidth() / 2;
+        int cy = rootLayout.getHeight() / 2;
+
+        float finalRadius = Math.max(rootLayout.getWidth(), rootLayout.getHeight());
+
+        // create the animator for this view (the start radius is zero)
+        Animator circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, cx, cy, 0, finalRadius);
+        circularReveal.setDuration(1000);
+
+        // make the view visible and start the animation
+        rootLayout.setVisibility(View.VISIBLE);
+        circularReveal.start();
+    }
+
+
 
     public static Bitmap processingBitmap(Bitmap src) {
         Bitmap dest = Bitmap.createBitmap(

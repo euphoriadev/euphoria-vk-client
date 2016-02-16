@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.view.ProgressLayout;
 
@@ -30,7 +29,6 @@ public class AudioAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<VKAudio> mAudios;
     private LayoutInflater inflater;
-    private ThemeManagerOld tm;
     private Typeface typeface;
 
     private Drawable iconPlay;
@@ -42,7 +40,6 @@ public class AudioAdapter extends BaseAdapter {
     public AudioAdapter(Context context, ArrayList<VKAudio> audios) {
         this.mContext = context;
         this.mAudios = audios;
-        tm = ThemeManagerOld.get(context);
 
 //        iconPlay = new IconicsDrawable(context, GoogleMaterial.Icon.gmd_play_circle_filled);
 //        iconPause = new IconicsDrawable(context, GoogleMaterial.Icon.gmd_pause_circle_filled);

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKGroup;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
@@ -49,8 +50,8 @@ public class GroupsAdapter extends BaseArrayAdapter<VKGroup> {
 
         VKGroup group = getItem(position);
 
-        holder.tvTitle.setTextColor(getThemeManager().getPrimaryTextColor());
-        holder.tvStatus.setTextColor(getThemeManager().getSecondaryTextColor());
+        holder.tvTitle.setTextColor(ThemeManager.getPrimaryTextColor());
+        holder.tvStatus.setTextColor(ThemeManager.getSecondaryTextColor());
 
 
         ViewUtil.setTypeface(holder.tvTitle);
@@ -60,11 +61,11 @@ public class GroupsAdapter extends BaseArrayAdapter<VKGroup> {
             holder.ivSelected.setVisibility(View.VISIBLE);
             if (isSelectedItem(group)) {
                 holder.ivSelected.setImageResource(R.drawable.ic_selected);
-                holder.ivSelected.setColorFilter(getThemeManager().getFabColor());
+                holder.ivSelected.setColorFilter(ThemeManager.getColorAccent(getContext()));
                 holder.ivSelected.setAlpha(1f);
             } else {
                 holder.ivSelected.setImageResource(R.drawable.ic_vector_unselected);
-                holder.ivSelected.setColorFilter(getThemeManager().getSecondaryTextColor());
+                holder.ivSelected.setColorFilter(ThemeManager.getSecondaryTextColor());
                 holder.ivSelected.setAlpha(0.5f);
             }
         } else {

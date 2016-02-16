@@ -1,7 +1,6 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,10 +18,6 @@ import ru.euphoriadev.vk.util.ViewUtil;
  */
 public class ChatMemberAdapter extends BaseArrayAdapter<ChatMember> {
 
-    private Context mContext;
-    private LayoutInflater inflater;
-    private ArrayList<ChatMember> members;
-
     public ChatMemberAdapter(Context context, ArrayList<ChatMember> members) {
         super(context, members);
     }
@@ -31,7 +26,7 @@ public class ChatMemberAdapter extends BaseArrayAdapter<ChatMember> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = inflater.inflate(R.layout.list_item_chat_member, parent, false);
+            view = getInflater().inflate(R.layout.list_item_chat_member, parent, false);
         }
 
         ChatMember member = getItem(position);
@@ -45,12 +40,12 @@ public class ChatMemberAdapter extends BaseArrayAdapter<ChatMember> {
 
         tvTitle.setText(member.user.toString());
         if (member.user.uid == member.invitedBy.uid) {
-            tvInvitedBy.setText(mContext.getString(R.string.owner_of_chat));
+            tvInvitedBy.setText(getContext().getString(R.string.owner_of_chat));
         } else {
-            tvInvitedBy.setText(mContext.getString(R.string.invited_by) + member.invitedBy.toString());
+            tvInvitedBy.setText(getContext().getString(R.string.invited_by) + member.invitedBy.toString());
         }
 
-        Picasso.with(mContext).load(member.user.photo).into(ivPhoto);
+        Picasso.with(getContext()).load(member.user.photo).into(ivPhoto);
 
         return view;
     }

@@ -19,11 +19,11 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:visibility="gone"
             android:id="@+id/ivWallpaper"
-            android:scaleType="centerCrop"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="gone"/>
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -49,7 +49,6 @@
             tools:layout="@layout/fragment_dialogs"
             />
     </android.support.design.widget.CoordinatorLayout>
-
 
 
     <!-- The navigation drawer -->

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.helper.FileHelper;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.view.TextCircleView;
 
@@ -31,7 +32,7 @@ public class DocsAdapter extends BaseArrayAdapter<VKDocument> {
     public DocsAdapter(Context context, ArrayList<VKDocument> values) {
         super(context, values);
 
-        colorFilter = new PorterDuffColorFilter(getThemeManager().getSecondaryTextColor(), PorterDuff.Mode.MULTIPLY);
+        colorFilter = new PorterDuffColorFilter(ThemeManager.getSecondaryTextColor(), PorterDuff.Mode.MULTIPLY);
         colorDrawable = new ColorDrawable(ThemeUtils.getThemeAttrColor(getContext(), R.attr.colorAccent));
     }
 

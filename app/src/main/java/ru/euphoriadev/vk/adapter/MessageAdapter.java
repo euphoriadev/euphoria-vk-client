@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import ru.euphoriadev.vk.ForwardMessagesActivity;
+import ru.euphoriadev.vk.PhotoViewerActivity;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.api.Api;
@@ -51,6 +52,7 @@ import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.util.ResourcesLoader;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
@@ -61,7 +63,7 @@ import ru.euphoriadev.vk.view.CircleImageView;
  */
 public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements LongPollService.VKOnDialogListener {
 
-    public static final int DEFAULT_COLOR = Color.parseColor("#424242");
+    public static final int DEFAULT_COLOR = ResourcesLoader.getColor(R.color.md_grey_800);
     public static final int DEFAULT_DARK_COLOR = ThemeManager.darkenColor(DEFAULT_COLOR);
     private final Object mLock = new Object();
     public boolean isScrolling;
@@ -69,8 +71,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     int secondaryTextColorDark;
     int secondaryTextColorLight;
     int widthDisplay;
-    Drawable dBubbleOutgoing;
-    Drawable dBubbleIncoming;
     private Context mContext;
     private DBHelper mHelper;
     private SimpleDateFormat sdf;
@@ -104,15 +104,12 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
 
         isColorInMessages = PrefManager.getBoolean(SettingsFragment.KEY_COLOR_IN_MESSAGES, true);
         isColorOutMessages = PrefManager.getBoolean(SettingsFragment.KEY_COLOR_OUT_MESSAGES, false);
-        isNightTheme = getThemeManager().isNightTheme();
-        isBlackTheme = getThemeManager().isBlackTheme();
-
-        dBubbleOutgoing = AndroidUtils.getDrawable(mContext, R.drawable.msg_bubble_outgoing);
-        dBubbleIncoming = AndroidUtils.getDrawable(mContext, R.drawable.msg_bubble_incoming);
+        isNightTheme = ThemeManager.isDarkTheme();
+        isBlackTheme = ThemeManager.getThemeColor(getContext()) == ThemeManager.PALETTE[19];
 
         if (isColorInMessages) {
-            colorInMessages = getThemeManager().getBasicColorOfTheme();
-            colorNotReadingInMessages = getThemeManager().getDarkBasicColorOfTheme();
+            colorInMessages = ThemeManager.getThemeColor(getContext());
+            colorNotReadingInMessages = ThemeManager.darkenColor(ThemeManager.getThemeColor(getContext()));
         } else {
             if (isNightTheme) {
                 colorInMessages = DEFAULT_COLOR;
@@ -124,8 +121,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         }
 
         if (isColorOutMessages) {
-            colorOutMessages = getThemeManager().getBasicColorOfTheme();
-            colorNotReadingOutMessages = getThemeManager().getDarkBasicColorOfTheme();
+            colorOutMessages = ThemeManager.getThemeColor(getContext());
+            colorNotReadingOutMessages = ThemeManager.darkenColor(ThemeManager.getThemeColor(getContext()));
         } else {
             if (isNightTheme) {
                 colorOutMessages = DEFAULT_COLOR;
@@ -222,11 +219,11 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
             holder.spaceSelected.setVisibility(item.message.is_out ? View.GONE : View.VISIBLE);
             if (isSelectedItem(item)) {
                 holder.ivSelected.setImageResource(R.drawable.ic_selected);
-                holder.ivSelected.setColorFilter(getThemeManager().getFabColor());
+                holder.ivSelected.setColorFilter(ThemeManager.getColorAccent(getContext()));
                 holder.ivSelected.setAlpha(1f);
             } else {
                 holder.ivSelected.setImageResource(R.drawable.ic_vector_unselected);
-                holder.ivSelected.setColorFilter(getThemeManager().getSecondaryTextColor());
+                holder.ivSelected.setColorFilter(ThemeManager.getSecondaryTextColor());
                 holder.ivSelected.setAlpha(0.5f);
             }
         } else {
@@ -544,6 +541,12 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                         final ImageView iv = new ImageView(mContext);
                         iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         iv.setLayoutParams(params);
+                        iv.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                PhotoViewerActivity.start(getContext(), att.photo);
+                            }
+                        });
                         holder.llAttachContainer.addView(iv);
 //                        iv.setClipToOutline(true);
                         if (holder.llAttachContainer.getVisibility() == View.GONE) {

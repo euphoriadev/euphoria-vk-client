@@ -4,11 +4,10 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/lvGifts"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerViewPhotos"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@android:color/transparent"
-        android:layoutAnimation="@anim/layout_bottom_to_top_slide"/>
+        android:layout_height="match_parent">
 
+    </android.support.v7.widget.RecyclerView>
 </LinearLayout>

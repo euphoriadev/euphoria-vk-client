@@ -2,29 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="65sp"
-              android:padding="10dp"
-              android:orientation="vertical" >
+              android:orientation="vertical"
+              android:padding="10dp">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/notification_download_layout_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"/>
 
         <TextView
             android:id="@+id/notification_download_layout_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dip"
             android:singleLine="true"
-            android:text="notification_download_layout_title"
-            android:layout_gravity="center_vertical" />
+            android:text="notification_download_layout_title"/>
     </LinearLayout>
 
     <ProgressBar
@@ -33,6 +33,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:progress="0" />
+        android:progress="0"/>
 
 </LinearLayout>

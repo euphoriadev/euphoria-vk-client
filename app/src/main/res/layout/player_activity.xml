@@ -88,8 +88,8 @@
                 android:id="@+id/pbPlayer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:progress="30"
                 android:max="100"
+                android:progress="30"
                 android:src="@android:drawable/progress_horizontal"
                 />
 
@@ -134,19 +134,19 @@
         android:orientation="vertical">
 
         <!--<include-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout="@layout/playlist"/>-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout="@layout/playlist"/>-->
 
         <!--<include-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout="@layout/playlist"/>-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout="@layout/playlist"/>-->
 
         <!--<include-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout="@layout/playlist"/>-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout="@layout/playlist"/>-->
 
     </LinearLayout>
 

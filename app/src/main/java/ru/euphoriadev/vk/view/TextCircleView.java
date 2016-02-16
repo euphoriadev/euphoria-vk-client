@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.TypefaceManager;
 
 /**
@@ -42,7 +43,7 @@ public class TextCircleView extends CircleImageView {
             mTextPaint.setAntiAlias(true);
             mTextPaint.setTypeface(TypefaceManager.getBoldTypeface(getContext()));
             mTextPaint.setTextAlign(Paint.Align.CENTER);
-            mTextPaint.setTextSize(mTextSize == 0 ? 16 : mTextSize);
+            mTextPaint.setTextSize(AndroidUtils.pxFromDp(getContext(), mTextSize == 0 ? 16 : (int) mTextSize));
 
             int xPos = (getWidth() / 2);
             int yPos = (int) ((getHeight() / 2) - ((mTextPaint.descent() + mTextPaint.ascent()) / 2));

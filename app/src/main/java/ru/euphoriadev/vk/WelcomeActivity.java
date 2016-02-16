@@ -2,10 +2,11 @@ package ru.euphoriadev.vk;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -25,6 +26,7 @@ import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.ViewUtil;
 
 
 /**
@@ -42,7 +44,7 @@ public class WelcomeActivity extends BaseThemedActivity implements View.OnClickL
     TextView tvDesctiption;
     ImageView ivLogin;
 
-    private boolean isAmimationShowed;
+    private boolean isAnimationShowed;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,8 +61,12 @@ public class WelcomeActivity extends BaseThemedActivity implements View.OnClickL
         btnLogin.setOnClickListener(this);
         buttonToken.setOnClickListener(this);
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            ViewUtil.setFilter(btnLogin, ThemeManager.getThemeColor(this));
+        }
 
     }
+
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -135,24 +141,25 @@ public class WelcomeActivity extends BaseThemedActivity implements View.OnClickL
     }
 
     private void animate() {
-        if (isAmimationShowed) {
+        if (isAnimationShowed) {
             return;
         }
 
-        CardView cardView = (CardView) findViewById(R.id.cardView);
-        LinearLayout cardViewContainer = (LinearLayout) findViewById(R.id.cardViewContainer);
+        final CardView cardView = (CardView) findViewById(R.id.cardView);
+        final LinearLayout cardViewContainer = (LinearLayout) findViewById(R.id.cardViewContainer);
 
-        float y = cardView.getY();
-
-        cardView.setY(AndroidUtils.getDisplayHeight(this));
-        cardView.setCardElevation(0);
+        final float y = cardView.getY();
+        cardView.setY(AndroidUtils.getDisplayHeight(WelcomeActivity.this));
         cardViewContainer.setAlpha(0);
 
-        cardView.animate().y(y).z(25).setDuration(900).withLayer().start();
-        cardViewContainer.animate().alpha(1.0f).setDuration(900).withLayer().withEndAction(new Runnable() {
+        tvTitle.setAlpha(0);
+        ViewCompat.animate(tvTitle).setStartDelay(600).alpha(1.0f).setDuration(600).withLayer().withEndAction(new Runnable() {
             @Override
             public void run() {
-                isAmimationShowed = true;
+                isAnimationShowed = true;
+
+                ViewCompat.animate(cardView).y(y).setDuration(600).withLayer().start();
+                ViewCompat.animate(cardViewContainer).alpha(1.0f).setDuration(600).withLayer();
             }
         }).start();
 

@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -17,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,6 +24,8 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
+
+import ru.euphoriadev.vk.view.CircleCheckBox;
 
 /**
  * Created by Igor on 19.12.15.
@@ -47,9 +49,24 @@ public class ViewUtil {
         if (view instanceof ImageView) {
             ImageView iv = (ImageView) view;
             iv.getDrawable().setColorFilter(colorFilter);
+        } else if (view instanceof CircleCheckBox) {
+            CheckBox checkBox = (CheckBox) view;
+            Drawable drawable = getCheckBoxDrawable(checkBox);
+            if (drawable != null) {
+                drawable.setColorFilter(colorFilter);
+                checkBox.invalidate();
+            }
         } else {
             Drawable drawable = view.getBackground();
             if (drawable != null) drawable.setColorFilter(colorFilter);
+        }
+    }
+
+    private static Drawable getCheckBoxDrawable(CheckBox checkBox) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return checkBox.getButtonDrawable();
+        } else {
+            return checkBox.getCompoundDrawables()[0];
         }
     }
 

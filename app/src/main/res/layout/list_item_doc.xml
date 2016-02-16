@@ -6,57 +6,57 @@
                 android:orientation="horizontal">
 
     <ru.euphoriadev.vk.view.TextCircleView
-        android:layout_width="40dp"
-        android:src="?colorAccent"
-        android:layout_height="40dp"
         android:id="@+id/ivDoc"
-        android:focusable="false"
-        android:layout_centerVertical="true"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"/>
+        android:layout_marginStart="12dp"
+        android:focusable="false"
+        android:src="?colorAccent"/>
 
     <TextView
         android:id="@+id/tvDocTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TimeVK 0.0.9.apk"
-        android:textSize="16sp"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:textColor="?android:textColorPrimary"
-        android:layout_alignTop="@+id/ivDoc"
         android:layout_alignLeft="@+id/tvDocSize"
         android:layout_alignStart="@+id/tvDocSize"
+        android:layout_alignTop="@+id/ivDoc"
         android:layout_toLeftOf="@+id/ibDocMenu"
-        android:layout_toStartOf="@+id/ibDocMenu"/>
+        android:layout_toStartOf="@+id/ibDocMenu"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="TimeVK 0.0.9.apk"
+        android:textColor="?android:textColorPrimary"
+        android:textSize="16sp"/>
 
     <TextView
-        android:layout_marginLeft="12dp"
-        android:paddingTop="2dp"
         android:id="@+id/tvDocSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="5.3MB"
-        android:textSize="12sp"
-        android:textColor="?android:textColorSecondary"
-        android:layout_marginStart="12dp"
         android:layout_below="@+id/tvDocTitle"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/ivDoc"
         android:layout_toRightOf="@+id/ivDoc"
-        android:layout_toEndOf="@+id/ivDoc"/>
+        android:paddingTop="2dp"
+        android:text="5.3MB"
+        android:textColor="?android:textColorSecondary"
+        android:textSize="12sp"/>
 
 
     <ImageButton
         android:id="@+id/ibDocMenu"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="60dp"
-        android:focusable="false"
-        android:clickable="false"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:clickable="false"
+        android:focusable="false"
         android:scaleType="centerInside"
         android:src="@drawable/ic_file_download_white_24dp"/>
 

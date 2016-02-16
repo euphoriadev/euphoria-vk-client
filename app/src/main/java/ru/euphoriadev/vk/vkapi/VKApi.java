@@ -2372,8 +2372,26 @@ public class VKApi {
             return list == null || list.isEmpty();
         }
 
+        /**
+         * Returns true, if array is null or empty
+         *
+         * @param array the json array to check
+         */
+        public static boolean isEmpty(JSONArray array) {
+            return array == null || array.length() <= 0;
+        }
+
+        /**
+         * Returns true, if source is null or empty
+         *
+         * @param source the json object to check
+         */
+        public static boolean isEmpty(JSONObject source) {
+            return source == null || source.length() <= 0;
+        }
+
         public static void checkErrors(String url, JSONObject source) throws VKException {
-            if (source == null) {
+            if (isEmpty(source)) {
                 return;
             }
 
@@ -2408,16 +2426,19 @@ public class VKApi {
                 int errorCode = errorJson.optInt("error_code");
 
                 VKException exception = new VKException(url, errorMessage, errorCode);
+                // Captcha needed
                 if (errorCode == 14) {
                     exception.captchaSid = errorJson.optString("captcha_sid");
                     exception.captchaImg = errorJson.optString("captcha_img");
                 }
+                // Validation required
                 if (errorCode == 17) {
                     exception.redirectUri = errorJson.optString("redirect_uri");
                 }
                 throw exception;
             }
         }
+
 
     }
 
@@ -2484,7 +2505,7 @@ public class VKApi {
          * @param name name of field to read
          */
         public static int parseInt(JSONObject from, String name) {
-            if (from == null) return 0;
+            if (VKUtil.isEmpty(from)) return 0;
             return from.optInt(name, 0);
         }
 
@@ -2494,7 +2515,7 @@ public class VKApi {
          * @param from server response like this format: {@code response: 34}
          */
         public static int parseInt(JSONObject from) {
-            if (from == null) return 0;
+            if (VKUtil.isEmpty(from)) return 0;
             return from.optInt("response");
         }
 
@@ -2505,7 +2526,7 @@ public class VKApi {
          * @param name name of field to read
          */
         public static long parseLong(JSONObject from, String name) {
-            if (from == null) return 0;
+            if (VKUtil.isEmpty(from)) return 0;
             return from.optLong(name, 0);
         }
 
@@ -2698,7 +2719,7 @@ public class VKApi {
                 @SuppressWarnings("unchecked")
                 Constructor<T> constructor = c.getConstructor();
                 return constructor.newInstance();
-            } catch (java.lang.Exception e) {
+            } catch (Exception e) {
                 if (DEBUG) {
                     e.printStackTrace();
                 }
@@ -2868,19 +2889,6 @@ public class VKApi {
         /** Others */
         public static final String CODE = "code";
 
-    }
-
-    /**
-     * Execute codes for {@link VKApi#execute(String)} method
-     */
-    public static class VKExexutes {
-        public static final String CODE_GROUP_MEMBERS = "var members=API.groups.getMembers(" +
-                "{\"gid\":" + "%s" + "}); " +
-                "var u=members[1]; return API.users.get({\"user_ids\":u,\"fields\":\"" + "%s" + "\"});";
-
-        public static String getGroupMembersCode(String groupId, String fields) {
-            return String.format(CODE_GROUP_MEMBERS, groupId, fields);
-        }
     }
 
     /**
@@ -3215,7 +3223,7 @@ public class VKApi {
          * @return ArrayList contains string constants of permissions (scope)
          */
         public static ArrayList<String> parseVkPermissionsFromInteger(int permissionsValue) {
-            ArrayList<String> res = new ArrayList<String>();
+            ArrayList<String> res = new ArrayList<String>(16);
             if ((permissionsValue & 1) > 0) res.add(NOTIFY);
             if ((permissionsValue & 2) > 0) res.add(FRIENDS);
             if ((permissionsValue & 4) > 0) res.add(PHOTOS);

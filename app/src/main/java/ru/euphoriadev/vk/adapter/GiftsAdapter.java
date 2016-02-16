@@ -19,7 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.ThemeManager;
 
 /**
  * Created by user on 24.07.15.
@@ -28,7 +29,6 @@ public class GiftsAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<GiftItem> gifts;
     private LayoutInflater inflater;
-    private ThemeManagerOld tm;
 
     private int colorPrimary;
     private int colorSecondary;
@@ -38,17 +38,13 @@ public class GiftsAdapter extends BaseAdapter {
     public GiftsAdapter(Context context, ArrayList<GiftItem> gifts) {
         this.context = context;
         this.gifts = gifts;
-        this.tm = new ThemeManagerOld(this.context);
         this.inflater = (LayoutInflater)
                 this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        this.colorPrimary = tm.getPrimaryTextColor();
-        this.colorSecondary = tm.getSecondaryTextColor();
-        this.isNightTheme = tm.isNightTheme();
+        this.colorPrimary = ThemeManager.getPrimaryTextColor();
+        this.colorSecondary = ThemeManager.getSecondaryTextColor();
+        this.isNightTheme = ThemeManager.isDarkTheme();
 
-        if (!tm.isSystemFont()) {
-            typeface = Typeface.createFromAsset(context.getAssets(), tm.getFont());
-        }
     }
 
     @Override
@@ -80,10 +76,6 @@ public class GiftsAdapter extends BaseAdapter {
         TextView tvDate = (TextView) view.findViewById(R.id.tvGiftDate);
         CardView cardView = (CardView) view.findViewById(R.id.cvGift);
 
-        if (!tm.isSystemFont()) {
-            tvTitle.setTypeface(typeface);
-            tvDate.setTypeface(typeface);
-        }
         if (isNightTheme) {
             cardView.setCardBackgroundColor(Color.parseColor("#424242"));
         } else {
@@ -95,6 +87,10 @@ public class GiftsAdapter extends BaseAdapter {
         tvTitle.setText(String.valueOf(item.fromUser.toString()));
         tvDate.setText(new SimpleDateFormat("dd MMM. HH:mm").format(item.gift.date * 1000));
 
+        ViewGroup.LayoutParams params = ivSrc.getLayoutParams();
+        params.height = AndroidUtils.pxFromDp(ivSrc.getContext(), 256);
+
+        ivSrc.setLayoutParams(params);
         Picasso.with(context)
                 .load(item.gift.thumb_256)
 //                .transform(new MessageAdapter.RoundedTransformation(8))

@@ -41,6 +41,7 @@ public class VideosAdapter extends ArrayAdapter<VideosAdapter.VideoItem> {
 
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;

@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <View
         android:id="@+id/statusBarPrefs"
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
 
-    <include layout="@layout/toolbar"
-             android:id="@+id/main_toolbar"/>
+    <include
+        android:id="@+id/main_toolbar"
+        layout="@layout/toolbar"/>
 
-    <FrameLayout android:layout_width="match_parent"
-                 android:layout_height="match_parent">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
-                android:orientation="vertical"
-                android:id="@+id/container_prefs"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"/>
+            android:id="@+id/container_prefs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"/>
 
         <View
-                android:layout_width="match_parent"
-                android:layout_height="6dp"
-                android:background="@drawable/toolbar_dropshadow"/>
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:background="@drawable/toolbar_dropshadow"/>
     </FrameLayout>
 
 

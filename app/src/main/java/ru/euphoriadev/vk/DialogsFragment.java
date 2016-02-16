@@ -56,7 +56,6 @@ import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
@@ -72,7 +71,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     Api api;
     Account account;
-    ThemeManagerOld tm;
 
     SwipeRefreshLayout swipeLayout;
     ListView listView;
@@ -93,7 +91,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         activity = getActivity();
         api = Api.get();
 
-        tm = new ThemeManagerOld(activity);
 
         ((BasicActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
         ((BaseThemedActivity) getActivity())
@@ -105,7 +102,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         listView = (ListView) rootView.findViewById(R.id.lvMess);
         ViewCompat.setLayerType(listView, ViewCompat.LAYER_TYPE_HARDWARE, null);
         AndroidUtils.setEdgeGlowColor(listView, ThemeManager.getThemeColor(getActivity()));
-        tm.initDivider(listView);
+        ThemeManager.initDivider(listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

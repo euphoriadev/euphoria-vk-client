@@ -31,7 +31,7 @@ import ru.euphoriadev.vk.adapter.FriendsAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
@@ -55,13 +55,12 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         activity = getActivity();
 
-        ThemeManagerOld tm = ThemeManagerOld.get(activity);
         api = Api.get();
 
       //  tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout_friends);;
       //  tabLayout.setVisibility(View.GONE);
         listView = (ListView) rootView.findViewById(R.id.lvFriends);
-        tm.initDivider(listView);
+        ThemeManager.initDivider(listView);
 
         refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container_friends);
         refreshLayout.setOnRefreshListener(this);

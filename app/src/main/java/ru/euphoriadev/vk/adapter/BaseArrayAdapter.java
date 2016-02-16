@@ -9,7 +9,6 @@ import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
 
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 
 /**
  * Created by Igor on 09.12.15.
@@ -21,7 +20,6 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
     private ArrayList<E> mCleanValues;
     private ArrayList<E> mSelectedItems;
     private LayoutInflater inflater;
-    private ThemeManagerOld tm;
     private OnMultiModeCloseListener closeListener;
 
     public BaseArrayAdapter(Context context, ArrayList<E> values) {
@@ -30,8 +28,6 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
 
         this.inflater = (LayoutInflater)
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        this.tm = ThemeManagerOld.get(context);
         mSelectedItems = new ArrayList<>();
     }
 
@@ -120,10 +116,6 @@ public class BaseArrayAdapter<E> extends BaseAdapter {
 
     public LayoutInflater getInflater() {
         return inflater;
-    }
-
-    public ThemeManagerOld getThemeManager() {
-        return tm;
     }
 
     public boolean isInMultiSelectMode() {

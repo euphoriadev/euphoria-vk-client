@@ -1,6 +1,5 @@
 package ru.euphoriadev.vk;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +14,7 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.Counters;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.util.Account;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
@@ -25,7 +24,6 @@ public class UserProfileActivity extends BaseThemedActivity {
 
     Api api;
     Account account;
-    ThemeManagerOld tm;
 
     TextView tvFullName;
     TextView tvStatus;
@@ -40,7 +38,6 @@ public class UserProfileActivity extends BaseThemedActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        tm = ThemeManagerOld.get(this).setBasicTheme();
         super.onCreate(savedInstanceState);
 
         boolean useTwoProfile = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("use_two_profile", false);
@@ -68,20 +65,15 @@ public class UserProfileActivity extends BaseThemedActivity {
         tvAudios = (TextView) findViewById(R.id.tvProfileAudios);
         tvVideos = (TextView) findViewById(R.id.tvProfileVideos);
 
-        int colorSecondary = tm.getSecondaryTextColor();
-        int colorPrimary = tm.getPrimaryTextColor();
+        int colorSecondary = ThemeManager.getSecondaryTextColor();
+        int colorPrimary = ThemeManager.getPrimaryTextColor();
 
         tvStatus.setTextColor(colorSecondary);
         tvFullName.setTextColor(colorPrimary);
 
-        if (!tm.isSystemFont()) {
-            Typeface typeface = Typeface.createFromAsset(getAssets(), tm.getFont());
-            tvFullName.setTypeface(typeface);
-            tvStatus.setTypeface(typeface);
-        }
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.llProfileBackground);
-        ll.setBackgroundColor(tm.getBasicColorOfTheme());
+        ll.setBackgroundColor(ThemeManager.getThemeColor(this));
 
         api = Api.get();
         getProfile();

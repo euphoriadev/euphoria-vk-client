@@ -1,122 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-    <FrameLayout android:layout_width="wrap_content"
-                 android:layout_weight="1"
-                 android:elevation="8dp"
-                 android:translationZ="6dp"
-                 android:layout_height="wrap_content">
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:elevation="8dp"
+        android:translationZ="6dp">
 
-        <ImageView android:layout_width="match_parent"
-                   android:src="@drawable/cate"
-                   android:scaleType="centerCrop"
-                   android:layout_height="wrap_content"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cate"/>
 
         <android.support.v7.widget.Toolbar
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/toolbar_player"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:minHeight="?attr/actionBarSize"
+            android:title=""
+            app:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_gravity="left|bottom"
+            android:background="@drawable/profile_header_gradient"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/toolbar_player"
-                android:title=""
-                android:background="@android:color/transparent"
-                app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                android:minHeight="?attr/actionBarSize"/>
+                android:shadowColor="@android:color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="Cult To Follow"
+                android:textColor="@android:color/primary_text_dark"
+                android:textSize="26sp"/>
 
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_gravity="left|bottom"
-                      android:background="@drawable/profile_header_gradient"
-                      android:orientation="vertical"
-                      android:gravity="bottom"
-                      android:padding="16dp"
-                      android:layout_height="120dp">
-
-            <TextView android:layout_width="match_parent"
-                      android:text="Cult To Follow"
-                      android:textSize="26sp"
-                      android:shadowDx="1"
-                      android:shadowDy="1"
-                      android:shadowRadius="1"
-                      android:shadowColor="@android:color/black"
-                      android:textColor="@android:color/primary_text_dark"
-                      android:layout_height="wrap_content"/>
-
-            <TextView android:layout_width="match_parent"
-                      android:text="Through With You"
-                      android:textSize="18sp"
-                      android:shadowDx="1"
-                      android:shadowDy="1"
-                      android:shadowRadius="1"
-                      android:shadowColor="@android:color/black"
-                      android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shadowColor="@android:color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="Through With You"
+                android:textSize="18sp"/>
 
         </LinearLayout>
     </FrameLayout>
 
-    <LinearLayout android:layout_width="match_parent"
-                  android:orientation="vertical"
-                  android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <LinearLayout android:layout_width="match_parent"
-                      android:orientation="horizontal"
-                      android:gravity="center"
-                      android:padding="8dp"
-                      android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="1:36"
-                    android:id="@+id/textView3"/>
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1:36"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <SeekBar
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:progress="50"
-                    android:layout_gravity="center_horizontal"/>
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:max="100"
+                android:padding="12dp"
+                android:progress="50"/>
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="4:30"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4:30"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         </LinearLayout>
 
 
-        <LinearLayout android:layout_width="match_parent"
-                      android:orientation="horizontal"
-                      android:gravity="center"
-                      android:paddingBottom="18dp"
-                      android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="18dp">
 
-            <ImageView android:layout_width="wrap_content"
-                         android:layout_weight="1"
-                         android:src="@android:drawable/ic_media_rew"
-                         android:layout_height="46dp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_media_rew"/>
 
             <android.support.design.widget.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    app:elevation="4dp"
-                    app:fabSize="normal"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_media_play"
-                    android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_media_play"
+                app:elevation="4dp"
+                app:fabSize="normal"/>
 
-            <ImageView android:layout_width="wrap_content"
-                         android:layout_weight="1"
-                         android:src="@android:drawable/ic_media_ff"
-                         android:layout_height="46dp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_media_ff"/>
 
         </LinearLayout>
 

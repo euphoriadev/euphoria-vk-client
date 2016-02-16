@@ -37,9 +37,9 @@ public class FastBlur {
     /**
      * Blur bitmap
      *
-     * @param sentBitmap target image
-     * @param radius
-     * @return
+     * @param sentBitmap the {@link Bitmap} to blur
+     * @param radius     the radius of blur
+     * @return blurred bitmap
      */
     public static Bitmap doBlur(Bitmap sentBitmap, int radius) {
         Bitmap bitmap;

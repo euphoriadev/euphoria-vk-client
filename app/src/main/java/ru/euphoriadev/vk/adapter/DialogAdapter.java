@@ -42,7 +42,6 @@ import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
@@ -58,7 +57,6 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
     private Context context;
     private LayoutInflater inflater;
     private ArrayList<DialogItem> dialogItems;
-    private ThemeManagerOld tManager;
     private Handler handler;
     private ServiceConnection serviceConnection;
     private LongPollService longPollService;
@@ -73,14 +71,13 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
     public DialogAdapter(final Context context, ArrayList<DialogItem> listMessages) {
         this.context = context;
 
-        tManager = new ThemeManagerOld(this.context);
         dialogItems = listMessages;
         inflater = (LayoutInflater)
                 this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
-        fullNameTextColor = tManager.getPrimaryTextColor();
-        bodyTextColor = tManager.getSecondaryTextColor();
+        fullNameTextColor = ThemeManager.getPrimaryTextColor();
+        bodyTextColor = ThemeManager.getSecondaryTextColor();
         date = new Date(System.currentTimeMillis());
 
         helper = DBHelper.get(context);
@@ -294,8 +291,8 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         // Если мне отправили, и я не прочитал
         if (!message.is_out && !message.read_state) {
             holder.indicator.setVisibility(View.VISIBLE);
-            holder.indicator.getBackground().setColorFilter(ThemeManagerOld.get(context).getIndicatorColor(), PorterDuff.Mode.MULTIPLY);
-            holder.tvDate.setTextColor(ThemeManagerOld.get(context).getIndicatorColor());
+            holder.indicator.getBackground().setColorFilter(ThemeManager.getColorAccent(context), PorterDuff.Mode.MULTIPLY);
+            holder.tvDate.setTextColor(ThemeManager.getColorAccent(context));
 
             holder.tvBody.setTextColor(fullNameTextColor);
             if (item.message.unread != 0)

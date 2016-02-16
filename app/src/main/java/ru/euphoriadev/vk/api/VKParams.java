@@ -43,10 +43,6 @@ public class VKParams {
         args.put(param_name, Double.toString(param_value));
     }
 
-    public String getMethodName() {
-        return method_name;
-    }
-
     public String getParamsString() {
         StringBuilder bufferParams = new StringBuilder();
         try {

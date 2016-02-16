@@ -17,6 +17,7 @@ public class VKMessageAttachment {
     public static final String TYPE_AUDIO = "audio";
     public static final String TYPE_VIDEO = "video";
     public static final String TYPE_DOC = "doc";
+    public static final String TYPE_LINK = "link";
 
     /**
      * Current media type
@@ -51,17 +52,18 @@ public class VKMessageAttachment {
 
         switch (type) {
             case TYPE_AUDIO:
-                attachment.audio = VKAudio.parse(source);
+                attachment.audio = VKAudio.parse(source.optJSONObject(TYPE_AUDIO));
                 break;
             case TYPE_VIDEO:
-                attachment.video = VKVideo.parse(source);
+                attachment.video = VKVideo.parse(source.optJSONObject(TYPE_VIDEO));
                 break;
             case TYPE_PHOTO:
-                attachment.photo = VKPhoto.parse(source);
+                attachment.photo = VKPhoto.parse(source.optJSONObject(TYPE_PHOTO));
                 break;
             case TYPE_DOC:
-                attachment.doc = VKDocument.parse(source);
+                attachment.doc = VKDocument.parse(source.optJSONObject(TYPE_DOC));
                 break;
+
         }
         return attachment;
     }

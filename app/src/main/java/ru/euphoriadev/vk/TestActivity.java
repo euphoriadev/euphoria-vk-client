@@ -1,6 +1,8 @@
 package ru.euphoriadev.vk;
 
 import android.animation.LayoutTransition;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
@@ -11,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
@@ -43,7 +48,6 @@ public class TestActivity extends BaseThemedActivity {
 
         ScrollView rootView = new ScrollView(this);
         setContentView(rootView);
-
 
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.VERTICAL);

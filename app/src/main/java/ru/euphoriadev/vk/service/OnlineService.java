@@ -20,13 +20,8 @@ public class OnlineService extends IntentService {
     private boolean keepPhantomlOnline;
     private String lastAction = "";
 
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
-     * @param name Used to name the worker thread, important only for debugging.
-     */
-    public OnlineService(String name) {
-        super(name);
+    public OnlineService() {
+        super("OnlineService");
     }
 
     @Override

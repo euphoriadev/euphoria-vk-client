@@ -20,8 +20,8 @@
             android:id="@+id/tvNoteTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title of Note"
             android:singleLine="true"
+            android:text="Title of Note"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?android:textColorPrimary"
             android:textStyle="bold"/>
@@ -30,8 +30,8 @@
             android:id="@+id/tvNoteText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Description"
             android:singleLine="true"
+            android:text="Description"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?android:textColorSecondary"
             android:textStyle="italic"/>
@@ -40,10 +40,10 @@
             android:id="@+id/tvNoteDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9 December"
-            android:layout_marginTop="6dp"
             android:layout_gravity="right"
+            android:layout_marginTop="6dp"
             android:singleLine="true"
+            android:text="9 December"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?android:textColorSecondary"
             android:textStyle="italic"/>

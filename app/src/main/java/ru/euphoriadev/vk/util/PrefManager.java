@@ -21,7 +21,6 @@ public class PrefManager {
     /** Editor for change values of Preference */
     private static final SharedPreferences.Editor sEditor = sPreferences.edit();
 
-
     /**
      * Set a String value in the preferences editor and apply
      *
@@ -140,7 +139,6 @@ public class PrefManager {
     }
 
     /**
-     * /**
      * Retrieve a boolean value from the preferences.
      *
      * @param key the name of the preference to retrieve.
@@ -170,9 +168,9 @@ public class PrefManager {
 
     /**
      * Apply changes to Preferences.
-     * If build version < 9 - use old method {@link SharedPreferences.Editor#commit()}
+     * If build version < 9 - uses old method {@link SharedPreferences.Editor#commit()}
      *
-     * @param editor the editor to use for apply
+     * @param editor the editor to apply preferences
      */
     public static void apply(SharedPreferences.Editor editor) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {

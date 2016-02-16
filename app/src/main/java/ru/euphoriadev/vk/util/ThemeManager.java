@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 
 import java.util.Locale;
 
@@ -384,14 +385,12 @@ public class ThemeManager {
      */
     public static void updateColourTheme(int newColourTheme) {
         PrefManager.putString(PREF_KEY_THEME_COLOUR, String.valueOf(newColourTheme));
-
         sColourTheme = newColourTheme;
     }
 
 
     public static void setDarkTheme(boolean newDarkThemeValue) {
         PrefManager.putBoolean(PREF_KEY_IS_DARK_THEME, newDarkThemeValue);
-
         sIsDarkTheme = newDarkThemeValue;
     }
 
@@ -494,9 +493,19 @@ public class ThemeManager {
      * @return a new color which is lighten of specified color
      */
     public static int lightenColor(int color) {
+        return lightenColor(color, 1.1f);
+    }
+
+    /**
+     * Lighten color
+     *
+     * @param color the color to lighten
+     * @return a new color which is lighten of specified color
+     */
+    public static int lightenColor(int color, float lightFactor) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
-        hsv[2] *= 1.1f;
+        hsv[2] *= lightFactor;
         return Color.HSVToColor(hsv);
     }
 
@@ -516,6 +525,32 @@ public class ThemeManager {
         return Color.argb((int) (alpha * 0.90f), red, green, blue);
     }
 
+    /**
+     * Set alpha to color
+     *
+     * @param color the color to set alpha
+     * @return a new color which is alpha of specified color
+     */
+    public static int alphaColor(int color, float alphaFactor) {
+        int alpha = Color.alpha(color);
+
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+
+        return Color.argb((int) (alpha * alphaFactor), red, green, blue);
+    }
+
+    public static void initDivider(ListView listView) {
+        if (!PrefManager.getBoolean(SettingsFragment.KEY_SHOW_DIVIDER)) {
+            listView.setDivider(null);
+            return;
+        }
+
+        listView.setDivider(isDarkTheme() ?
+                AndroidUtils.getDrawable(listView.getContext(), R.drawable.divider_dialogs_dark) :
+                AndroidUtils.getDrawable(listView.getContext(), R.drawable.dialog_divider));
+    }
 
     public static int getPrimaryTextColor() {
         loadThemePreferences(AppLoader.appContext);

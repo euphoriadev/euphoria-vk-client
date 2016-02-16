@@ -18,7 +18,6 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKGift;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.Account;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
@@ -30,7 +29,6 @@ public class GiftsFragment extends Fragment {
     Account account;
     Activity activity;
     ListView lv;
-    ThemeManagerOld tm;
 
     @Nullable
     @Override
@@ -58,8 +56,6 @@ public class GiftsFragment extends Fragment {
                     for (VKGift g : apiGifts) {
                         mapUsers.put(g.from_id, null);
                     }
-
-
 
                     ArrayList<VKUser> apiProfiles = api.getProfiles(mapUsers.keySet(), null, null, null, null);
                     for (VKUser u : apiProfiles) {

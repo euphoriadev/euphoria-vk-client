@@ -22,7 +22,6 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
@@ -32,7 +31,6 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
  * Created by Igor on 01.11.15.
  */
 public class CreateChatActivity extends BaseThemedActivity {
-    ThemeManagerOld manager;
     Api api;
 
     ListView lv;

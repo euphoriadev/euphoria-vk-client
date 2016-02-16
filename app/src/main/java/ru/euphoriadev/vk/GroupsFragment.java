@@ -29,7 +29,7 @@ import ru.euphoriadev.vk.api.model.VKGroup;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThemeManagerOld;
+import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 
 /**
@@ -40,7 +40,6 @@ public class GroupsFragment extends Fragment {
     Activity activity;
     Account account;
     Api api;
-    ThemeManagerOld tm;
     GroupsAdapter adapter;
     ListView listView;
 
@@ -51,8 +50,6 @@ public class GroupsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
 
         activity = getActivity();
-
-        tm = new ThemeManagerOld(activity);
         api = Api.get();
 
         listView = (ListView) rootView.findViewById(R.id.lvGroups);
@@ -77,7 +74,7 @@ public class GroupsFragment extends Fragment {
                 return true;
             }
         });
-        ThemeManagerOld.get(getActivity()).initDivider(listView);
+        ThemeManager.initDivider(listView);
 
         setHasOptionsMenu(true);
         loadGroups();
