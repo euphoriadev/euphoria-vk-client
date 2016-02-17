@@ -1,5 +1,6 @@
 package ru.euphoriadev.vk.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -263,6 +264,11 @@ public class ArrayUtil {
             }
         }
         return VALUE_NOT_FOUND;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> ArrayList<E> changeGenericTypeOf(ArrayList<Object> list, Class<E> classType) {
+        return (ArrayList<E>) list;
     }
 
 }

@@ -39,6 +39,7 @@ import java.io.IOException;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
+import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
@@ -400,12 +401,29 @@ public class BasicActivity extends BaseThemedActivity implements
     }
 
     private void getUserStatus(final Account account, final TextView textView) {
-        if (!TextUtils.isEmpty(account.status)) {
+        if (TextUtils.isEmpty(account.status)) {
+            ThreadExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    final VKUser user = Api.get().getProfile((int) account.user_id);
+                    if (user != null && !TextUtils.isEmpty(user.status)) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textView.setText(user.status);
+                                account.status = user.status;
+                                account.save();
+                            }
+                        });
+                    }
+                }
+            });
             return;
         }
         textView.setText(account.status);
 
     }
+
 
     private void initDrawerHeader() {
         if (account == null) {

@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,6 +18,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -137,7 +139,6 @@ public class AndroidUtils {
         rootLayout.setVisibility(View.VISIBLE);
         circularReveal.start();
     }
-
 
 
     public static Bitmap processingBitmap(Bitmap src) {
@@ -515,6 +516,27 @@ public class AndroidUtils {
         } catch (Exception ignored) {
 
         }
+    }
+
+    public void roundBitmap(Bitmap source) {
+        BitmapShader shader;
+        shader = new BitmapShader(source, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setShader(shader);
+
+        final int width = source.getWidth();
+        final int height = source.getHeight();
+        RectF rect = new RectF(0.0f, 0.0f, width, height);
+
+        // rect contains the bounds of the shape
+        // radius is the radius in pixels of the rounded corners
+        // paint contains the shader that will texture the shape
+        final int radius = Math.abs(Math.min(width, height)) / 2;
+
+        Canvas canvas = new Canvas(source);
+        canvas.drawRoundRect(rect, radius, radius, paint);
     }
 
     public static class PicassoBlurTransform implements Transformation {

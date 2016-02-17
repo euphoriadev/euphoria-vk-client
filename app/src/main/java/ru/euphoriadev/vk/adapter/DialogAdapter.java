@@ -311,8 +311,8 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             holder.onlineIndicator.setVisibility(View.VISIBLE);
             if (holder.onlineIndicator.getBackground() == null) {
                 holder.onlineIndicator.setBackgroundDrawable(user.online_mobile ?
-                        context.getResources().getDrawable(R.drawable.ic_android) :
-                        context.getResources().getDrawable(R.drawable.shape_circle));
+                        AndroidUtils.getDrawable(context, R.drawable.ic_android) :
+                        AndroidUtils.getDrawable(context, R.drawable.shape_circle));
             }
 
             holder.onlineIndicator.setLayoutParams(new LinearLayout.LayoutParams(
@@ -538,8 +538,8 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             tvFullName = (TextView) v.findViewById(R.id.tvDialogTitle);
             tvBody = (TextView) v.findViewById(R.id.tvDialogBody);
             tvDate = (TextView) v.findViewById(R.id.tvDialogDate);
-            ivPhoto = (CircleImageView) v.findViewById(R.id.ivDialogPhoto);
-            ivLastPhotoUser = (CircleImageView) v.findViewById(R.id.ivDialogLastPhotoUser);
+            ivPhoto = (ImageView) v.findViewById(R.id.ivDialogPhoto);
+            ivLastPhotoUser = (ImageView) v.findViewById(R.id.ivDialogLastPhotoUser);
             tvUnreadCount = (TextView) v.findViewById(R.id.tvUnreadCount);
             indicator = v.findViewById(R.id.vDialogUnreadIndicator);
             onlineIndicator = v.findViewById(R.id.viewDialogOnlineIndicator);

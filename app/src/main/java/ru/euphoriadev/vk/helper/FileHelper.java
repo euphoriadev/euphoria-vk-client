@@ -359,6 +359,7 @@ public class FileHelper {
      * @param title the file name
      */
     public static void downloadFileWithDefaultManager(String url, String title, String mimeType) {
+
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         //  request.setDescription("Some descrition");
         request.setTitle(title);

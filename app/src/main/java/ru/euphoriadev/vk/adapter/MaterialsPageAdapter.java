@@ -1,16 +1,15 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.PermissionChecker;
 
-import ru.euphoriadev.vk.AudiosAttachmentFragment;
-import ru.euphoriadev.vk.DocsAttachmentFragment;
-import ru.euphoriadev.vk.DocsFragment;
-import ru.euphoriadev.vk.PhotosAttachmentFragment;
+import ru.euphoriadev.vk.HistoryAttachmentFragment;
 import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.VideosAttachmentFragment;
+import ru.euphoriadev.vk.api.model.VKMessageAttachment;
 
 /**
  * Created by Igor on 28.09.15.
@@ -34,6 +33,26 @@ public class MaterialsPageAdapter extends FragmentPagerAdapter {
         this.fragments = new Fragment[tabs.length];
         this.chat_id = chat_id;
         this.user_id = user_id;
+
+    }
+
+    public static String typeFrom(int position) {
+        String type = "";
+        switch (position) {
+            case POSITION_PICTURES:
+                type = VKMessageAttachment.TYPE_PHOTO;
+                break;
+            case POSITION_VIDEO:
+                type = VKMessageAttachment.TYPE_VIDEO;
+                break;
+            case POSITION_AUDIO:
+                type = VKMessageAttachment.TYPE_AUDIO;
+                break;
+            case POSITION_DOC:
+                type = VKMessageAttachment.TYPE_DOC;
+                break;
+        }
+        return type;
     }
 
     @Override
@@ -43,20 +62,7 @@ public class MaterialsPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case POSITION_PICTURES:
-                fragments[position] = PhotosAttachmentFragment.newInstance(chat_id, user_id, position);
-                break;
-            case POSITION_VIDEO:
-                fragments[position] = VideosAttachmentFragment.newInstance(chat_id, user_id, position);
-                break;
-            case POSITION_AUDIO:
-                fragments[position] = AudiosAttachmentFragment.newInstance(chat_id, user_id, position);
-                break;
-            case POSITION_DOC:
-                fragments[position] = DocsAttachmentFragment.newInstance(chat_id, user_id, position);
-
-        }
+        fragments[position] = HistoryAttachmentFragment.newInstance(chat_id, user_id, position);
         return fragments[position];
     }
 

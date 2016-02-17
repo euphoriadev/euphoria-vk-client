@@ -55,6 +55,7 @@ public class TestActivity extends BaseThemedActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
+
         rootLayout.setPadding(0, AndroidUtils.getStatusBarHeight(this), 0, 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             LayoutTransition transition = new LayoutTransition();
@@ -62,7 +63,6 @@ public class TestActivity extends BaseThemedActivity {
             rootLayout.setLayoutTransition(transition);
         }
         rootView.addView(rootLayout);
-
 
         tvResult = new AppCompatTextView(this);
         tvResult.setTextColor(ThemeManager.getPrimaryTextColor());

@@ -1,11 +1,14 @@
 package ru.euphoriadev.vk.adapter;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.PermissionChecker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -13,11 +16,13 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.security.Permissions;
 import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.helper.FileHelper;
+import ru.euphoriadev.vk.util.PermissionAllower;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.view.TextCircleView;
@@ -61,6 +66,10 @@ public class DocsAdapter extends BaseArrayAdapter<VKDocument> {
 //                menu.getMenuInflater().inflate(R.menu.oopup_menu_doc, menu.getMenu());
 //                menu.show();
 
+                if (PermissionChecker.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
+                    PermissionAllower.allowPermission((Activity) getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    return;
+                }
                 FileHelper.downloadFileWithDefaultManager(doc.url, doc.title, null);
             }
         });
