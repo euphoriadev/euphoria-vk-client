@@ -1,24 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Main strings-->
     <string name="app_name">Euphoria</string>
-    <string name="prefs">Настройки</string>
     <string name="search">Поиск</string>
-    <string name="statistics_messages">Статистика сообщений</string>
     <string name="profile">Профиль</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="forward_messages">[Пересланные сообщения]</string>
+    <string name="online">В сети</string>
+    <string name="load_old">ЗАГРУЗИТЬ ЕЩЕ</string>
+    <string name="delete_message">Удалить сообщения</string>
+    <string name="add">Добавить</string>
+    <string name="owner_of_chat">создатель беседы</string>
+    <string name="invited_by">"пригласил(а) "</string>
+    <string name="gift">[Подарок]</string>
+    <string name="chat">" (Беседа) "</string>
+    <string name="type_group">Группа</string>
+    <string name="type_page">Публичная страница</string>
+    <string name="type_event">Сообщество</string>
+    <string name="offline">Оффлайн</string>
+    <string name="all">"Всего сообщений: "</string>
+    <string name="incoming">"Полученные: "</string>
+    <string name="outgoing">"Отправленные: "</string>
+    <string name="already_in_group">Вы уже состоите в группе</string>
+    <string name="thank_you">Спасибо!</string>
+    <string name="sending">Отправка..</string>
+    <string name="error">Ошибка</string>
+    <string name="check_update">Проверить обновление</string>
+    <string name="download_dialog">Скачать диалог</string>
+    <string name="download_dialog_with">Скачивание диалога</string>
+    <string name="started_download_dialog">Начато скачивание диалога</string>
+    <string name="enter">Введите</string>
+    <string name="login">Вход</string>
+    <string name="login_description">Введите логин и пороль пользователя. Можно ввести как порядковый номер страници (12345678), так и короткий id пользователя начиная со знака "@" (@durov) </string>
+    <string name="download_ask">Скачать?</string>
+    <string name="you">Я</string>
+    <string name="authorization_successfully">Авторизовались успешно… Пожалуйста подождите…</string>
+    <string name="login_with_token">Вход с access token</string>
+    <string name="no_updates">У вас последняя версия приложения</string>
+    <string name="write_message">Сообщение…</string>
+    <string name="download_history_successful">download history successful</string>
+    <string name="new_messages">новых сообщений</string>
+    <string name="is_typing">Набирает текст…</string>
+    <string name="translate_text.please_wait">Переводим текст. Это займет несколько секунд…</string>
+    <string name="all_words">"Всего слов: "</string>
+    <string name="wallpaper_change">Поменять фон</string>
+    <string name="wallpaper_remove">Удалить фон</string>
+    <string name="exit_message">Нажмите еще раз для выхода</string>
+
+    <!-- Menu actions strings-->
+    <string name="delete">Удалить</string>
+    <string name="statistics_messages">Статистика сообщений</string>
+    <string name="materials_from_talk">Материалы беседы</string>
+    <string name="set_wallpaper">Фон сообщений</string>
+    <string name="show_and_hide_time">Показать/скрыть время</string>
+    <string name="translate_all">Перевести все</string>
+    <string name="update">Обновить</string>
+
+    <!-- Navigation view strings-->
+    <string name="news">Новости</string>
     <string name="friends">Друзья</string>
     <string name="messages">Сообщения</string>
-    <string name="forward_messages">[Пересланные сообщения]</string>
     <string name="audios">Аудиозаписи</string>
+    <string name="gifts">Подарки</string>
+    <string name="videos">Видео</string>
+    <string name="groups">Группы</string>
+    <string name="docs">Документы</string>
+    <string name="notes">Заметки</string>
+    <string name="prefs">Настройки</string>
+    <string name="exit_for_account">Выход из аккаунта</string>
+
+
+    <string name="delete_dialog">Удалить диалог</string>
+    <string name="delete_doc">Удалить диалог</string>
+    <string name="load_saved_dialog">Загрузить сохраненный диалог</string>
+    <string name="exit_for_account_description">Вы уверены, что хотите выйти из аккаунта?</string>
+    <string name="creating_chat">Создание чата</string>
+    <string name="error_decrypting">Произошла ошибка декодирование</string>
+    <string name="message_copied">Сообщение скопировано</string>
+    <string name="translator">Яндекс Переводчик</string>
+    <string name="translation_text">Перевод текста, Пожалуйста, подождите…</string>
+    <string name="important_messages">Важные сообщения</string>
+    <string name="action_settings">Settings</string>
+    <string name="chat_name">Название чата</string>
+    <string name="attach">Прикрепить</string>
+    <string name="dialogs_number">"всего диалогов: "</string>
+
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+
     <string name="exit">Выход</string>
-    <string name="update">Обновить</string>
     <string name="members">участников</string>
     <string name="title_members">Участники беседы</string>
-
     <string name="authorization">Авторизация</string>
-    <string name="exit_for_account">Выход из аккаунта</string>
     <string name="themes">Тема</string>
     <string name="colour">Цветовая гамма</string>
     <string name="check_internet">Пожалуйста, проверьте Ваше подключение к интернету</string>
@@ -33,7 +108,7 @@
         • Немного изменена разметка;\n
         • Возможность скрыть время в истории;\n
         • Отображение кол-ва диалогов в Toolbar;\n
-        • Настройка иконки отравки;\n
+        • Настройка иконки отправки;\n
         • Немного подправлен механизм сохранения сообщений;\n
         • Начата работа над вложениями и смайликами;\n
         • Редизайн сообщений;\n
@@ -42,10 +117,11 @@
         • Новый вид облака сообщения;\n
         • Возможность отправить лог разработчикам;\n
         • Смена положения заголовка в шторке;\n
-        • Редизайн авторизации;\n
+        • Редизайн окна авторизации;\n
         • Возможность просмотреть фото в полном экране;\n
         • Новый механизм загрузки материалов беседы;\n
         • Новая иконка;\n
+        • Увеличение стабильности в плане обновления сообщений;\n
         \n
         <u>0.8</u>\n
         • Заметки;\n
@@ -56,7 +132,7 @@
         • Статистика сообщений, добавленно количество слов;\n
         • Оптимизация;\n
         • Мелкие графические изминения;\n
-        • Изминено переключения шрифта;\n
+        • Изменено переключения шрифта;\n
         • Выход из групп;\n
         • Удаление сообщений;\n
         • Новые темы;\n
@@ -168,10 +244,10 @@
         \n
         <u>0.0.8</u>\n
         • Заголовок в шторке;\n
-        • Убран пункт "Профль", Открытие профиля по клику на аватар в шторке;\n
+        • Убран пункт "Профиль", Открытие профиля по клику на аватар в шторке;\n
         • Оффлайн загрузка профиля;\n
         • Новые пузырики для сообщений;\n
-        • Исправлен баг с наролзанием стату бара на тулбар;\n
+        • Исправлен баг с наползанием стату бара на тулбар;\n
         • При нажатии на ссылку - приложение не крашится;\n
         • Статус последнего захода пользователя виден в тулбаре;\n
         • Загрузка старых сообщений в переписке;\n
@@ -190,12 +266,12 @@
         <u>0.0.7</u>\n
         • Переезд на Gradle;\n
         • MaterialDrawer!;\n
-        • Измененны некоторые цветовые схемы;\n
+        • Смена некоторых цветовых схем;\n
         • Полупрозрачный StatusBar и NavigationBar на KitKat;\n
         • Переход в профиль, по клику на пользователя в друзьях;\n
         • Выход из аккаунта перенесен в шторку;\n
         • И настройки тоже;\n
-        • Пунк "Статистика сообщений" в диалоге;\n
+        • Пункт "Статистика сообщений" в диалоге;\n
         • Другая анимация загрузки диалогов;\n
         • Новости;\n
         \n
@@ -211,7 +287,7 @@
         • Немного изменена разметка диалога;\n
         • Добавленна тема "Teal", "Dark", "Black", "Purple";\n
         • При смене ориентации, активти не пересоздается";\n
-        • Подправленны темы и немного изменнен цвет фона";\n
+        • Подправленны темы и немного изменен цвет фона";\n
         • Загрузка фото в истории сообщений";\n
 
         \n <u>0.0.5</u>\n
@@ -252,28 +328,22 @@
         \n <u>0.0.1\n</u>
         • <b>Первый запуск! <i>04.02.2015</i></b>;\n
         • <b>Добавлен</b> Navigation Drawer;\n
-        • <b>Тема приложения:</b> Material Desing;\n
+        • <b>Тема приложения:</b> Material Design;\n
         • <b>Добавлено</b> окно настроек;\n
-        • <b>Добавлен</b> чистичный английский;\n
+        • <b>Добавлен</b> частичный английский;\n
         • <b>Добавлена</b> авторизация;\n
         • <b>Добавлен</b> выход из учетной записи;\n
-        • <b>Добавлена</b> возмжность постить на стену;\n
+        • <b>Добавлена</b> возможность постить на стену;\n
         • <b>Добавлен</b> список изменений;\n
         \n</string>
-    <string name="news">Новости</string>
-    <string name="online">В сети</string>
-    <string name="load_old">ЗАГРУЗИТЬ ЕЩЕ</string>
+
     <string name="change_log">Список изменений</string>
 
+    <!-- Preferences strings -->
     <string name="color_swatch_description">Color %1$d</string>
     <string name="color_swatch_description_selected">Color %1$d selected</string>
     <string name="color_picker_default_title">Select a Color</string>
     <string name="pick_color">Выберите цвет</string>
-    <string name="delete_message">Удалить сообщения</string>
-    <string name="add">Добавить</string>
-    <string name="owner_of_chat">создатель беседы</string>
-    <string name="invited_by">"пригласил(а) "</string>
-    <string name="gift">[Подарок]</string>
     <string name="prefs_night_theme">Ночной режим</string>
     <string name="prefs_night_theme_description">Ночная тема</string>
     <string name="prefs_app_color">Цветовая схема</string>
@@ -282,7 +352,7 @@
     <string name="prefs_color_in_msg_description">Перекрашивать фон пузырька в цвет темы</string>
     <string name="prefs_color_out_msg">Цвет отправленных сообщений</string>
     <string name="prefs_color_out_msg_description">Перекрашивать фон пузырька в цвет темы</string>
-    <string name="prefs_visiblity">Видимость</string>
+    <string name="prefs_visibility">Видимость</string>
     <string name="prefs_offline">Оффлайн</string>
     <string name="prefs_offline_description">Вас не будет видно в сети</string>
     <string name="prefs_hide_typing">Скрывать статус тайпинга</string>
@@ -300,12 +370,6 @@
     <string name="prefs_select_locale_description">Использовать выбранный вами язык, не зависимо от настройки
         системы
     </string>
-    <string name="chat">" (Беседа) "</string>
-    <string name="groups">Группы</string>
-    <string name="type_group">Группа</string>
-    <string name="type_page">Публичная страница</string>
-    <string name="type_event">Сообщество</string>
-    <string name="offline">Оффлайн</string>
     <string name="prefs_show_divider">Показывать разделители</string>
     <string name="prefs_show_divider_description">Разделители в списке диалогов</string>
     <string name="prefs_font">Шрифт</string>
@@ -313,64 +377,25 @@
     <string name="prefs_group_description">Нажмите, для вступления в группу приложения, если вы хотите видеть все
         изменения о приложение
     </string>
-    <string name="all">"Всего сообщений: "</string>
-    <string name="incoming">"Полученные: "</string>
-    <string name="outgoing">"Отправленные: "</string>
-    <string name="already_in_group">Вы уже состоите в группе</string>
-    <string name="thank_you">Спасибо!</string>
-    <string name="gifts">Подарки</string>
     <string name="prefs_use_second_profile">Использовать второй профиль</string>
     <string name="prefs_use_second_profile_description">(Еще не реализовано)</string>
     <string name="prefs_use_cat_icon_send">Добавить няшности</string>
     <string name="prefs_use_cat_icon_send_description">Использовать другую иконку отправки сообщения: лапка кота</string>
-    <string name="videos">Видео</string>
     <string name="prefs_other">Прочее</string>
-    <string name="prefa_unstable_connection">Режим RFM</string>
-    <string name="prefa_unstable_connection_description">Режим RFM (Resend Failed Messages) позволяет не беспокоиться об плохом интернете, В этом случае приложение позаботиться о том, что бы все ваши сообщения были доставлены (даже если оно выключено).
+    <string name="prefs_unstable_connection">Режим RFM</string>
+    <string name="prefs_unstable_connection_description">Режим RFM (Resend Failed Messages) позволяет не беспокоиться об плохом интернете, В этом случае приложение позаботиться о том, что бы все ваши сообщения были доставлены (даже если оно выключено).
     </string>
-    <string name="sending">Отправка..</string>
-    <string name="error">Ошибка</string>
-    <string name="check_update">Проверить обновление</string>
-    <string name="download_dialog">Скачать диалог</string>
-    <string name="download_dialog_with">Скачивание диалога</string>
-    <string name="started_download_dialog">Начато скачивание диалога</string>
-    <string name="enter">Введите</string>
-    <string name="login">Вход</string>
-    <string name="login_description">Введите логин и пороль пользователя. Можно ввести как порядковый номер страници (12345678), так и короткий id пользователя начиная со знака "@" (@durov) </string>
-    <string name="materials_from_talk">Материалы беседы</string>
     <string name="click_to_update">Нажмите для проверки обновления</string>
     <string name="found_new_version">"Найдена новая версия приложения: "</string>
     <string name="prefs_online_status">Онлайн статус</string>
-    <string name="prefs_online_statu_description">Вечный - постоянно \"онлайн\";\nФантомный - онлайн без изменения даты
+    <string name="prefs_online_status_description">Вечный - постоянно \"онлайн\";\nФантомный - онлайн без изменения даты
         выхода;
     </string>
-    <string name="download_ask">Скачать?</string>
-    <string name="you">Я</string>
-    <string name="authorization_successfully">Авторизовались успешно… Пожалуйста подождите…</string>
-    <string name="login_with_token">Вход с access token</string>
-    <string name="no_updates">У вас последняя версия приложения</string>
-    <string name="write_message">Сообщение…</string>
-    <string name="download_history_successful">download history successful</string>
-
     <string name="prefs_notification">Уведомления</string>
     <string name="prefs_notification_enable">Включить</string>
     <string name="prefs_notification_enable_description">Оповещать и приходе новых сообщений</string>
     <string name="prefs_vibration">Вибрация</string>
     <string name="prefs_led_indicator">LED Индикатор</string>
-    <string name="new_messages">новых сообщений</string>
-    <string name="is_typing">Набирает текст…</string>
-    <string name="title_activity_scrolling">ScrollingActivity</string>
-
-    <string name="delete_dialog">Удалить диалог</string>
-    <string name="delete_doc">Удалить диалог</string>
-    <string name="load_saved_dialog">Загрузить сохраненный диалог</string>
-    <string name="exit_for_account_description">Вы уверены, что хотите выйти из аккаунта?</string>
-    <string name="creating_chat">Создание чата</string>
-    <string name="error_decrypting">Произошла ошибка декодирование</string>
-    <string name="message_copied">Сообщение скопировано</string>
-    <string name="translator">Яндекс Переводчик</string>
-    <string name="translation_text">Перевод текста, Пожалуйста, подождите…</string>
-    <string name="important_messages">Важные сообщения</string>
     <string name="prefs_message_encryption">Шифрование сообщений</string>
     <string name="prefs_message_encryption_description">При отправке нового сообщений долгим тапом - оно будет зашифровываться выбранным алгоритмом. Для расшифровки нужно нажать на сообщение</string>
     <string name="join_in_group_ask">Вставить в группу приложения</string>
@@ -379,41 +404,16 @@
     <string name="prefs_drawer_description">Настройки оформления заголовка боковой шторки (Drawer-a)</string>
     <string name="title_activity_navigation_view_acitivity">NavigationViewAcitivity</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_example">Example action</string>
-
-    <string name="action_settings">Settings</string>
-    <string name="chat_name">Название чата</string>
-
     <string name="prefs_bug_report">Баг-репорт</string>
     <string name="prefs_enable_log">Включить логирование</string>
     <string name="prefs_enable_log_description">Сохранить файл с информацией об ошибках на SD при краше приложение</string>
     <string name="prefs_clear_log">Очистить логи</string>
-    <string name="docs">Документы</string>
-    <string name="notes">Заметки</string>
-    <string name="translate_text.please_wait">Переводим текст. Это займет несколько секунд…</string>
-    <string name="translate_all">Перевести все</string>
-    <string name="all_words">"Всего слов: "</string>
     <string name="prefs_font_weight">Толщина шрифта</string>
     <string name="prefs_font_family">Семейство шрифтов</string>
-    <string name="delete">Удалить</string>
-    <string name="attach">Прикрепить</string>
-    <string name="set_wallpaper">Фон сообщений</string>
     <string name="pref_blur_radius">Радиус размытия</string>
     <string name="pref_blur_radius_description">Радиус размытия главной фотографии профиля в боковой шторке</string>
-    <string name="show_and_hide_time">Показать/скрыть время</string>
-    <string name="dialogs_number">"всего диалогов: "</string>
     <string name="prefs_use_system_emoji">Использовать системные смайлы</string>
     <string name="prefs_use_system_emoji_description">Как правило, система отображает смайлики гораздо быстрее</string>
     <string name="prefs_check_auto_update">Автообновление</string>
     <string name="prefs_check_auto_update_description">Проверка обновлений раз в день</string>
-    <string name="wallpaper_change">Поменять фон</string>
-    <string name="wallpaper_remove">Удалить фон</string>
-    <string name="exit_message">Нажмите еще раз для выхода</string>
 </resources>

@@ -2,6 +2,7 @@ package ru.euphoriadev.vk.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by Igor on 06.02.16.
@@ -264,6 +265,16 @@ public class ArrayUtil {
             }
         }
         return VALUE_NOT_FOUND;
+    }
+
+    /**
+     * Returns true if the collection is null or empty
+     *
+     * @param collection the collection to be examined
+     * @return true of list is null or empty
+     */
+    public static boolean isEmpty(Collection collection) {
+        return collection == null || collection.isEmpty();
     }
 
     @SuppressWarnings("unchecked")

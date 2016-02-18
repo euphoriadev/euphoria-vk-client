@@ -8,7 +8,7 @@ android {
         applicationId "ru.euphoriadev.vk"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 856
+        versionCode 860
         versionName "0.9 Beta"
     }
 
@@ -67,7 +67,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
-            debuggable true
+            debuggable false
             jniDebuggable false
             renderscriptDebuggable false
         }

@@ -327,7 +327,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 
         PreferenceCategory categoryOnline = new MaterialPreferenceCategory(getActivity());
-        categoryOnline.setTitle(getActivity().getString(R.string.prefs_visiblity));
+        categoryOnline.setTitle(getActivity().getString(R.string.prefs_visibility));
 
         rootScreen.addPreference(categoryOnline);
 
@@ -335,7 +335,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         MaterialListPreference listOnlineStatus = new MaterialListPreference(getActivity());
         listOnlineStatus.setTitle(getActivity().getString(R.string.prefs_online_status));
         listOnlineStatus.setKey(KEY_ONLINE_STATUS);
-        listOnlineStatus.setSummary(getActivity().getString(R.string.prefs_online_statu_description));
+        listOnlineStatus.setSummary(getActivity().getString(R.string.prefs_online_status_description));
         listOnlineStatus.setEntries(R.array.online_status_array);
         listOnlineStatus.setEntryValues(new CharSequence[]{"off", "eternal", "phantom"});
         listOnlineStatus.setDefaultValue("off");
@@ -449,8 +449,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 
         CheckBoxPreference boxSendFailedMsg = new MaterialCheckBoxPreference(getActivity());
-        boxSendFailedMsg.setTitle(getActivity().getString(R.string.prefa_unstable_connection));
-        boxSendFailedMsg.setSummary(getActivity().getString(R.string.prefa_unstable_connection_description));
+        boxSendFailedMsg.setTitle(getActivity().getString(R.string.prefs_unstable_connection));
+        boxSendFailedMsg.setSummary(getActivity().getString(R.string.prefs_unstable_connection_description));
         boxSendFailedMsg.setKey(KEY_RESEND_FAILED_MESSAGES);
         boxSendFailedMsg.setDefaultValue(true);
 

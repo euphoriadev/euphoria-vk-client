@@ -4,14 +4,13 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.SparseArray;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,23 +24,27 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.NotificationsHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.VKUpdateController;
 
 /**
  * Created by Igor on 13.11.15.
+ * <p/>
+ * The operating principle of a Long Poll connection is that the
+ * server withholds the request it receives until an event occurs or
+ * the time indicated in the wait parameter runs out (since some proxy servers
+ * terminate the connection after 30 seconds.
+ * <p/>
+ * See for more: http://vk.com/dev/using_longpoll
  */
 public class LongPollService extends Service {
 
     public static final String TAG = "VKOnLongPoll";
     public static int messageCount = 0;
-    @Deprecated
-    private SparseArray<VKOnLongPollListener> mListeners;
-    private VKOnDialogListener dialogListener;
     private Handler mHandler;
     private Thread mThread;
     private Api api;
     private SharedPreferences preferences;
     private NotificationsHelper notificationsHelper;
-    private LocalBinder mBinder = new LocalBinder();
     private boolean isRunning;
     private int lastSendMessageUid;
 
@@ -50,84 +53,17 @@ public class LongPollService extends Service {
         super.onCreate();
         Log.i(TAG, "onCreate");
 
-        mListeners = new SparseArray<>();
         mHandler = new Handler(Looper.getMainLooper());
         notificationsHelper = NotificationsHelper.get(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         isRunning = true;
 
         api = Api.get();
-        Runnable longPollRun = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                    Log.w(TAG, "LongPoll started!");
-                    VKLongPollServer pollServer = api.getLongPollServer(null, null);
-
-                    while (isRunning) {
-                        if (!AndroidUtils.isInternetConnection(LongPollService.this)) {
-                            Thread.sleep(5000);
-                            continue;
-                        }
-                        String request = "http://" + pollServer.server + "?act=a_check&key=" + pollServer.key + "&ts=" + pollServer.ts + "&wait=25&mode=2";
-                        String response = Api.sendRequestInternal(request, "", false);
-                        JSONObject root = new JSONObject(response);
-
-                        if (root.has("failed")) {
-                            // произошла ошибка, пробуем сначала
-                            Log.w(TAG, "JSON has failed: " + root.toString());
-                            Thread.sleep(1500);
-                            pollServer = api.getLongPollServer(null, null);
-                            continue;
-                        }
-                        long tsResponse = root.optLong("ts");
-                        JSONArray updates = root.getJSONArray("updates");
-
-                        Log.w(TAG, "while...");
-                        Log.i(TAG, "response = " + updates);
-
-                        if (updates.length() == 0) {
-                            pollServer.ts = tsResponse;
-                        } else {
-                            pollServer.ts = tsResponse;
-                            processResponse(updates);
-                        }
-
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        };
-        this.mThread = new Thread(longPollRun);
+        LongPollRunner runner = new LongPollRunner();
+        this.mThread = new Thread(runner);
         this.mThread.start();
     }
 
-    public void register(String tag, VKOnLongPollListener listener) {
-        if (mListeners.get(tag.hashCode()) == null) {
-            mListeners.put(tag.hashCode(), listener);
-        }
-    }
-
-    public boolean inRegistered(String tag) {
-        return mListeners.get(tag.hashCode()) != null;
-    }
-
-    public void unregister(String tag) {
-        mListeners.remove(tag.hashCode());
-    }
-
-    public void unregisterAll() {
-        mListeners.clear();
-        dialogListener = null;
-    }
-
-    public void setDialogListener(VKOnDialogListener listener) {
-        this.dialogListener = listener;
-    }
 
     private void runOnUiThread(Runnable command) {
         // если из новго потока
@@ -146,13 +82,12 @@ public class LongPollService extends Service {
      * @param array
      */
     private void processResponse(final JSONArray array) {
-
-        if (mListeners == null) {
-            return;
-        }
         if (array.length() == 0) {
             return;
         }
+
+        // that would not be falsity positives
+        final boolean[] useCase7 = {true};
         for (int i = 0; i < array.length(); ++i) {
             if (!isRunning) break;
 
@@ -161,52 +96,58 @@ public class LongPollService extends Service {
                 @Override
                 public void run() {
                     try {
-                        final JSONArray arrayItem = (JSONArray) array.opt(finalI);
+                        final JSONArray arrayItem = array.optJSONArray(finalI);
                         int type = (Integer) arrayItem.opt(0);
 
                         /**
                          0,$message_id,0 — удаление сообщения с указанным local_id
-                         1,$message_id,0 — удаление сообщения с указанным local_id
+                         1,$message_id,$flags — замена флагов сообщения (FLAGS:=$flags)
                          2,$message_id,$mask[,$user_id] — установка флагов сообщения (FLAGS|=$mask)
                          3,$message_id,$mask[,$user_id] — сброс флагов сообщения (FLAGS&=~$mask)
-                         4,$message_id,$flags,$from_id,$timestamp,$subject,$text,$attachments — добавление нового сообщения
+                         4,$message_id,$flags,$from_id,$timestamp,$subject,$text,$attachments — добавление нового сообщения. Если сообщение отправлено в беседе, $from_id содержит id беседы + 2000000000.
                          6,$peer_id,$local_id — прочтение всех входящих сообщений с $peer_id вплоть до $local_id включительно
                          7,$peer_id,$local_id — прочтение всех исходящих сообщений с $peer_id вплоть до $local_id включительно
-                         8,-$user_id,$extra — друг $user_id стал онлайн, $extra не равен 0, если в mode был передан флаг 64, в младшем байте (остаток от деления на 256) числа $extra лежит идентификатор платформы (таблица ниже)
+                         8,-$user_id,$extra — друг $user_id стал онлайн, $extra не равен 0, если в mode был передан флаг 64, в младшем байте (остаток от деления на 256) числа $extra лежит идентификатор платформы
                          9,-$user_id,$flags — друг $user_id стал оффлайн ($flags равен 0, если пользователь покинул сайт (например, нажал выход) и 1, если оффлайн по таймауту (например, статус away))
 
-                         51,$chat_id,$self — один из параметров (состав, тема) беседы $chat_id были изменены. $self - были ли изменения вызваны самим пользователем
 
+                         10,$peer_id,$mask — сброс флагов фильтрации по папкам для чата/собеседника с $peer_id. Соответствует операции directories &= ~mask.
+                         11,$peer_id,$flags — замена флагов фильтрации по папкам для чата/собеседника с $peer_id.
+                         12,$peer_id,$mask — установка флагов фильтрации по папкам для чата/собеседника с $peer_id. Соответствует операции directories |= mask.
+
+
+                         13,$peer_id,$flags — замена флагов всех сообщений с заданным peer_id (применяется только к сообщениям, у которых на текущий момент не установлены флаги 128 (deleted) и 64 (spam))
+                         14,$peer_id,$mask — установка флагов всех сообщений с заданным peer_id (FLAGS|=$mask) (применяется только к сообщениям, у которых на текущий момент не установлены флаги 128 (deleted) и 64 (spam))
+                         15,$peer_id,$mask — сброс флагов всех сообщений с заданным peer_id (FLAGS&=~$mask) (применяется только к сообщениям, у которых на текущий момент не установлены флаги 128 (deleted) и 64 (spam))
+
+
+                         51,$chat_id,$self — один из параметров (состав, тема) беседы $chat_id были изменены. $self - были ли изменения вызваны самим пользователем
                          61,$user_id,$flags — пользователь $user_id начал набирать текст в диалоге. событие должно приходить раз в ~5 секунд при постоянном наборе текста. $flags = 1
                          62,$user_id,$chat_id — пользователь $user_id начал набирать текст в беседе $chat_id.
-
                          70,$user_id,$call_id — пользователь $user_id совершил звонок имеющий идентификатор $call_id.
                          80,$count,0 — новый счетчик непрочитанных в левом меню стал равен $count.
+                         114,{ $peerId, $sound, $disabled_until } — изменились настройки оповещений, где peerId — $peer_id чата/собеседника, sound — 1 || 0, включены/выключены звуковые оповещения, disabled_until — выключение оповещений на необходимый срок (-1: навсегда, 0: включены, other: timestamp, когда нужно включить).
                          */
 
                         switch (type) {
+                            // удалил сообщение
+                            case 1:
+                                VKUpdateController.getInstance().updateMessageListenersForDelete(arrayItem.optInt(1));
+                                break;
                             // Новое сообщение
                             case 4:
                                 final VKMessage message = VKMessage.parse(arrayItem);
-                                if (message == null) return;
+                                if (message == null) break;
 
-
-                                for (int i = 0; i < mListeners.size(); i++) {
-                                    mListeners.valueAt(i).onNewMessage(message);
-
-                                }
-                                if (dialogListener != null) {
-                                    dialogListener.onNewMessage(message);
-                                }
+                                useCase7[0] = false;
+                                VKUpdateController.getInstance().updateMessageListenersForNew(message);
 
                                 if (preferences.getBoolean("enable_notify", true)) {
                                     if (message.is_out) {
                                         break;
                                     }
 
-//                                    if (mListeners.indexOfKey("MessageAdapter".hashCode()) == -1) {
-//                                        // мы сейчас в этом диалоге
-//                                    }
+
                                     VKUser user = DBHelper.get(LongPollService.this).getUserFromDB(message.uid);
                                     if (user != null) {
                                         Intent intent = new Intent(LongPollService.this, MessageHistoryActivity.class);
@@ -224,37 +165,36 @@ public class LongPollService extends Service {
                                         String textSummary = messageCount + " " + (getApplicationContext().getResources().getString(R.string.new_messages));
                                         notificationsHelper.createInboxNotification(pIntent, textMessage, user.toString(), textMessage, user.photo_50, textSummary, textMessage, messageCount, lastSendMessageUid != message.uid);
                                     }
-                                    lastSendMessageUid = (int) message.uid;
+                                    lastSendMessageUid = message.uid;
                                 }
-                            break;
+                                break;
 
                             // прочитал сообщение
                             case 6:
                             case 7:
-                                for (int i = 0; i < mListeners.size(); i++) {
-                                    mListeners.valueAt(i).onReadMessage(arrayItem.getInt(2));
+                                if (useCase7[0]) {
+                                    VKUpdateController.getInstance().updateMessageListenersForRead(arrayItem.getInt(2));
                                 }
-
-//                                if (preferences.getBoolean("enable_notify", true) {
-//
-//                                }
                                 break;
 
+                            // друг стал онлайн
+                            case 8:
+                                VKUpdateController.getInstance().updateUserListenersForOnline(Math.abs(arrayItem.optInt(1)));
+                                break;
+
+                            // друг стал оффлайн
+                            case 9:
+                                VKUpdateController.getInstance().updateUserListenersForOffline(Math.abs(arrayItem.optInt(1)));
+                                break;
 
                             // пользователь набираует сообщение
                             case 61:
-                                for (int i = 0; i < mListeners.size(); i++) {
-                                    mListeners.valueAt(i).onUserTyping(0, arrayItem.optLong(1));
-                                }
+                                VKUpdateController.getInstance().updateUserListenersForTyping(arrayItem.optInt(1), 0);
                                 break;
 
                             // пользователь набирает текст В ЧАТЕ
                             case 62:
-
-                                for (int i = 0; i < mListeners.size(); i++) {
-                                    mListeners.valueAt(i).onUserTyping(arrayItem.optLong(2),
-                                            arrayItem.optLong(1));
-                                }
+                                VKUpdateController.getInstance().updateUserListenersForTyping(arrayItem.optInt(1), arrayItem.optInt(2));
                                 break;
                         }
                     } catch (Exception e) {
@@ -266,55 +206,79 @@ public class LongPollService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy");
-
         isRunning = false;
         mHandler = null;
-        mListeners.clear();
-        dialogListener = null;
     }
 
-
-    public interface VKOnLongPollListener {
-        /**
-         * Пришло новое сообщение
-         *
-         * @param message
-         */
-        void onNewMessage(VKMessage message);
-
-        /**
-         * Пользователь начал набирать текст
-         *
-         * @param uid
-         * @param chat_id TODO: if (chat_id != 0) is chat
-         */
-        void onUserTyping(long chat_id, long uid);
-
-        /**
-         * Пользователь прочитал мое сообщение
-         */
-        void onReadMessage(long message_id);
-
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-    public interface VKOnDialogListener {
+    private class LongPollRunner implements Runnable {
 
-        void onNewMessage(VKMessage message);
-    }
+        @Override
+        public void run() {
+            try {
+                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                Log.w(TAG, "LongPoll started!");
 
-    public class LocalBinder extends Binder {
+                VKLongPollServer pollServer;
+                // we try as long until the user will not have Internet connection
+                while (true) {
+                    // user do not have Internet connection
+                    if (!AndroidUtils.isInternetConnection(LongPollService.this)) {
+                        Thread.sleep(3000);
+                        continue;
+                    }
+                    pollServer = api.getLongPollServer(null, null);
+                    break;
+                }
 
-        public LongPollService getService() {
-            return LongPollService.this;
+                while (isRunning) {
+                    try {
+                        if (!AndroidUtils.isInternetConnection(LongPollService.this)) {
+                            Thread.sleep(3000);
+                            continue;
+                        }
+                        String request = "http://" + pollServer.server + "?act=a_check&key=" + pollServer.key + "&ts=" + pollServer.ts + "&wait=25&mode=2";
+                        String response = Api.sendRequestInternal(request, "", false);
+                        JSONObject root = new JSONObject(response);
+
+                        if (root.has("failed")) {
+                            // произошла ошибка, пробуем сначала
+                            Log.w(TAG, "JSON has failed: " + root.toString());
+                            Thread.sleep(1500);
+                            pollServer = api.getLongPollServer(null, null);
+                            continue;
+                        }
+                        long tsResponse = root.optLong("ts");
+                        JSONArray updates = root.getJSONArray("updates");
+
+                        Log.i(TAG, "response = " + updates);
+
+                        if (updates.length() == 0) {
+                            pollServer.ts = tsResponse;
+                        } else {
+                            pollServer.ts = tsResponse;
+                            processResponse(updates);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
+
 
 }

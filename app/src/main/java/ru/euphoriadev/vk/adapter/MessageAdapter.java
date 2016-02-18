@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -31,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -55,13 +55,14 @@ import ru.euphoriadev.vk.util.PrefManager;
 import ru.euphoriadev.vk.util.ResourcesLoader;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleImageView;
 
 /**
  * Created by Igor on 07.09.15.
  */
-public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements LongPollService.VKOnDialogListener {
+public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKUpdateController.MessageListener {
 
     public static final int DEFAULT_COLOR = ResourcesLoader.getColor(R.color.md_grey_800);
     public static final int DEFAULT_DARK_COLOR = ThemeManager.darkenColor(DEFAULT_COLOR);
@@ -76,9 +77,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
     private SimpleDateFormat sdf;
     private Date date;
     private CacheMessages cacheMessages;
-    private ServiceConnection serviceConnection;
-    private LongPollService longPollService;
-    private boolean isBoundService;
     private long chat_id;
     private long uid;
     private int colorInMessages;
@@ -150,21 +148,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         mHelper = DBHelper.get(mContext);
         cacheMessages = new CacheMessages(CacheMessages.DEFAULT_SIZE);
 
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder binder) {
-                isBoundService = true;
 
-                longPollService = ((LongPollService.LocalBinder) binder).getService();
-                longPollService.setDialogListener(MessageAdapter.this);
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                isBoundService = false;
-
-            }
-        };
+        VKUpdateController.getInstance().addMessageListenr(this);
 
     }
 
@@ -178,18 +163,14 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
         }
     }
 
-    public void connectToLongPoll() {
-        if (!isBoundService) {
-            mContext.bindService(new Intent(mContext, LongPollService.class), serviceConnection, 0);
-        }
-    }
-
+    @Deprecated
     public void unregisterLongPoll() {
-        if (isBoundService) {
-            longPollService.setDialogListener(null);
-            mContext.unbindService(serviceConnection);
-            isBoundService = false;
-        }
+//        if (isBoundService) {
+//            longPollService.setDialogListener(null);
+//            mContext.unbindService(serviceConnection);
+//            isBoundService = false;
+//        }
+        VKUpdateController.getInstance().removeListener(this);
     }
 
 
@@ -815,6 +796,23 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements Lon
                 }
             }
         });
+    }
+
+    @Override
+    public void onReadMessage(int message_id) {
+        for (int i = 0; i < getMessages().size(); i++) {
+            MessageItem item = getMessages().get(i);
+            if (message_id == item.message.mid) {
+                item.message.read_state = true;
+                notifyDataSetChanged();
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onDeleteMessage(int message_id) {
+
     }
 
     public void toggleStateTime() {

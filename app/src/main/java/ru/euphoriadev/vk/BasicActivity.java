@@ -39,6 +39,7 @@ import java.io.IOException;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
+import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.service.LongPollService;
@@ -50,6 +51,8 @@ import ru.euphoriadev.vk.util.RefreshManager;
 import ru.euphoriadev.vk.util.Refreshable;
 import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.VKInsertHelper;
+import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.vkapi.VKApi;
 
@@ -125,6 +128,53 @@ public class BasicActivity extends BaseThemedActivity implements
 
         startService(new Intent(this, LongPollService.class));
         loadWallpaper();
+    }
+
+
+    private void testLongPoll() {
+        VKUpdateController.getInstance().addListener(new VKUpdateController.MessageListener() {
+            @Override
+            public void onNewMessage(VKMessage message) {
+                VKUser user = DBHelper.get(BasicActivity.this).getUserFromDB(message.uid);
+                Toast.makeText(BasicActivity.this, "Новое сообщение от "
+                        + user.first_name + ", chat id: "
+                        + message.chat_id + " с текстом " + message.body, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onReadMessage(int message_id) {
+                Toast.makeText(BasicActivity.this, "Сообщение с id " + message_id + " прочтено", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onDeleteMessage(int message_id) {
+                Toast.makeText(BasicActivity.this, "Сообщение с id " + message_id + " удалено", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        VKUpdateController.getInstance().addListener(new VKUpdateController.UserListener() {
+            @Override
+            public void onOffline(int user_id) {
+                VKUser user = DBHelper.get(BasicActivity.this).getUserFromDB(user_id);
+
+                Toast.makeText(BasicActivity.this, "Пользователь " + user.toString() + " стал оффлайн", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onOnline(int user_id) {
+                VKUser user = DBHelper.get(BasicActivity.this).getUserFromDB(user_id);
+
+                Toast.makeText(BasicActivity.this, "Пользователь " + user.toString() + " стал онлайн", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onTyping(int user_id, int chat_id) {
+                VKUser user = DBHelper.get(BasicActivity.this).getUserFromDB(user_id);
+
+                Toast.makeText(BasicActivity.this, "Пользователь " + user.toString() + " набирает текст" +
+                        (chat_id == 0 ? "" : "в чате " + chat_id), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void circularRevealAnimation() {
@@ -500,6 +550,7 @@ public class BasicActivity extends BaseThemedActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        VKUpdateController.getInstance().cleanup();
         RefreshManager.unregisterForChangePreferences(this);
 
         DBHelper helper = DBHelper.get(this);

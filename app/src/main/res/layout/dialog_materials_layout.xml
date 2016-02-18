@@ -23,6 +23,7 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/materials_tablayout"
         android:layout_width="match_parent"
+        android:elevation="1dp"
         android:layout_height="?attr/actionBarSize"
         app:layout_scrollFlags="scroll|enterAlways"
         app:tabIndicatorColor="?colorPrimary"

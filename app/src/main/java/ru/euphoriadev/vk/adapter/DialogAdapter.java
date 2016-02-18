@@ -1,15 +1,12 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.text.Html;
 import android.text.Spannable;
@@ -45,22 +42,19 @@ import ru.euphoriadev.vk.util.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
+import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
-import ru.euphoriadev.vk.view.CircleImageView;
 
 /**
  * Created by Igor on 30.03.15.
  */
-public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLongPollListener {
+public class DialogAdapter extends BaseAdapter implements VKUpdateController.MessageListener, VKUpdateController.UserListener {
 
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
     private Context context;
     private LayoutInflater inflater;
     private ArrayList<DialogItem> dialogItems;
     private Handler handler;
-    private ServiceConnection serviceConnection;
-    private LongPollService longPollService;
-    private boolean mBoundService = false;
     private DBHelper helper;
     private Typeface typefaceBold;
     private int fullNameTextColor;
@@ -83,21 +77,9 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
         helper = DBHelper.get(context);
         helper.open();
         handler = new Handler(Looper.getMainLooper());
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder binder) {
-                mBoundService = true;
 
-                longPollService = ((LongPollService.LocalBinder) binder).getService();
-                longPollService.register("DialogsAdapter", DialogAdapter.this);
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mBoundService = false;
-                longPollService = null;
-            }
-        };
+        VKUpdateController.getInstance().addUserListener(this);
+        VKUpdateController.getInstance().addMessageListenr(this);
     }
 
     @Override
@@ -109,29 +91,15 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
 
     }
 
+
     @Override
-    public void onUserTyping(final long chat_id, final long uid) {
-        final DialogItem dialog = search(uid, chat_id);
-        if (dialog != null) {
-            dialog.isTyping = true;
-            dialog.userIdTyping = (int) uid;
-            dialog.chatIdTyping = (int) chat_id;
-            notifyDataSetChanged();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    dialog.isTyping = false;
-                    dialog.userIdTyping = -1;
-                    dialog.chatIdTyping = -1;
-                    notifyDataSetChanged();
-                }
-            }, 5000);
-        }
+    public void onDeleteMessage(int message_id) {
 
     }
 
+
     @Override
-    public void onReadMessage(long message_id) {
+    public void onReadMessage(int message_id) {
         for (int i = 0; i < dialogItems.size(); i++) {
             DialogItem item = dialogItems.get(i);
             if (item.message.mid == message_id) {
@@ -144,37 +112,20 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
     }
 
 
-    public void connectToLongPollService() {
-        try {
-            if (!mBoundService || longPollService == null) {
-                context.bindService(new Intent(context, LongPollService.class), serviceConnection, 0);
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean isConnected() {
-        return mBoundService;
-    }
-
     public void disconnectLongPoll() {
-        if (mBoundService || longPollService != null) {
-            longPollService.unregister("DialogsAdapter");
-            context.unbindService(serviceConnection);
-            mBoundService = false;
-        }
+        VKUpdateController.getInstance().removeUserListener(this);
+        VKUpdateController.getInstance().removeMessageListener(this);
     }
 
-    public DialogItem search(long uid, long cha_id) {
+    public DialogItem search(long uid, long chat_id) {
         for (DialogItem dialog : dialogItems) {
             // ищем сначала chat
-            if (cha_id == dialog.message.chat_id && cha_id != 0) {
+            if (chat_id == dialog.message.chat_id && chat_id != 0) {
                 return dialog;
             }
 
             // теперь ищем user-а
-            if (uid == dialog.message.uid && cha_id == dialog.message.chat_id) {
+            if (uid == dialog.message.uid && chat_id == dialog.message.chat_id) {
                 return dialog;
             }
         }
@@ -437,7 +388,7 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
                 if (item.message.is_out) item.message.unread = 0;
             } else {
                 // если это беседа
-                // если id совпадают, и они не 0 - значит мы нащли
+                // если id совпадают, и они не 0 - значит мы нашли
                 if (updateMessage.chat_id == item.message.chat_id) {
 
                     if (updateMessage.uid != item.message.uid) {
@@ -520,6 +471,36 @@ public class DialogAdapter extends BaseAdapter implements LongPollService.VKOnLo
             dialogItems.clear();
             dialogItems.trimToSize();
             dialogItems = null;
+        }
+    }
+
+    @Override
+    public void onOffline(int user_id) {
+
+    }
+
+    @Override
+    public void onOnline(int user_id) {
+
+    }
+
+    @Override
+    public void onTyping(int user_id, int chat_id) {
+        final DialogItem dialog = search(user_id, chat_id);
+        if (dialog != null) {
+            dialog.isTyping = true;
+            dialog.userIdTyping = user_id;
+            dialog.chatIdTyping = chat_id;
+            notifyDataSetChanged();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.isTyping = false;
+                    dialog.userIdTyping = -1;
+                    dialog.chatIdTyping = -1;
+                    notifyDataSetChanged();
+                }
+            }, 6000);
         }
     }
 

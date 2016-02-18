@@ -208,7 +208,7 @@
     <string name="prefs_color_in_msg_description">Перефарбовувати фон бульбашки в колір теми</string>
     <string name="prefs_color_out_msg">Колір відправлених повідомлень</string>
     <string name="prefs_color_out_msg_description">Перефарбовувати фон бульбашки в колір теми</string>
-    <string name="prefs_visiblity">Видимість</string>
+    <string name="prefs_visibility">Видимість</string>
     <string name="prefs_offline">Оффлайн</string>
     <string name="prefs_offline_description">Вас не буде видно в мережі</string>
     <string name="prefs_hide_typing">Приховувати статус набору повідомлення</string>
@@ -249,8 +249,8 @@
     <string name="prefs_use_second_profile_description">(Ще не здійснено)</string>
     <string name="videos">Відеозапис</string>
     <string name="prefs_other">Інше</string>
-    <string name="prefa_unstable_connection">Режим RFM</string>
-    <string name="prefa_unstable_connection_description">Режим RFN (Resend Failed Messages) дозволяє не турбуватися про
+    <string name="prefs_unstable_connection">Режим RFM</string>
+    <string name="prefs_unstable_connection_description">Режим RFN (Resend Failed Messages) дозволяє не турбуватися про
         поганому підключенні до мережі, в цьому випадку програма подбати про те, що б всі ваші повідомлення були
         доставлені (навіть якщо воно вимкнене).
     </string>
@@ -269,7 +269,7 @@
     <string name="click_to_update">Натисніть для перевірки оновлення</string>
     <string name="found_new_version">"Знайдена нова версія програми: "</string>
     <string name="prefs_online_status">Онлайн статус</string>
-    <string name="prefs_online_statu_description">Вічний - постійно \"онлайн \"; \nФантомний - онлайн без зміни дати виходу;
+    <string name="prefs_online_status_description">Вічний - постійно \"онлайн \"; \nФантомний - онлайн без зміни дати виходу;
     </string>
     <string name="download_ask">Завантажити?</string>
     <string name="you">Я</string>

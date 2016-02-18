@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Navigation drawer items -->
     <string-array name="screen_array">
-        <!--<item>News</item>-->
         <item>Friends</item>
         <item>Messages</item>
         <item>Audios</item>

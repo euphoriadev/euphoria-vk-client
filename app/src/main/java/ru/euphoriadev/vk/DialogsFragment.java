@@ -805,9 +805,6 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 adapter.notifyDataSetChanged();
             }
 
-            if (!adapter.isConnected()) {
-                adapter.connectToLongPollService();
-            }
         }
 
         private ArrayList<VKMessage> getDialogsFromNet() {

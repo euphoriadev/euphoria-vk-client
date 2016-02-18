@@ -21,6 +21,242 @@
     <string name="title_members">Members of the chat</string>
     <string name="sending">Sending...</string>
 
+     <string name="changelog">
+        <u>0.9</u>\n
+        • Open Source!;\n
+        • The ability to set the chat background;\n
+        • Choose the radius of blur curtain;\n
+        • Slightly changed the markup;\n
+        • Option to hide time in history;\n
+        • Display of number of dialogs in the Toolbar;\n
+        • Customize icon send;\n
+        • Slightly adjusted the mechanism for storing messages;\n
+        • Started work on the attachments and smileys;\n
+        • Redesign message;\n
+        • Optimizations and bug fixes;\n
+        • Auto auto update;\n
+        • A new style of bubble message;\n
+        • The ability to send log to developers;\n
+        • Change the gravity of navigation drawer header;\n
+        • Redesign authorization screen;\n
+        • The ability to view photos in full screen;\n
+        • New mechanism for loading materials of conversation;\n
+        • New icon;\n
+        • Increased stability of update messages;\n
+        \n
+        <u>0.8</u>\n
+        • Notes;\n
+        • Documents: download, delete, view;\n
+        • Sort friends by online/offline;\n
+        • Translation of all messages;\n
+        • Video playback using an external player;\n
+        • Statistics reports, the number of added words;\n
+        • Optimization;\n
+        • Small graphical changes;\n
+        • Changed switching the font;\n
+        • Exit from groups;\n
+        • Delete messages;\n
+        • New themes;\n
+        \n
+        <u>0.7.1</u>\n
+        • Bugs fix;\n
+        \n
+        <u>0.7</u>\n
+        • New navigation drawer;\n
+        • New profile;\n
+        • The ability to move the app;\n
+        • Ability to lead the event log (logs);\n
+        • Optimization;\n
+        • Display where the user is online;\n
+        • Local search by friends;\n
+        • Display of number of users in the group;\n
+        • New theme: Green;\n
+        • Ability to write to the group, if already in dialogue;\n
+        • Ability to login using the token, use screen name (for example: @durov);\n
+        \n
+        <u>0.6.1</u>\n
+        • Accelerated load messages when scrolling (About 20-25%);\n
+        • Fixed typos;\n
+        • Fixed material of the conversation and the departure of important messages;\n
+        • The application is fully translated into Ukrainian;\n
+        • Fixed the Photo in the shutter;\n
+        • A new kind of time in the cloud messages;\n
+        \n
+        <u>0.6</u>\n
+        • Improved update method of the message;\n
+        • Another mechanism of loading of saved messages;\n
+        • Switch themes without restarting the application;\n
+        • Notifications\n
+        • Display the status of Taiping;\n
+        • Display sent messages in a different form;\n
+        • Creating the chat;\n
+        • Delete dialog;\n
+        • The opportunity to include a solid background in the sidebar;\n
+        • Search through messages;\n
+        • Encryption of messages;\n
+        • Delete, copy text, to decipher the info in the message;\n
+        • Integrated the Yandex translator;\n
+        • Important message;\n
+        • Display the message is read;\n
+        • Display the service messages;\n
+        • Download message history automatically as you scroll;\n
+        • Improved stability\n
+        \n
+        <u>0.5.1</u>\n
+        • Fixed a bug with the blurred picture of the user and eternal online;\n
+        \n
+        <u>0.5</u>\n
+        • Optimized start of applications;\n
+        • Experimental function - send the failed message, as soon as a stable network connection;\n
+        • Painting of unread messages;\n
+        • Log in by using the token;\n
+        • Black and dark theme;\n
+        • Status of online correspondence;\n
+        • The download dialog;\n
+        • OTA - update the app from the app;\n
+        • The content of the conversation;\n
+        • Material settings;\n
+        • music player;\n
+        • Eternal and phantom line;\n
+        • Little noticeable improvement and remediation;\n
+        \n
+        <u>0.2</u>\n
+        • Gift list;\n
+        • Counters to the profile;\n
+        • Search by group;\n
+        • The number of unread SMS in the dialogues;\n
+        • 2 new themes;\n
+        • English language\n
+        • Drawer header to teal theme;\n
+        • System font;\n
+        \n
+        <u>0.1</u>\n
+        • Display the user name in the chat;\n
+        • Option to enable blur image in drawer;\n
+        • Minor improvements and bug fixes;\n
+        • New icon;\n
+        • Change the font;\n
+        • Update the dialogues and stories;\n
+        • Redesigned conversation list;\n
+        • Improved display of images in the history;\n
+        • The separators in the list of dialogs;\n
+        • Notifications\n
+        • Display groups;\n
+        • Redesigned friends list;\n
+        \n
+        <u>0.0.9</u>\n
+        • Uploading of avatars in the conversation;\n
+        • Forwarded messages can be opened;\n
+        • Sound clips;\n
+        • Loading images in the history of message;\n
+        • The text is returned in the native language;\n
+        • Display emoticons;\n
+        • Display of recordings in the history of messages;\n
+        • Display of stickers;\n
+        • Display of documents;\n
+        • Gifts display;\n
+        • Kill messages load much faster;\n
+        • Typing status (User is typing a message);\n
+        • Recycled application settings;\n
+        • Added ColorPicker, offline, or disabled status of Taiping, as well as the repainting of the cloud messages depending on the topic;\n
+        • Chat settings;\n
+        • Delete messages;\n
+        • On the toolbar there is a list of the participants of the conversation;\n
+        \n
+        <u>0.0.8</u>\n
+        • The title in the status bar;\n
+        • Removed the paragraph "Profile", Open the profile by clicking the avatar in the shutter;\n
+        • Offline download profile;\n
+        • New bubbles for messages;\n
+        • Fixed a bug with the status bar covering on the toolbar;\n
+        • When you click on the link - the app is not buggy;\n
+        • Status of the last visit of the user is visible in the toolbar;\n
+        • Download old messages in the conversation;\n
+        • Fixed the disappearance of the name from the user when sending sticker;\n
+        • Display of new messages/requests in the shutter;\n
+        • Number of participants in the conversation;\n
+        • Fixed bug with crash when calculating statistics of messages on some devices;\n
+        • Shadow above the box for entering text in dialogs;\n
+        • Show sent message;\n
+        • Added the light theme;\n
+        • Manual update history;\n
+        • Offline download history;\n
+        • Saving of messages;\n
+        • Show date of otbivki message in the history;\n
+        \n
+        <u>0.0.7</u>\n
+        • Moving to Gradle;\n
+        • MaterialDrawer!;\n
+        • Change of some color schemes;\n
+        • Translucent StatusBar and NavigationBar for Lollipop;\n
+        • Go to profile, click on user in your friends;\n
+        • Logout moved to the curtain;\n
+        • And also settings;\n
+        • The paragraph "Statistics reports" in dialogue;\n
+        • Another animation is download dialogues;\n
+        • News;\n
+        \n
+        <u>0.0.6</u>\n
+        • Optimization of the message list.\n
+        • Large messages are truncated;\n
+        • Painting the status bar in the theme color;\n
+        • Download old dialogues;\n
+        • New profile;\n
+        • Open your profile by clicking on the photo;\n
+        • Search widget in the toolbar;\n
+        • FloatingActionButton;\n
+        • Slightly changed layout of the dialog;\n
+        • Added "theme": "Teal", "Dark", "Black", "Purple";\n
+        • When you change the orientation, activity not generated";\n
+        • Changed themes and slightly changed the background color";\n
+        • Download photos in the history of communications";\n
+
+        \n <u>0.0.5</u>\n
+        • Message history of the user;\n
+        • Sending SMS;\n
+        • Fixed usernames (Null, Null);\n
+        • Auto-refresh of the message list.\n
+        • The animation when you click on the dialogue;\n
+        • Dark, Orange, Blue color scheme;\n
+        • Roboto font;\n
+        • The shadow under the toolbar is visible on all versions of the game;\n
+        • Highlighting of unread messages;\n
+        • Full load at first run;\n
+
+        \n <u>0.0.4</u>\n
+        • A list of dialogs;\n
+        • Sort by popularity;\n
+        • Icon is in NavigationDrawer animation;\n
+        • Indigo, Red, Blue themes;\n
+
+        \n <u>0.0.3</u>\n
+        • New app icon;\n
+        • Offline zaraska friends list and pictures!;\n
+        • SwipeToRefresh;\n
+        • Change log;\n
+        • The scroll bar;\n
+        • Round avatars in the friends list;\n
+        • Animation list of friends;\n
+
+        \n <u>0.0.2</u>\n
+        • New features:\n
+        - Wall post;\n
+        - Change the status, it displays;\n
+        - List of friends;\n
+        - Always on offline;\n
+        - Settings;\n
+
+        \n <u>0.0.1\n</u>
+        • <b>First run! <i>04.02.2015</i></b>;\n
+        • <b>Added</b> Navigation Drawer;\n
+        • <b>Theme:</b> Material Design;\n
+        • <b>Added</b> the settings window;\n
+        • <b>Added</b> partial English;\n
+        • <b>Added</b> authorization;\n
+        • <b>Added</b> exit from the account;\n
+        • <b>Added</b> the ability to post on the wall;\n
+        • <b>Added</b> list changes;\n
+         \n</string>
 
     <string name="authorization">Authorization</string>
     <string name="preview">Preview</string>
@@ -55,7 +291,7 @@
     <string name="prefs_color_in_msg_description">Repaint the background of the bubble in the color theme</string>
     <string name="prefs_color_out_msg">Color incoming messages</string>
     <string name="prefs_color_out_msg_description">Repaint the background of the bubble in the color theme</string>
-    <string name="prefs_visiblity">Visibility</string>
+    <string name="prefs_visibility">Visibility</string>
     <string name="prefs_offline">Offline</string>
     <string name="prefs_offline_description">You will not be seen on the vk</string>
     <string name="prefs_hide_typing">Hide typing</string>
@@ -97,8 +333,8 @@
     <string name="prefs_use_second_profile_description">(Not yet implemented)
     </string>
     <string name="prefs_other">Other</string>
-    <string name="prefa_unstable_connection">Mode RFM</string>
-    <string name="prefa_unstable_connection_description">Mode RFN (Resend Failed Messages) allows not to worry about bad Internet, In this case the application to ensure that all your messages have been delivered (even if the app is turned off).
+    <string name="prefs_unstable_connection">Mode RFM</string>
+    <string name="prefs_unstable_connection_description">Mode RFN (Resend Failed Messages) allows not to worry about bad Internet, In this case the application to ensure that all your messages have been delivered (even if the app is turned off).
     </string>
     <string name="error">Error</string>
     <string name="check_update">Check update</string>
@@ -112,7 +348,7 @@
     <string name="click_to_update">Click to check for updates</string>
     <string name="found_new_version">"Found a new version of app: "</string>
     <string name="prefs_online_status">Online status</string>
-    <string name="prefs_online_statu_description">
+    <string name="prefs_online_status_description">
         Eternal - always \"online\";\Phantom - online without changing the date
         output;\n
     </string>

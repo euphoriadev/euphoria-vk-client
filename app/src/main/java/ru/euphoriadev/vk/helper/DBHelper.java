@@ -301,7 +301,7 @@ public class DBHelper extends SQLiteOpenHelper {
             mDatabase = getWritableDatabase();
         }
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM " + DBHelper.USERS_TABLE + " WHERE " + DBHelper.USER_ID + " = " + uid, null);
-        VKUser user = null;
+        VKUser user = VKUser.EMPTY_USER;
         if (cursor.getCount() != 0)
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(0);

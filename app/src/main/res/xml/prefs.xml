@@ -27,7 +27,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/prefs_visiblity">
+    <PreferenceCategory android:title="@string/prefs_visibility">
 
         <CheckBoxPreference android:title="@string/prefs_offline"
                             android:defaultValue="true"

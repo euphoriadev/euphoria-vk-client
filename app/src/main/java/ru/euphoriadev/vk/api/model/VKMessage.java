@@ -21,6 +21,7 @@ public class VKMessage implements Serializable {
     public static final int FIXED = 256;      // сообщение проверено пользователем на спам
     public static final int MEDIA = 512;      // сообщение содержит медиаконтент
     public static final int BESEDA = 8192;    // беседа
+
     private static final long serialVersionUID = 1L;
     /**
      * 	Message ID. (Not returned for forwarded messages), positive number
@@ -256,7 +257,6 @@ public class VKMessage implements Serializable {
             JSONObject o = a.optJSONObject(7);
             m.uid = o.optInt("from");
         }
-       // m.attachment = a.getJSONArray(7); TODO
         m.attachments = VKAttachment.parseArray(a.optJSONArray(7));
         return m;
     }
