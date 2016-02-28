@@ -3,6 +3,7 @@ package ru.euphoriadev.vk.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Igor on 06.02.16.
@@ -11,7 +12,7 @@ import java.util.Collection;
  */
 public class ArrayUtil {
     /**
-     * The index for linear search, if the value is not found
+     * The index for linear and binary search, if the value is not found
      */
     public static final int VALUE_NOT_FOUND = -1;
 
@@ -268,18 +269,62 @@ public class ArrayUtil {
     }
 
     /**
+     * Compares the two lists.
+     *
+     * @param list1 the first collection
+     * @param list2 the second collection
+     * @return true, if both list are have same length
+     * and all elements at index is equal according to {@link Object#equals},
+     * false otherwise
+     */
+    public static boolean equals(List list1, List list2) {
+        if (list1 == list2) {
+            return true;
+        }
+
+        if (list1.size() != list2.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < list1.size(); i++) {
+            Object o1 = list1.get(i);
+            Object o2 = list2.get(i);
+            if (!(o1 == null ? o2 == null : o1.equals(o2))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns true if the array has the specified value
+     *
+     * @param array the array to search specified value
+     * @param value  the value to search for
+     */
+    public static boolean contains(int[] array, int value) {
+        return linearSearch(array, value) != VALUE_NOT_FOUND;
+    }
+
+    public static int[] toIntArray(List<Integer> list) {
+        int[] array = new int[list.size()];
+        if (isEmpty(list)) {
+            return array;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
+
+    /**
      * Returns true if the collection is null or empty
      *
      * @param collection the collection to be examined
-     * @return true of list is null or empty
      */
     public static boolean isEmpty(Collection collection) {
         return collection == null || collection.isEmpty();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <E> ArrayList<E> changeGenericTypeOf(ArrayList<Object> list, Class<E> classType) {
-        return (ArrayList<E>) list;
     }
 
 }

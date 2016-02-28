@@ -64,9 +64,9 @@ public class VKChat implements Serializable {
 
         JSONArray array = sourse.optJSONArray("users");
         if (array != null)
-        for (int i = 0; i < array.length(); i++) {
-            chat.users.add(array.optLong(i));
-        }
+            for (int i = 0; i < array.length(); i++) {
+                chat.users.add(array.optLong(i));
+            }
         return chat;
     }
 

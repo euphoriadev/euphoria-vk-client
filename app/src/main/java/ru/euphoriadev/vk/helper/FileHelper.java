@@ -23,7 +23,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 
-import ru.euphoriadev.vk.util.AppLoader;
+import ru.euphoriadev.vk.common.AppLoader;
 
 
 /**

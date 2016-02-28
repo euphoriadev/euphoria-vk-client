@@ -16,7 +16,7 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by user on 13.11.15.
@@ -98,7 +98,9 @@ public class ImportantMessagesActivity extends BaseThemedActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home: finish(); break;
+            case android.R.id.home:
+                finish();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

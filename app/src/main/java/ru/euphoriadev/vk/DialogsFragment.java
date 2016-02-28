@@ -16,8 +16,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Process;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -52,20 +52,20 @@ import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
+import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.PrefManager;
-import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
-import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 10.07.15.
  */
-public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class DialogsFragment extends AbstractFragment implements SwipeRefreshLayout.OnRefreshListener {
     private final String TAG = "DialogsFragment";
     Activity activity;
 
@@ -93,10 +93,11 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
         ((BasicActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
-        ((BaseThemedActivity) getActivity())
-                .getSupportActionBar()
-                .setSubtitle(activity.getString(R.string.dialogs_number) + PrefManager.getInt("message_count", 0));
-        ((BasicActivity) getActivity()).getToolbar();
+        ((BasicActivity) getActivity()).getSupportActionBar()
+                .setTitle(String.format("%s (%s)",
+                        getResources().getString(R.string.messages),
+                        PrefManager.getInt(SettingsFragment.KEY_MESSAGE_COUNT, 0)));
+
         ViewUtil.setColor(((BasicActivity) getActivity()).getToolbar(), ThemeManager.getPrimaryTextColorOnThemeColor(getActivity()));
 
         listView = (ListView) rootView.findViewById(R.id.lvMess);
@@ -127,19 +128,13 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 final DialogItem item = (DialogItem) parent.getItemAtPosition(position);
+                final boolean exists = DBHelper.get(getActivity()).exists(database, DBHelper.SAVED_MESSAGES_TABLE + "_" + item.user.user_id);
 
                 CharSequence[] items = new CharSequence[]{
-                        activity.getString(R.string.download_dialog),
+                        activity.getString(exists ? R.string.load_saved_dialog : R.string.download_dialog),
                         activity.getString(R.string.delete_dialog)
                 };
 
-                final boolean exists = DBHelper.get(getActivity()).exists(database, DBHelper.SAVED_MESSAGES_TABLE + "_" + item.user.user_id);
-                if (exists) {
-                    items = new CharSequence[]{
-                            activity.getString(R.string.load_saved_dialog),
-                            activity.getString(R.string.delete_dialog)
-                    };
-                }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -277,7 +272,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     ContentValues cv = new ContentValues();
                     while (true) {
                         // скачиваем 1.5 сообщений
-                        ArrayList<VKMessage> vkMessages = api.getMessagesHistoryWithExecute(id, chatid, account.user_id, count);
+                        ArrayList<VKMessage> vkMessages = api.getMessagesHistoryWithExecute(id, chatid, count);
                         if (vkMessages.isEmpty()) {
                             // если offset > общего кол-во, то список будет пуст
                             break;
@@ -347,9 +342,10 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         while (cursor.moveToNext()) {
             int uid = cursor.getInt(cursor.getColumnIndex(DBHelper.USER_ID));
-            String firstNameUser = cursor.getString(cursor.getColumnIndex(DBHelper.FIRST_NAME)) + "";
-            String lastNameUser = cursor.getString(cursor.getColumnIndex(DBHelper.LAST_NAME)) + "";
+            String firstNameUser = cursor.getString(cursor.getColumnIndex(DBHelper.FIRST_NAME));
+            String lastNameUser = cursor.getString(cursor.getColumnIndex(DBHelper.LAST_NAME));
             String photo50User = cursor.getString(cursor.getColumnIndex(DBHelper.PHOTO_50));
+            boolean isOnline = cursor.getInt(cursor.getColumnIndex(DBHelper.ONLINE)) == 1;
 
             int chatIdMessage = cursor.getInt(cursor.getColumnIndex(DBHelper.CHAT_ID));
             int isOutMessage = cursor.getInt(cursor.getColumnIndex(DBHelper.IS_OUT));
@@ -377,6 +373,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             u.first_name = firstNameUser;
             u.last_name = lastNameUser;
             u.photo_50 = photo50User;
+            u.online = isOnline;
 
             dialogItems.add(new DialogItem(m, u));
         }
@@ -428,7 +425,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
     private void loadDialogs(final boolean onlyUpdate) {
-        new AsyncLoadDialogsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        AsyncTaskCompat.executeParallel(new AsyncLoadDialogsTask());
 
         if (AndroidUtils.isInternetConnection(getActivity())) {
             VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
@@ -443,9 +440,10 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     if (getActivity() == null || ((BasicActivity) getActivity()).getSupportActionBar() == null) {
                         return;
                     }
-                    ((BaseThemedActivity) getActivity())
-                            .getSupportActionBar()
-                            .setSubtitle(activity.getString(R.string.dialogs_number) + messageCount);
+                    ((BasicActivity) getActivity()).getSupportActionBar()
+                            .setTitle(String.format("%s (%s)",
+                                    getResources().getString(R.string.messages),
+                                    PrefManager.getInt(SettingsFragment.KEY_MESSAGE_COUNT, 0)));
                 }
 
                 @Override
@@ -458,7 +456,8 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     }
 
-    private void setRefreshing(final boolean refreshing) {
+    @Override
+    public void setRefreshing(final boolean refreshing) {
         swipeLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -526,6 +525,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         });
     }
+
     /**
      * Удаление диалога
      * TODO: на метод наложено ограничение, за один вызов нельзя удалить больше 10000 сообщений
@@ -536,33 +536,46 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             return;
         }
 
-        ThreadExecutor.execute(new Runnable() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.delete_dialog);
+        builder.setMessage(activity.getResources().getString(R.string.delete_dialog_confirm));
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
-            public void run() {
-                try {
-                    boolean isEmpty = false;
-                    while (!isEmpty) {
-                        // если true - удалили все сообщения
-                        // еще раз вызывать удаление не нужно
-                        isEmpty = api.getMessagesHistory(user_id, chat_id, 0, 10, false).isEmpty();
+            public void onClick(DialogInterface dialog, int which) {
+                ThreadExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            boolean isEmpty = false;
+                            while (!isEmpty) {
+                                // если true - удалили все сообщения
+                                // еще раз вызывать удаление не нужно
+                                isEmpty = api.getMessagesHistory(user_id, chat_id, 0, 10, false).isEmpty();
 
-                        api.deleteMessageDialog(user_id, chat_id);
-                    }
+                                api.deleteMessageDialog(user_id, chat_id);
+                            }
 
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.getDialogs().remove(adapter.search(user_id, chat_id));
-                            adapter.notifyDataSetChanged();
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.getDialogs().remove(adapter.search(user_id, chat_id));
+                                    adapter.notifyDataSetChanged();
 
+                                    Toast.makeText(getActivity(), "Dialog is deleted", Toast.LENGTH_LONG).show();
+
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    }
+                });
             }
         });
+        builder.show();
     }
+
 
 
     @Override
@@ -694,6 +707,7 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private class AsyncLoadDialogsTask extends AsyncTask<Void, Boolean, Void> {
         private final String TAG = "AsyncLoadDialogsTask";
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -703,7 +717,8 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             if (dialogItems == null) {
                 dialogItems = new ArrayList<>(30);
             }
-            database = DBHelper.get(getActivity()).getWritableDatabase();;
+            database = DBHelper.get(getActivity()).getWritableDatabase();
+            ;
 
             // get dialogs from database
             getDialogsFrom(database);
@@ -798,6 +813,9 @@ public class DialogsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
 
         private void updateAdapter() {
+            if (getActivity() == null) {
+                return;
+            }
             if (adapter == null) {
                 adapter = new DialogAdapter(getActivity(), dialogItems);
                 listView.setAdapter(adapter);

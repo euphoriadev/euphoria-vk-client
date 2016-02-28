@@ -1,40 +1,49 @@
 package ru.euphoriadev.vk;
 
 import android.animation.LayoutTransition;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
 import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.KException;
+import ru.euphoriadev.vk.api.model.VKPhoto;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.interfaces.OnTwiceClickListener;
+import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.util.Emoji;
-import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.vkapi.VKApi;
+import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadTask;
+
+import static ru.euphoriadev.vk.napi.VKApi.TAG;
+import static ru.euphoriadev.vk.napi.VKApi.VKMessageUploader;
 
 /**
  * Created by Igor on 15.07.15.
@@ -157,7 +166,7 @@ public class TestActivity extends BaseThemedActivity {
         buttonVkApi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VKApi.init(VKApi.VKUserAccount.from(Api.get().getAccount()));
+                VKApi.init(VKApi.VKUserConfig.from(Api.get().getAccount()));
                 VKApi.messages().setActivity().userId(Api.get().getUserId()).execute(VKApi.DEFAULT_RESPONSE_LISTENER);
             }
         });
@@ -202,12 +211,70 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonKateApi);
 
+        AppCompatButton buttonSendGift = new AppCompatButton(this);
+        buttonSendGift.setText("Send gift");
+        buttonSendGift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ThreadExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // Victor
+//                            List<Integer> integers = Collections.singletonList(17791724);
+                            // Roman
+//                            List<Integer> integers = Collections.singletonList(185957061);
+                            // Lev
+//                            List<Integer> integers = Collections.singletonList(138479323);
+                            // Denis
+                            List<Integer> integers = Collections.singletonList(214453200);
+
+//                            Api.get().sendGift(integers, String.valueOf(System.currentTimeMillis()), true, 692, new Random().nextInt());
+                            Api.get().sendGift(integers, "С прошедшим тебя тоже!", false, 750, new Random().nextInt());
+                        } catch (Exception e) {
+                            if (e instanceof KException) {
+//                                KException ke = (KException) e;
+//                                if (ke.error_code == VKApi.VKErrorCodes.VALIDATION_REQUIRED) {
+//                                    AndroidUtils.openUrlInBrowser(TestActivity.this, ke.redirect_uri);
+//                                }
+                            }
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+        rootLayout.addView(buttonSendGift);
+
+        AppCompatButton buttonAuthorization = new AppCompatButton(this);
+        buttonAuthorization.setText("Direct Authorization");
+        buttonAuthorization.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VKApi.authorization("login", "pass", new VKApi.VKOnAuthorizationListener() {
+                    @Override
+                    public void onSuccess(VKApi.VKUserConfig newConfig) {
+                        Log.w(TAG, "new config: " + newConfig.toString());
+                        Log.w(TAG, "apply to vk api");
+                        VKApi.setUserConfig(newConfig);
+                        Api.get().setAccessToken(newConfig.accessToken);
+                    }
+
+                    @Override
+                    public void onError(VKApi.VKException e) {
+
+                    }
+                });
+            }
+        });
+        rootLayout.addView(buttonAuthorization);
+
         AppCompatButton buttonSend = new AppCompatButton(this);
         buttonSend.setText("VKApi: Send message to me");
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VKApi.init(VKApi.VKUserAccount.from(Api.get().getAccount()));
+                VKApi.init(VKApi.VKUserConfig.from(Api.get().getAccount()));
                 tvResult.append("Sending message...\n");
                 final long startTime = System.currentTimeMillis();
 
@@ -215,7 +282,7 @@ public class TestActivity extends BaseThemedActivity {
                         .send()
                         .message("This is text message from Euphoria")
                         .guid(new Random().nextInt())
-                        .userId(VKApi.getAccount().userId)
+                        .userId(VKApi.getUserConfig().userId)
                         .execute(new VKApi.VKOnResponseListener() {
                             @Override
                             public void onResponse(VKApi.VKRequest r, JSONObject responseJson) {
@@ -249,6 +316,43 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonDownEmoji);
 
+        AppCompatButton buttonUpload = new AppCompatButton(this);
+        buttonUpload.setText("Upload file");
+        buttonUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvResult.append("Starting upload file...");
+                uploadFile();
+            }
+        });
+        rootLayout.addView(buttonUpload);
+
+        AppCompatButton memoryButton = new AppCompatButton(this);
+        memoryButton.setText("Fill memory");
+        memoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ThreadExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            ArrayList<Integer> list = new ArrayList<>();
+                            list.add(1024);
+
+                            for (int i = 0; i < list.size(); i++) {
+                                list.add(list.get(i));
+                            }
+                        } catch (OutOfMemoryError e) {
+                            System.gc();
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+            }
+        });
+        rootLayout.addView(memoryButton);
+
         AppCompatButton buttonClear = new AppCompatButton(this);
         buttonClear.setText("Clear text");
         buttonClear.setOnClickListener(new View.OnClickListener() {
@@ -259,13 +363,92 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(buttonClear);
 
+        ThreadTask task = new ThreadTask() {
+            @Override
+            public void onPreExecute() {
+
+            }
+
+            @Override
+            public void doInBackground() {
+
+            }
+
+            @Override
+            public void onPostExecute() {
+
+            }
+        };
+        task.start();
+
+        final Button button = new Button(this);
+        button.setText("Test scale with animation");
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                float scaleY = button.getScaleY();
+                float scaleX = button.getScaleX();
+
+                ViewCompat.animate(v)
+                        .setDuration(100)
+                        .scaleX(scaleY * 2.0f)
+                        .scaleY(scaleX * 2.0f)
+                        .withLayer()
+                        .start();
+
+
+            }
+        });
+
+        rootLayout.addView(button);
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
 
+    private void uploadFile() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    File file = new File(AppLoader.getLoader().getAppDir(), "test.jpg");
+                    VKMessageUploader uploader = VKApi.getMessageUploader();
+                    VKPhoto photo = uploader.uploadFile(file, new VKApi.VKOnProgressListener() {
+                        @Override
+                        public void onStart(File file) {
+                            Toast.makeText(TestActivity.this, "Start loading file: " + file, Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onProgress(byte[] buffer, int progress, long totalSize) {
+                            Log.w(TAG, "progress: " + progress);
+                        }
+
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(TestActivity.this, "Success!", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    VKApi.messages().send()
+                            .attachment(photo.toAttachmentString())
+                            .message("Message with files!")
+                            .userId(Api.get().getUserId())
+                            .execute();
+
+//                    Api.get().sendMessage(185957061, 0, "Test message with file",
+//                            null, null, Collections.singleton("photo" + photo.pid),
+//                            null, null, null, null, null);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void connectToGoogle() {

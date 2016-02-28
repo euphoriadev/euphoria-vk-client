@@ -15,13 +15,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.FastBlur;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.view.CircleImageView;
 
 /**
@@ -38,7 +37,7 @@ public class ProfileActivity extends BaseThemedActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
@@ -63,7 +62,7 @@ public class ProfileActivity extends BaseThemedActivity {
                 Picasso.with(ProfileActivity.this)
                         .load(user.photo_50)
                         .config(Bitmap.Config.RGB_565)
-                        .transform(new BlurTransformation(30))
+                        .transform(new AndroidUtils.PicassoBlurTransform(30))
                         .fit()
                         .into(ivPlaceholder);
 
@@ -126,23 +125,6 @@ public class ProfileActivity extends BaseThemedActivity {
         void omComplete(VKUser user);
     }
 
-    private class BlurTransformation implements Transformation {
-        private int radius;
-
-        public BlurTransformation(int radius) {
-            this.radius = radius;
-        }
-
-        @Override
-        public Bitmap transform(Bitmap source) {
-            return FastBlur.doBlur(source, radius);
-        }
-
-        @Override
-        public String key() {
-            return "blur";
-        }
-    }
 
     public class AvatarImageBehavior extends CoordinatorLayout.Behavior<CircleImageView> {
 

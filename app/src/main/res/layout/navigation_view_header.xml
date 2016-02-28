@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="164dp">
 
@@ -28,6 +29,8 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:paddingTop="16dp"
+            app:border_width="1dp"
+            app:border_color="@android:color/white"
             android:src="@drawable/camera_b"/>
 
         <TextView
@@ -35,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
+            android:textColor="@android:color/white"
             android:text="Igor Morozkin"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
@@ -43,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            android:textColor="@color/white_translucent"
             android:text="its user status!"/>
     </LinearLayout>
 

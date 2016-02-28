@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKGroup;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
@@ -74,11 +74,18 @@ public class GroupsAdapter extends BaseArrayAdapter<VKGroup> {
 
         String type;
         switch (group.type) {
-            case VKGroup.Type.GROUP: type = getContext().getString(R.string.type_group); break;
-            case VKGroup.Type.PAGE:  type = getContext().getString(R.string.type_page); break;
-            case VKGroup.Type.EVENT: type = getContext().getString(R.string.type_event); break;
+            case VKGroup.Type.GROUP:
+                type = getContext().getString(R.string.type_group);
+                break;
+            case VKGroup.Type.PAGE:
+                type = getContext().getString(R.string.type_page);
+                break;
+            case VKGroup.Type.EVENT:
+                type = getContext().getString(R.string.type_event);
+                break;
 
-            default: type = getContext().getString(R.string.type_group);
+            default:
+                type = getContext().getString(R.string.type_group);
         }
 
         holder.tvTitle.setText(group.name);

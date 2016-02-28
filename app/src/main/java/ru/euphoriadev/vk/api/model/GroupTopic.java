@@ -19,7 +19,7 @@ public class GroupTopic implements Serializable {
     public int is_closed;
     public int is_fixed;
     public int comments;
-    
+
     public static GroupTopic parse(JSONObject o) {
         GroupTopic topic = new GroupTopic();
         topic.tid = o.optLong("id");
@@ -33,7 +33,7 @@ public class GroupTopic implements Serializable {
         topic.comments = o.optInt("comments");
         return topic;
     }
-    
+
     public static GroupTopic parseForNotifications(JSONObject o) throws NumberFormatException, JSONException {
         GroupTopic topic = new GroupTopic();
         topic.tid = o.getLong("id");

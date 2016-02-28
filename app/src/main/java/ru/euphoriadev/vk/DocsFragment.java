@@ -24,7 +24,7 @@ import ru.euphoriadev.vk.adapter.DocsAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.helper.FileHelper;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**

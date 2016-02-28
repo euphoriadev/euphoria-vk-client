@@ -32,9 +32,6 @@ public class MaterialSwitchPreference extends SwitchPreference {
             if (view instanceof ViewGroup) {
                 setLayout((ViewGroup) view);
             }
-
-            //  titleView.setTransformationMethod(null);
-            // titleView.setTextSize(android.R.attr.textAppearanceSmall);
             titleView.setTextColor(ThemeUtils.getThemeAttrColor(getContext(), android.R.attr.textColorPrimary));
 
         }

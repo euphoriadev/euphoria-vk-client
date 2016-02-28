@@ -6,6 +6,9 @@ import android.preference.PreferenceManager;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.interfaces.Refreshable;
+
 /**
  * Created by Igor on 28.12.15.
  * <p/>
@@ -73,19 +76,6 @@ public class RefreshManager implements SharedPreferences.OnSharedPreferenceChang
         sRefreshables.trimToSize();
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        for (int i = 0; i < sRefreshables.size(); i++) {
-            RefreshItem item = sRefreshables.get(i);
-            if (item.preferenceKey.equals(key)) {
-                Refreshable refreshable = item.reference.get();
-                if (refreshable != null) {
-                    refreshable.onRefresh(key);
-                }
-            }
-        }
-    }
-
     private static boolean checkIfEquals(Refreshable refreshable) {
         if (sRefreshables.isEmpty()) {
             return false;
@@ -107,6 +97,19 @@ public class RefreshManager implements SharedPreferences.OnSharedPreferenceChang
             Refreshable ref = item.reference.get();
             if (ref != null && ref == refreshable) {
                 sRefreshables.remove(i);
+            }
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        for (int i = 0; i < sRefreshables.size(); i++) {
+            RefreshItem item = sRefreshables.get(i);
+            if (item.preferenceKey.equals(key)) {
+                Refreshable refreshable = item.reference.get();
+                if (refreshable != null) {
+                    refreshable.onRefresh(key);
+                }
             }
         }
     }

@@ -10,7 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
@@ -104,6 +104,7 @@ public class BaseThemedActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
         ViewUtil.setTypeface(spinner);
+        ViewUtil.setColor(spinner, ThemeManager.getPrimaryTextColorOnThemeColor(this));
     }
 
     public void hideSpinner() {

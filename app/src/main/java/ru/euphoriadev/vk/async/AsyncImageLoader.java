@@ -1,9 +1,10 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.async;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Looper;
+import android.support.v4.graphics.BitmapCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
@@ -22,12 +23,13 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 
 
 /**
  * Created by Igor on 27.07.15.
- *
+ * <p/>
  * Асинхронный загрузчик ихображений,
  * кэширование изображений в память приложения, а так же на SD карту.
  * ВНИМАНИЕ! Данные загрузчик не предназначен для списков! {@link android.widget.ListView}
@@ -83,13 +85,14 @@ public class AsyncImageLoader {
     /**
      * Загрузка изображения из сети и изменение его к требуемым нам размерам
      * TODO: указать 0,0 если нужно получить оригинальное ихображение без изменения размера
-     * @param width Попытка привести ширину изображения к width
+     *
+     * @param width  Попытка привести ширину изображения к width
      * @param height Попытка привести высоту изображения к height
      */
     public void displayImage(final ImageView iv, final String path, final int width, final int height) {
         Bitmap memoryBitmap = getBitmapFromMemoryCache(path);
         if (memoryBitmap != null) {
-         //   Log.i(TAG, "bitmap from MEMORY cache via path: " + path);
+            //   Log.i(TAG, "bitmap from MEMORY cache via path: " + path);
             iv.setImageBitmap(memoryBitmap);
 
             if (listener != null) listener.onComplete(iv, memoryBitmap, path);
@@ -182,6 +185,7 @@ public class AsyncImageLoader {
     /**
      * Получание изображение из memory кеша
      * TODO: вернут null если изображение нет в кеше
+     *
      * @param path URL путь картинки
      * @return Bitmap
      */
@@ -191,7 +195,8 @@ public class AsyncImageLoader {
 
     /**
      * Добавление изображение в memory кеш приложения
-     * @param path URL путь к изображению
+     *
+     * @param path   URL путь к изображению
      * @param bitmap текущее изображение, которое надо поместить в кеш
      */
     private void addBitmapToMemoryCache(String path, Bitmap bitmap) {
@@ -203,6 +208,7 @@ public class AsyncImageLoader {
     /**
      * Думаю, тут тоже уже понятно, получаение ихображеиня с SD карты
      * Вернет null, если изображения нет на SD
+     *
      * @param path ссылка к изображению
      * @return
      */
@@ -221,7 +227,8 @@ public class AsyncImageLoader {
 
     /**
      * Добавление ихображение на SD карту изображение
-     * @param path ссылка на изображение
+     *
+     * @param path   ссылка на изображение
      * @param bitmap само изображение
      */
     private synchronized void addBitmapToDiskCache(String path, Bitmap bitmap) {
@@ -263,8 +270,10 @@ public class AsyncImageLoader {
         memoryCache.clear();
         executor.shutdown();
     }
+
     /**
      * Получение оптимизированного декодера изображения
+     *
      * @return
      */
     public BitmapDecoder getDecoder() {
@@ -313,6 +322,7 @@ public class AsyncImageLoader {
 
         /**
          * Докодирований потока с options. Тут все и так понятно
+         *
          * @param is
          * @param options
          * @return
@@ -350,6 +360,7 @@ public class AsyncImageLoader {
         /**
          * Докидирования файла,
          * TODO: работает на порядок быстрее обычного, засчет BufferedInputStream
+         *
          * @param file
          * @param options
          * @return
@@ -370,6 +381,7 @@ public class AsyncImageLoader {
         /**
          * Попытка привести размер Bitmap в width и height.
          * Докидирования размеров изображение, вычисление насколько можно сжать
+         *
          * @param is
          * @param width
          * @param height
@@ -494,17 +506,19 @@ public class AsyncImageLoader {
 
         /**
          * Текущий размер изображений в байтах
+         *
          * @param bitmap изображение
          * @return
          */
         private int sizeOf(Bitmap bitmap) {
-            return bitmap.getRowBytes() * bitmap.getHeight();
+            return BitmapCompat.getAllocationByteCount(bitmap);
         }
 
         /**
          * Добавление изображение в RAM кеш
          * TODO: если размер кеша превзойдет максимальный - он автоматически очиститься
-         * @param path URL или пусть к файлу
+         *
+         * @param path   URL или пусть к файлу
          * @param bitmap само изображение
          */
         public void add(String path, Bitmap bitmap) {
@@ -524,6 +538,7 @@ public class AsyncImageLoader {
         /**
          * Получение изображение из RAM кеша по ключу
          * TODO: Вернет null, если изображения в кеше нет
+         *
          * @param path сам ключ, путь
          * @return
          */
@@ -533,6 +548,7 @@ public class AsyncImageLoader {
 
         /**
          * Удаление изображения из RAM кеша
+         *
          * @param path путь к изображению, которое надо удалить
          */
         public void remove(String path) {

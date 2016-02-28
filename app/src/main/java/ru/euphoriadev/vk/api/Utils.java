@@ -12,14 +12,14 @@ public class Utils {
     private static String pattern_string_profile_id = "^(id)?(\\d{1,10})$";
     private static Pattern pattern_profile_id = Pattern.compile(pattern_string_profile_id);
 
-    public static String extractPattern(String string, String pattern){
+    public static String extractPattern(String string, String pattern) {
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(string);
         if (!m.find())
             return null;
         return m.toMatchResult().group(1);
     }
-    
+
     public static String convertStreamToString(InputStream is) throws IOException {
         InputStreamReader reader = new InputStreamReader(is);
         StringBuilder builder = new StringBuilder(128);
@@ -31,8 +31,7 @@ public class Utils {
             }
             buffer = null;
             return builder.toString();
-        }
-        finally{
+        } finally {
             try {
                 builder.setLength(0);
                 is.close();

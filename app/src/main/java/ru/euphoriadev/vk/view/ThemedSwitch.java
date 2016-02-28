@@ -8,7 +8,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.util.AttributeSet;
 
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 
 /**
  * Created by user on 27.12.15.

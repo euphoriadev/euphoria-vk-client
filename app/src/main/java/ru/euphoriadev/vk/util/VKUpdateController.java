@@ -12,9 +12,8 @@ import ru.euphoriadev.vk.api.model.VKMessage;
  * Helper, for control receipt of messages
  */
 public class VKUpdateController {
-    private static VKUpdateController instance;
     private static final String TAG = "VKUpdateController";
-
+    private static VKUpdateController instance;
     private ArrayList<MessageListener> messageListeners = new ArrayList<>(6);
     private ArrayList<UserListener> userListeners = new ArrayList<>(6);
 

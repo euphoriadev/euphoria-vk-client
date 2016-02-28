@@ -13,7 +13,7 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by Igor on 06.09.15.

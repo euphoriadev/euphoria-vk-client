@@ -9,9 +9,9 @@ import android.widget.SeekBar;
 
 import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.common.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
-import ru.euphoriadev.vk.util.Refreshable;
+import ru.euphoriadev.vk.interfaces.Refreshable;
 
 /**
  * Created by user on 14.01.16.

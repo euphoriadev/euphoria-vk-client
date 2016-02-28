@@ -2,6 +2,7 @@ package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,53 +15,67 @@ import java.util.ArrayList;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.UserProfileActivity;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ResourcesLoader;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
  * Created by Igor on 16.07.15.
  */
 public class FriendsAdapter extends BaseArrayAdapter<VKUser> {
+    final int secondaryTextColor;
+    final int tealTextColor;
+    final String offline;
+    final String online;
+    Picasso picasso;
     private ArrayList<VKUser> mCleanFriends;
 
     public FriendsAdapter(Context context, ArrayList<VKUser> friends) {
         super(context, friends);
 
+        secondaryTextColor = ThemeManager.getSecondaryTextColor();
+        tealTextColor = ResourcesLoader.getColor(R.color.md_teal_500);
+        picasso = Picasso.with(context);
+
+        offline = getContext().getString(R.string.offline);
+        online = getContext().getString(R.string.online);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
         View view = convertView;
+
         if (view == null) {
             view = getInflater().inflate(R.layout.list_item_friends, parent, false);
+            holder = new ViewHolder(view);
+            view.setTag(holder);
+        } else {
+            holder = (ViewHolder) view.getTag();
         }
 
         final VKUser user = getItem(position);
 
-        TextView tvName = (TextView) view.findViewById(R.id.tvUserName);
-        TextView tvScreenName = (TextView) view.findViewById(R.id.tvUserScreenName);
-        TextView tvOnlineStatus = (TextView) view.findViewById(R.id.tvUserOnline);
-        ImageView ivPhoto = (ImageView) view.findViewById(R.id.ivUserPhoto);
 
-        tvName.setTextColor(ThemeManager.getPrimaryTextColor());
-        tvName.setText(user.toString());
+        holder.tvName.setTextColor(ThemeManager.getPrimaryTextColor());
+        holder.tvName.setText(user.toString());
 
-        tvScreenName.setTextColor(ThemeManager.getSecondaryTextColor());
-        tvScreenName.setText("@".concat(user.screen_name));
+        holder.tvScreenName.setTextColor(secondaryTextColor);
+        holder.tvScreenName.setText("@".concat(user.screen_name));
 
-        ViewUtil.setTypeface(tvName);
-        ViewUtil.setTypeface(tvScreenName);
-        ViewUtil.setTypeface(tvOnlineStatus);
+        ViewUtil.setTypeface(holder.tvName);
+        ViewUtil.setTypeface(holder.tvScreenName);
+        ViewUtil.setTypeface(holder.tvOnlineStatus);
 
         if (user.online) {
-            tvOnlineStatus.setText(getContext().getString(R.string.online));
-            tvOnlineStatus.setTextColor(getContext().getResources().getColor(R.color.md_teal_500));
+            holder.tvOnlineStatus.setText(online);
+            holder.tvOnlineStatus.setTextColor(tealTextColor);
         } else {
-            tvOnlineStatus.setText(getContext().getString(R.string.offline));
-            tvOnlineStatus.setTextColor(ThemeManager.getSecondaryTextColor());
+            holder.tvOnlineStatus.setText(offline);
+            holder.tvOnlineStatus.setTextColor(secondaryTextColor);
         }
 
-        ivPhoto.setOnClickListener(new View.OnClickListener() {
+        holder.ivPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), UserProfileActivity.class);
@@ -69,9 +84,9 @@ public class FriendsAdapter extends BaseArrayAdapter<VKUser> {
             }
         });
 
-        Picasso.with(getContext())
-                .load(user.photo_50)
-                .into(ivPhoto);
+        picasso.load(user.photo_50)
+                .config(Bitmap.Config.RGB_565)
+                .into(holder.ivPhoto);
 
         return view;
     }
@@ -125,6 +140,20 @@ public class FriendsAdapter extends BaseArrayAdapter<VKUser> {
             mCleanFriends.clear();
             mCleanFriends.trimToSize();
             mCleanFriends = null;
+        }
+    }
+
+    private static final class ViewHolder {
+        public TextView tvName;
+        public TextView tvScreenName;
+        public TextView tvOnlineStatus;
+        public ImageView ivPhoto;
+
+        public ViewHolder(View view) {
+            tvName = (TextView) view.findViewById(R.id.tvUserName);
+            tvScreenName = (TextView) view.findViewById(R.id.tvUserScreenName);
+            tvOnlineStatus = (TextView) view.findViewById(R.id.tvUserOnline);
+            ivPhoto = (ImageView) view.findViewById(R.id.ivUserPhoto);
         }
     }
 }

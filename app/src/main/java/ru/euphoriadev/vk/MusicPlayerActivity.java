@@ -6,14 +6,15 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import ru.euphoriadev.vk.api.model.VKAudio;
-import ru.euphoriadev.vk.util.AppLoader;
+import ru.euphoriadev.vk.common.AppLoader;
 
 /**
  * Created by Igor on 03.12.15.
- *
+ * <p/>
  * Музыкальный плеер
  */
 public class MusicPlayerActivity extends AppCompatActivity {
@@ -46,7 +47,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         tvTitle = (TextView) findViewById(R.id.tvPlayerTitle);
         tvArtist = (TextView) findViewById(R.id.tvPlayerArtist);
 
-        progressBar = (ProgressBar) findViewById(R.id.pbPlayer);
+        progressBar = (SeekBar) findViewById(R.id.pbPlayer);
 
 
         mAudio = (VKAudio) getIntent().getSerializableExtra("audio");

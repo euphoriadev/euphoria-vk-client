@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="78dp"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:gravity="center_vertical"
               android:orientation="vertical"
               android:paddingLeft="16dp"
@@ -22,27 +23,27 @@
                 android:id="@+id/ivDialogPhoto"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
+                app:border_color="@color/white"
+                app:border_width="1dp"
                 android:src="@drawable/camera_b"/>
 
-            <View
+            <ru.euphoriadev.vk.view.CircleView
                 android:id="@+id/vDialogUnreadIndicator"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_gravity="right|bottom"
-                android:background="@drawable/unread_indicator"
-                android:textColor="#FFFFFF"/>
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_gravity="right|bottom"/>
 
-            <TextView
-                android:id="@+id/tvUnreadCount"
-                android:layout_width="18dp"
-                android:layout_height="15dp"
-                android:layout_gravity="right|bottom"
+            <!--<TextView-->
+                <!--android:id="@+id/tvUnreadCount"-->
+                <!--android:layout_width="18dp"-->
+                <!--android:layout_height="15dp"-->
+                <!--android:layout_gravity="right|bottom"-->
 
-                android:gravity="center"
-                android:text="51"
-                android:textColor="@color/white"
-                android:textSize="10sp"
-                android:textStyle="bold"/>
+                <!--android:gravity="center"-->
+                <!--android:text="51"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:textSize="10sp"-->
+                <!--android:textStyle="bold"/>-->
         </FrameLayout>
 
 

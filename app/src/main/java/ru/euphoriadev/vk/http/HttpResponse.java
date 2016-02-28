@@ -9,19 +9,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 18.01.16.
  */
 public class HttpResponse {
-    private InputStream inputStream;
-    private String inputStreamAsString;
-
     public HttpRequest request;
     public String responseMessage;
-
     public int responseCode;
+    private InputStream inputStream;
+    private String inputStreamAsString;
 
     public HttpResponse(HttpRequest request, InputStream inputStream, String responseMessage, int responseCode) {
         this.request = request;
@@ -44,8 +41,8 @@ public class HttpResponse {
         if (inputStreamAsString == null) {
             inputStreamAsString = AndroidUtils.convertStreamToString(inputStream);
             release();
-            if (VKApi.DEBUG) {
-                Log.i(VKApi.TAG, inputStreamAsString);
+            if (AsyncHttpClient.DEBUG) {
+                Log.i(AsyncHttpClient.TAG, inputStreamAsString);
             }
         }
         return inputStreamAsString;
@@ -72,7 +69,7 @@ public class HttpResponse {
                 inputStream.close();
                 inputStream = null;
             } catch (IOException e) {
-                e.printStackTrace();
+                if (AsyncHttpClient.DEBUG) e.printStackTrace();
             }
         }
     }

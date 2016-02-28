@@ -5,7 +5,7 @@ import android.graphics.PorterDuff;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.util.AttributeSet;
 
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 
 /**
  * Created by user on 28.12.15.

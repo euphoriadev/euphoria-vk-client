@@ -2,7 +2,6 @@ package ru.euphoriadev.vk;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,19 +41,18 @@ import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
-import ru.euphoriadev.vk.util.Refreshable;
-import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.util.VKInsertHelper;
+import ru.euphoriadev.vk.interfaces.Refreshable;
+import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
-import ru.euphoriadev.vk.vkapi.VKApi;
 
 
 public class BasicActivity extends BaseThemedActivity implements
@@ -68,7 +66,6 @@ public class BasicActivity extends BaseThemedActivity implements
     private Toolbar toolbar;
     private Api api;
     private Account account;
-    private SharedPreferences sPrefs;
     private long backPressedTime;
 
     @Override
@@ -83,11 +80,12 @@ public class BasicActivity extends BaseThemedActivity implements
 //        circularRevealAnimation();
 
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        toolbar.setTitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
+        toolbar.setSubtitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         setStatusBarColor();
         setTitle(R.string.messages);
-
 
         ViewUtil.setTypeface(toolbar);
 
@@ -115,7 +113,6 @@ public class BasicActivity extends BaseThemedActivity implements
 
         selectItem(R.id.navMessages);
         initDrawerHeader();
-        sPrefs = appLoader.getPreferences();
 
         if (AndroidUtils.isInternetConnection(this)) {
             trackStats();
@@ -244,7 +241,7 @@ public class BasicActivity extends BaseThemedActivity implements
         switch (id) {
 
             case R.id.navFriends:
-                currentFragment = new FriendsFragment();
+                currentFragment = new FriendsTabsFragment();
                 break;
 
             case R.id.navMessages:
@@ -336,7 +333,6 @@ public class BasicActivity extends BaseThemedActivity implements
 //            appBarLayout.setPadding(0, statusBarHeight, 0, 0);
 
             toolbar.setPadding(0, statusBarHeight, 0, 0);
-
         }
     }
 
@@ -578,6 +574,9 @@ public class BasicActivity extends BaseThemedActivity implements
         if (item.getItemId() != R.id.navPrefs) setTitle(item.getTitle());
 
         drawer.closeDrawers();
+        if (currentFragment != null && currentFragment instanceof AbstractFragment) {
+            ((AbstractFragment) currentFragment).setRefreshing(false);
+        }
         ThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {

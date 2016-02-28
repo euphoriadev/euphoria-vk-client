@@ -5,19 +5,24 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.AtomicFile;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.util.ArrayUtil;
 import ru.euphoriadev.vk.util.VKInsertHelper;
 
 /**
  * Created by Igor on 06.03.15.
  */
 public class DBHelper extends SQLiteOpenHelper {
-
     private static final String DATABASE_NAME = "euphoria.db";
-    private static final int DATABASE_VERSION = 82;
+    private static final int DATABASE_VERSION = 83;
 
     /** Tables */
     public static final String USERS_TABLE = "users";
@@ -29,8 +34,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DOCS_TABLE = "docs";
     public static final String GROUPS_TABLE = "groups";
     public static final String USER_GROUP_TABLE = "user_group";
-    public static final String STATS_MESSAGES_TABLE= "stats_messages";
-    public static final String FAILED_MESSAGES_TABLE= "failed_messages";
+    public static final String STATS_MESSAGES_TABLE = "stats_messages";
+    public static final String FAILED_MESSAGES_TABLE = "failed_messages";
 
     /** Columns */
     public static final String _ID = "_id";
@@ -81,11 +86,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DESCRIPTION = "description";
     public static final String MEMBERS_COUNT = "members_count";
 
-
     private static final String SQL_CREATE_TABLE_USERS = "CREATE TABLE " + USERS_TABLE +
             " (" + USER_ID + " INTEGER PRIMARY KEY ON CONFLICT REPLACE, " +
             " [" + FIRST_NAME + "] VARCHAR(255), " +
             " [" + LAST_NAME + "] VARCHAR(255), " +
+            " [" + SCREEN_NAME + "] VARCHAR(255), " +
             " [" + NICKNAME + "] VARCHAR(255), " +
             " [" + ONLINE + "] INTEGER VARCHAR(255), " +
             " [" + ONLINE_MOBILE + "] INTEGER VARCHAR(255), " +
@@ -99,11 +104,13 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + PHOTO_MAX + "] VARCHAR(255), " +
             " [" + POSITION_DECIMAL + "] DECIMAL" +
             ");";
+
     private static final String SQL_CREATE_TABLE_FRIENDS = "CREATE TABLE " + FRIENDS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + USER_ID + "] INTEGER, " +
             " [" + FRIEND_ID + "] INTEGER " +
             ");";
+
     private static final String SQL_CREATE_TABLE_DIALOGS = "CREATE TABLE " + DIALOGS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + MESSAGE_ID + "] INTEGER, " +
@@ -119,6 +126,7 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + PHOTO_50 + "] VARCHAR(255), " +
             " [" + PHOTO_100 + "] VARCHAR(255)" +
             ");";
+
     private final static String SQL_CREATE_TABLE_MESSAGES = "CREATE TABLE " + MESSAGES_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + MESSAGE_ID + "] INTEGER, " +
@@ -130,6 +138,7 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + IS_OUT + "] INTEGER, " +
             " [" + IMPORTANT + "] INTEGER" +
             ");";
+
     private final static String SQL_CREATE_TABLE_SAVED_MESSAGES = "CREATE TABLE " + SAVED_MESSAGES_TABLE + "_%1$s" +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + MESSAGE_ID + "] INTEGER, " +
@@ -141,6 +150,7 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + IS_OUT + "] INTEGER, " +
             " [" + IMPORTANT + "] INTEGER" +
             ");";
+
     private final static String SQL_CREATE_TABLE_STATS_MESSAGES = "CREATE TABLE " + STATS_MESSAGES_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + USER_ID + "] INTEGER, " +
@@ -149,6 +159,7 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + INCOMING_COUNT + "] INTEGER, " +
             " [" + OUTGOING_COUNT + "] INTEGER" +
             ");";
+
     private final static String SQL_CREATE_TABLE_AUDIOS = "CREATE TABLE " + AUDIOS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + AUDIO_ID + "] INTEGER, " +
@@ -159,6 +170,7 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + URL + "] VARCHAR(255), " +
             " [" + LYRICS_ID + "] INTEGER " +
             ");";
+
     private final static String SQL_CREATE_TABLE_DOCS = "CREATE TABLE " + DOCS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
             " [" + OWNER_ID + "] INTEGER, " +
@@ -168,7 +180,8 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + URL + "] VARCHAR(255), " +
             " [" + PHOTO_100 + "] VARCHAR(255) " +
             ");";
-    private final static String SQL_CREATE_TABLE_GROUPS = "CREATE TABLE " +  GROUPS_TABLE +
+
+    private final static String SQL_CREATE_TABLE_GROUPS = "CREATE TABLE " + GROUPS_TABLE +
             " (" + GROUP_ID + " INTEGER PRIMARY KEY, " +
             " [" + NAME + "] VARCHAR(255), " +
             " [" + SCREEN_NAME + "] VARCHAR(255), " +
@@ -182,17 +195,20 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + PHOTO_100 + "] VARCHAR(255), " +
             " [" + MEMBERS_COUNT + "] INTEGER " +
             ");";
+
     private final static String SQL_CREATE_TABLE_USER_GROUP = "CREATE TABLE " + USER_GROUP_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + GROUP_ID + "] INTEGER, " +
             " [" + USER_ID + "] INTEGER " +
             ");";
+
     private final static String SQL_CREATE_TABLE_FAILED_MESSAGES = "CREATE TABLE " + FAILED_MESSAGES_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " [" + USER_ID + "] INTEGER, " +
             " [" + CHAT_ID + "] INTEGER, " +
             " [" + BODY + "] VARCHAR(255)" +
             ");";
+
     private static final String SQL_DELETE_DOCS = "DROP TABLE IF EXISTS " + DOCS_TABLE;
     private static final String SQL_DELETE_USERS = "DROP TABLE IF EXISTS " + USERS_TABLE;
     private static final String SQL_DELETE_AUDIOS = "DROP TABLE IF EXISTS " + AUDIOS_TABLE;
@@ -204,6 +220,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_SAVED_MESSAGES = "DROP TABLE IF EXISTS " + SAVED_MESSAGES_TABLE;
     private static final String SQL_DElETE_STATS_MESSAGES = "DROP TABLE IF EXISTS " + STATS_MESSAGES_TABLE;
     private static final String SQL_DELETE_FAILED_MESSAGES = "DROP TABLE IF EXISTS " + FAILED_MESSAGES_TABLE;
+
     private static volatile DBHelper mHelper;
     private SQLiteDatabase mDatabase;
     private Context mContext;
@@ -278,6 +295,7 @@ public class DBHelper extends SQLiteOpenHelper {
         } catch (SQLException e) {
             return false;
         }
+
     }
 
     public void addUserToDB(VKUser profile) {
@@ -297,9 +315,8 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public VKUser getUserFromDB(long uid) {
-        if (mDatabase == null || !mDatabase.isOpen()) {
-            mDatabase = getWritableDatabase();
-        }
+        checkDatabaseForOpen();
+
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM " + DBHelper.USERS_TABLE + " WHERE " + DBHelper.USER_ID + " = " + uid, null);
         VKUser user = VKUser.EMPTY_USER;
         if (cursor.getCount() != 0)
@@ -307,16 +324,63 @@ public class DBHelper extends SQLiteOpenHelper {
                 int id = cursor.getInt(0);
                 String fistName = cursor.getString(1);
                 String lastName = cursor.getString(2);
-                String photo50 = cursor.getString(9);
+                String screenName = cursor.getString(3);
+                boolean isOnline = cursor.getInt(5) == 1;
+                String photo50 = cursor.getString(10);
 
                 user = new VKUser();
                 user.user_id = id;
                 user.first_name = fistName;
                 user.last_name = lastName;
+                user.screen_name = screenName;
+                user.online = isOnline;
                 user.photo_50 = photo50;
             }
         cursor.close();
         return user;
+    }
+
+    public ArrayList<VKUser> getUsersFromDB(int... userIds) {
+        checkDatabaseForOpen();
+        ArrayList<VKUser> users = new ArrayList<>();
+
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM " + DBHelper.USERS_TABLE, null);
+        if (cursor.getCount() <= 0) {
+            // cursor is empty
+            return users;
+        }
+
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(0);
+            String fistName = cursor.getString(1);
+            String lastName = cursor.getString(2);
+            String screenName = cursor.getString(3);
+            boolean isOnline = cursor.getInt(5) == 1;
+            String photo50 = cursor.getString(10);
+
+
+            if (ArrayUtil.contains(userIds, id)) {
+                VKUser user = new VKUser();
+                user.user_id = id;
+                user.first_name = fistName;
+                user.last_name = lastName;
+                user.screen_name = screenName;
+                user.online = isOnline;
+                user.photo_50 = photo50;
+
+                users.add(user);
+            }
+        }
+        cursor.close();
+
+        return users;
+    }
+
+
+    public void checkDatabaseForOpen() {
+        if (mDatabase == null || !mDatabase.isOpen()) {
+            mDatabase = getWritableDatabase();
+        }
     }
 
     @Override

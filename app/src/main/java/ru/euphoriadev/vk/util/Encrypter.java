@@ -133,7 +133,7 @@ public class Encrypter {
 
     /**
      * Зашифрование текста алгоритмом Base64
-     *
+     * <p/>
      * Base64 буквально означает — позиционная система счисления с основанием 64.
      * Здесь 64 — это число символов в алфавите кодирования,
      * из которого формируется конечный буквенно-цифровой текст на основе латинского алфавита.
@@ -157,7 +157,7 @@ public class Encrypter {
      * @return
      */
     public static String decodeBase64(String text) {
-       return new String(Base64.decode(text, Base64.DEFAULT));
+        return new String(Base64.decode(text, Base64.DEFAULT));
     }
 
     public static String decodeBase64(byte[] text) {
@@ -178,7 +178,7 @@ public class Encrypter {
             final MessageDigest md = MessageDigest.getInstance("MD5");
             final byte[] digestOfPassword = md.digest("release".getBytes("UTF-8"));
             final byte[] keyBytes = Arrays.copyOf(digestOfPassword, 24);
-            for (int j = 0, k = 16; j < 8;) {
+            for (int j = 0, k = 16; j < 8; ) {
                 keyBytes[k++] = keyBytes[j++];
             }
 
@@ -206,7 +206,7 @@ public class Encrypter {
             final MessageDigest md = MessageDigest.getInstance("MD5");
             final byte[] digestOfPassword = md.digest("release".getBytes("UTF-8"));
             final byte[] keyBytes = Arrays.copyOf(digestOfPassword, 24);
-            for (int j = 0, k = 16; j < 8;) {
+            for (int j = 0, k = 16; j < 8; ) {
                 keyBytes[k++] = keyBytes[j++];
             }
 
@@ -230,6 +230,7 @@ public class Encrypter {
 
     /**
      * Получение стандратного HashCode строки
+     *
      * @param text
      * @return
      */

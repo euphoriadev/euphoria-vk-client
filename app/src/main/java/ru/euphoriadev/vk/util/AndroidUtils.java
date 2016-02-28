@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -23,6 +24,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
@@ -45,6 +47,7 @@ import com.squareup.picasso.Transformation;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,6 +58,9 @@ import java.util.HashSet;
 import ru.euphoriadev.vk.BuildConfig;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.FileHelper;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
@@ -280,6 +286,9 @@ public class AndroidUtils {
         if (input == null) {
             return null;
         }
+        if (!input.markSupported()) {
+            input = new BufferedInputStream(input, 4096);
+        }
         ByteArrayOutputStream output = null;
         try {
             output = new ByteArrayOutputStream(1024);
@@ -368,7 +377,7 @@ public class AndroidUtils {
     }
 
     public static void runOnUi(Runnable runnable) {
-        AppLoader.getLoader().getHandler().post(runnable);
+        post(runnable);
     }
 
     public static void checkDatabase(Context context, SQLiteDatabase database) {
@@ -383,6 +392,12 @@ public class AndroidUtils {
             set.add(array.keyAt(i));
         }
         return set;
+    }
+
+    public static void openUrlInBrowser(Context context, String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        context.startActivity(browserIntent);
+
     }
 
     public static void checkUpdate(final Context context, final boolean forceCheck) {
@@ -492,8 +507,7 @@ public class AndroidUtils {
             fEdgeGlowBottom.setAccessible(true);
             setEdgeEffectColor((EdgeEffect) fEdgeGlowTop.get(listView), color);
             setEdgeEffectColor((EdgeEffect) fEdgeGlowBottom.get(listView), color);
-        } catch (Exception ignored) {
-
+        } catch (Throwable ignored) {
         }
     }
 

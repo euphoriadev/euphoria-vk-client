@@ -16,7 +16,8 @@ import com.squareup.picasso.Target;
 
 import ru.euphoriadev.vk.R;
 
-/**.
+/**
+ * .
  * Класс помощик, который управляет уведомлениями
  * Created by Igor on 26.10.15.
  */
@@ -49,9 +50,10 @@ public class NotificationsHelper {
 
     /**
      * Создание уведомления в статус бара
-     * @param title текст заголовка
+     *
+     * @param title   текст заголовка
      * @param message текст сообщения
-     * @param ticker текст, отображаемый вверху статус-бара при создании уведомления
+     * @param ticker  текст, отображаемый вверху статус-бара при создании уведомления
      * @return id уведомления
      */
     public int createNotification(String title, String message, String ticker) {
@@ -146,7 +148,7 @@ public class NotificationsHelper {
             }
         });
 
-     //   sparseNotifications.append(lastId, notification);
+        //   sparseNotifications.append(lastId, notification);
         return 500;
     }
 

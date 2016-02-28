@@ -14,8 +14,8 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.Counters;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.util.Account;
-import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by Igor on 30.07.15.

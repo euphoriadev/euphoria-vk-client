@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import ru.euphoriadev.vk.adapter.NoteAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKNote;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by Igor on 09.12.15.

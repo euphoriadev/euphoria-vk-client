@@ -29,8 +29,8 @@ public class AudioAlbum {
         if (array == null)
             return albums;
         int category_count = array.length();
-        for(int i = 0; i < category_count; ++i) {
-            JSONObject o = (JSONObject)array.get(i);
+        for (int i = 0; i < category_count; ++i) {
+            JSONObject o = (JSONObject) array.get(i);
             AudioAlbum m = AudioAlbum.parse(o);
             albums.add(m);
         }

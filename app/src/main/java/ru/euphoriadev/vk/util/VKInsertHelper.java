@@ -8,8 +8,9 @@ import java.util.List;
 
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.helper.DBHelper;
-import ru.euphoriadev.vk.vkapi.VKApi;
+import ru.euphoriadev.vk.napi.VKApi;
 
 /**
  * Created by Igor on 22.01.16.
@@ -17,7 +18,9 @@ import ru.euphoriadev.vk.vkapi.VKApi;
  * This allows you to easily insert data into the database
  */
 public class VKInsertHelper {
-    /** Will use a single object for inserting to save memory */
+    /**
+     * Will use a single object for inserting to save memory
+     */
     public static final ContentValues sValues = new ContentValues(16);
 
     /**
@@ -235,6 +238,7 @@ public class VKInsertHelper {
         sValues.put(DBHelper.USER_ID, user.user_id);
         sValues.put(DBHelper.FIRST_NAME, user.first_name);
         sValues.put(DBHelper.LAST_NAME, user.last_name);
+        sValues.put(DBHelper.SCREEN_NAME, user.screen_name);
         sValues.put(DBHelper.ONLINE, user.online);
         sValues.put(DBHelper.ONLINE_MOBILE, user.online_mobile);
         sValues.put(DBHelper.STATUS, user.status);

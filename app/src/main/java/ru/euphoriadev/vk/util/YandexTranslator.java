@@ -2,6 +2,8 @@ package ru.euphoriadev.vk.util;
 
 import android.content.Context;
 
+import org.json.JSONObject;
+
 import java.io.Closeable;
 
 import ru.euphoriadev.vk.http.AsyncHttpClient;
@@ -45,13 +47,23 @@ public class YandexTranslator implements Closeable {
         params.addParam("lang", (languageFrom.equals(Language.AUTO_DETECT.toString()) ? languageTo : languageFrom + "-" + languageTo));
 
         HttpRequest request = new HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
+        request.useCaches = true;
+        request.enableCompression = false;
+
+        if (client == null) {
+            client = new AsyncHttpClient(null);
+        }
         try {
             HttpResponse response = client.execute(request);
-            return response.getContentAsJson().optJSONArray("text").optString(0);
+            JSONObject json = response.getContentAsJson();
+            if (json != null && json.has("text")) {
+                return json.optJSONArray("text").optString(0);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            return "[error]";
         }
-        return "[error]";
+        return null;
     }
 
     /**
@@ -92,70 +104,70 @@ public class YandexTranslator implements Closeable {
     }
 
     public enum Language {
-        AUTO_DETECT   (""),
-        ALBANIAN      ("sq"),
-        ENGLISH       ("en"),
-        ARAB          ("ar"),
-        ARMENIAN      ("hy"),
-        AZERBAJIAN    ("az"),
-        AFRIKAAMS     ("af"),
-        BASQUE        ("eu"),
-        BELARUSIAN    ("be"),
-        BUGARIAN      ("bg"),
-        BOSNIAN       ("bs"),
-        WELSH         ("cy"),
-        VIETNAMESE    ("vi"),
-        HUNGRATION    ("hu"),
-        HAITIAN       ("ht"),
-        GALICIAN      ("gl"),
-        DUTCH         ("gl"),
-        GREEK         ("el"),
-        GEORGIAN      ("ka"),
-        DANISH        ("da"),
-        HEBREW        ("da"),
-        INDONESIAN    ("id"),
-        IRISH         ("ga"),
-        ITALIAN       ("it"),
-        ICELANDIC     ("is"),
-        SPANISH       ("es"),
-        KAZAKH        ("kk"),
-        CATALAN       ("ca"),
-        KYRGYA        ("ky"),
-        CHINESE       ("zh"),
-        KOREAN        ("ko"),
-        LATIN         ("la"),
-        LATVIAN       ("lv"),
-        LITHUANIAN    ("lt"),
-        MALAGSKY      ("mg"),
-        MALAY         ("ms"),
-        MALTA         ("mt"),
-        MACEDONIAN    ("mk"),
-        MONGOLIAN     ("mn"),
-        GERMAN        ("de"),
-        NORWEGIAN     ("no"),
-        PERSIAN       ("fa"),
-        POLISH        ("pl"),
-        PORTUGUESE    ("pt"),
-        ROMANIAN      ("ro"),
-        RUSSIAN       ("ru"),
-        SERBIAN       ("sr"),
-        SLOVAK        ("sk"),
-        SLOVENAAN     ("sl"),
-        SWAHILI       ("sw"),
-        TAJIK         ("tg"),
-        THAI          ("th"),
-        TAGALOG       ("tl"),
-        TATAR         ("tt"),
-        TURKISH       ("tr"),
-        UZBEK         ("uz"),
-        UKRAINIAN     ("uk"),
-        FINNISH       ("fi"),
-        FRENCH        ("fr"),
-        CROATIAN      ("hr"),
-        CZECH         ("cs"),
-        SWEDISH       ("sv"),
-        ESTONIAN      ("et"),
-        JAPANESE      ("ja");
+        AUTO_DETECT(""),
+        ALBANIAN("sq"),
+        ENGLISH("en"),
+        ARAB("ar"),
+        ARMENIAN("hy"),
+        AZERBAJIAN("az"),
+        AFRIKAAMS("af"),
+        BASQUE("eu"),
+        BELARUSIAN("be"),
+        BUGARIAN("bg"),
+        BOSNIAN("bs"),
+        WELSH("cy"),
+        VIETNAMESE("vi"),
+        HUNGRATION("hu"),
+        HAITIAN("ht"),
+        GALICIAN("gl"),
+        DUTCH("gl"),
+        GREEK("el"),
+        GEORGIAN("ka"),
+        DANISH("da"),
+        HEBREW("da"),
+        INDONESIAN("id"),
+        IRISH("ga"),
+        ITALIAN("it"),
+        ICELANDIC("is"),
+        SPANISH("es"),
+        KAZAKH("kk"),
+        CATALAN("ca"),
+        KYRGYA("ky"),
+        CHINESE("zh"),
+        KOREAN("ko"),
+        LATIN("la"),
+        LATVIAN("lv"),
+        LITHUANIAN("lt"),
+        MALAGSKY("mg"),
+        MALAY("ms"),
+        MALTA("mt"),
+        MACEDONIAN("mk"),
+        MONGOLIAN("mn"),
+        GERMAN("de"),
+        NORWEGIAN("no"),
+        PERSIAN("fa"),
+        POLISH("pl"),
+        PORTUGUESE("pt"),
+        ROMANIAN("ro"),
+        RUSSIAN("ru"),
+        SERBIAN("sr"),
+        SLOVAK("sk"),
+        SLOVENAAN("sl"),
+        SWAHILI("sw"),
+        TAJIK("tg"),
+        THAI("th"),
+        TAGALOG("tl"),
+        TATAR("tt"),
+        TURKISH("tr"),
+        UZBEK("uz"),
+        UKRAINIAN("uk"),
+        FINNISH("fi"),
+        FRENCH("fr"),
+        CROATIAN("hr"),
+        CZECH("cs"),
+        SWEDISH("sv"),
+        ESTONIAN("et"),
+        JAPANESE("ja");
 
         private String mLanguage;
 
@@ -170,10 +182,10 @@ public class YandexTranslator implements Closeable {
     }
 
 
-
     public interface OnCompleteListener {
         /**
          * Callback при ассинхронном вызове
+         *
          * @param translator
          * @param message
          */

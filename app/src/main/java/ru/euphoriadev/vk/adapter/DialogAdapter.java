@@ -36,14 +36,14 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
-import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
+import ru.euphoriadev.vk.view.CircleView;
 
 /**
  * Created by Igor on 30.03.15.
@@ -170,6 +170,10 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
             holder = (ViewHolder) view.getTag();
         }
         final DialogItem item = (DialogItem) getItem(position);
+        if (item == null) {
+            return view;
+        }
+
         final VKUser user = item.user;
         final VKMessage message = item.message;
         holder.tvFullName.setTextColor(fullNameTextColor);
@@ -187,7 +191,7 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
             ViewUtil.setTypeface(holder.tvFullName);
         }
         ViewUtil.setTypeface(holder.tvBody);
-        ViewUtil.setTypeface(holder.tvUnreadCount);
+//        ViewUtil.setTypeface(holder.tvUnreadCount);
 
         holder.tvBody.setTextColor(bodyTextColor);
         holder.tvDate.setTextColor(fullNameTextColor);
@@ -209,23 +213,13 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         }
         holder.tvDate.setText(sdf.format(item.date.getTime()));
 
-        holder.tvUnreadCount.setTextColor(ThemeManager.getPrimaryTextColorOnAccent(context));
+        holder.indicator.setTextSize(10);
+        holder.indicator.setTextColor(ThemeManager.getPrimaryTextColorOnAccent(context));
         if (message.isChat()) {
-//            IconicsDrawable iconChat = new IconicsDrawable(context, GoogleMaterial.Icon.gmd_people);
-//            iconChat.sizeDp(20);
-//            iconChat.color(tManager.getPrimaryTextColor());
-            // holder.tvFullName.setCompoundDrawables(iconChat, null, null, null);
-//            holder.tvFullName.setCompoundDrawablesWithIntrinsicBounds(iconChat, null, null, null);
-
             holder.tvFullName.setText(holder.tvFullName.getText());
         } else {
             holder.tvFullName.setCompoundDrawables(null, null, null, null);
         }
-
-
-//        // если отправил я
-//        if (item.isOut) holder.tvBody.setText(spannableString + item.body);
-//        else holder.tvBody.setText(item.body);
 
         // Если я отправил, но пользователь еще не прочитал
         if (message.is_out && !message.read_state) {
@@ -242,17 +236,17 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         // Если мне отправили, и я не прочитал
         if (!message.is_out && !message.read_state) {
             holder.indicator.setVisibility(View.VISIBLE);
-            holder.indicator.getBackground().setColorFilter(ThemeManager.getColorAccent(context), PorterDuff.Mode.MULTIPLY);
+//            holder.indicator.getBackground().setColorFilter(ThemeManager.getColorAccent(context), PorterDuff.Mode.MULTIPLY);
             holder.tvDate.setTextColor(ThemeManager.getColorAccent(context));
 
             holder.tvBody.setTextColor(fullNameTextColor);
             if (item.message.unread != 0)
-                holder.tvUnreadCount.setText(item.message.unread > 1000 ? item.message.unread / 1000 + "к" : item.message.unread + "");
+                holder.indicator.setText(item.message.unread > 1000 ? item.message.unread / 1000 + "к" : item.message.unread + "");
             //      holder.lLayout.setBackgroundColor(context.getResources().getColor(R.color.translucent_white));
         } else {
             //      holder.lLayout.setBackgroundColor(Color.TRANSPARENT);
             holder.indicator.setVisibility(View.GONE);
-            holder.tvUnreadCount.setText("");
+            holder.indicator.setText("");
             holder.tvBody.setTextColor(bodyTextColor);
             //       holder.tvDate.setTextColor(fullNameTextColor);
 
@@ -508,8 +502,8 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         TextView tvFullName;
         TextView tvBody;
         TextView tvDate;
-        View indicator;
-        TextView tvUnreadCount;
+        CircleView indicator;
+//        TextView tvUnreadCount;
         ImageView ivPhoto;
         ImageView ivLastPhotoUser;
         View onlineIndicator;
@@ -521,8 +515,8 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
             tvDate = (TextView) v.findViewById(R.id.tvDialogDate);
             ivPhoto = (ImageView) v.findViewById(R.id.ivDialogPhoto);
             ivLastPhotoUser = (ImageView) v.findViewById(R.id.ivDialogLastPhotoUser);
-            tvUnreadCount = (TextView) v.findViewById(R.id.tvUnreadCount);
-            indicator = v.findViewById(R.id.vDialogUnreadIndicator);
+//            tvUnreadCount = (TextView) v.findViewById(R.id.tvUnreadCount);
+            indicator = (CircleView) v.findViewById(R.id.vDialogUnreadIndicator);
             onlineIndicator = v.findViewById(R.id.viewDialogOnlineIndicator);
 
         }

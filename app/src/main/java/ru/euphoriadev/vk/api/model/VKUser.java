@@ -18,10 +18,10 @@ public class VKUser implements Serializable {
 
         @Override
         public String toString() {
-            return "Empty User";
+            return "";
         }
     };
-
+    public static final String FIELDS_DEFAULT = "photo_50, photo_100, photo_200, status, screen_name, online, online_mobile";
     /**
      * User ID.
      */
@@ -30,29 +30,18 @@ public class VKUser implements Serializable {
      * First name of user.
      */
     public String first_name = "DELETED";
-
     /**
      * Last name of user.
      */
     public String last_name = "";
-
     /**
      * Status of User
      */
     public String status = "";
-
     /**
      * User page's screen name (subdomain)
      */
     public String screen_name;
-
-    /**
-     * A Cached full name of user
-     *
-     * @see #toString()
-     */
-    private String fullName;
-
     /**
      * Information whether the user is online.
      */
@@ -77,10 +66,12 @@ public class VKUser implements Serializable {
      * URL of default square photo of the user with 200 pixels in width.
      */
     public String photo_200 = "http://vk.com/images/camera_a.gif";
-
-
-    public static final String FIELDS_DEFAULT = "photo_50, photo_100, photo_200, status, screen_name, online, online_mobile";
-
+    /**
+     * A Cached full name of user
+     *
+     * @see #toString()
+     */
+    private String fullName;
 
     public static VKUser parse(JSONObject source) {
         VKUser user = new VKUser();

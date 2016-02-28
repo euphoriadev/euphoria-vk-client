@@ -1,7 +1,6 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,7 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.IBinder;
+import android.os.Build;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -28,9 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -48,13 +45,12 @@ import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
-import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
-import ru.euphoriadev.vk.util.PrefManager;
-import ru.euphoriadev.vk.util.ResourcesLoader;
-import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ResourcesLoader;
+import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleImageView;
@@ -130,7 +126,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                 colorOutMessages = AndroidUtils.getColor(mContext, R.color.white);
             }
         }
-        boolean isWallpaperBackground = ThemeManager.getWallpaperPath(mContext) != null;
+        boolean isWallpaperBackground = TextUtils.isEmpty(ThemeManager.getWallpaperPath(mContext));
         if (isWallpaperBackground) {
             colorOutMessages = ThemeManager.alphaColor(colorOutMessages);
             colorInMessages = ThemeManager.alphaColor(colorInMessages);
@@ -201,11 +197,15 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
             if (isSelectedItem(item)) {
                 holder.ivSelected.setImageResource(R.drawable.ic_selected);
                 holder.ivSelected.setColorFilter(ThemeManager.getColorAccent(getContext()));
-                holder.ivSelected.setAlpha(1f);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    holder.ivSelected.setAlpha(1f);
+                }
             } else {
                 holder.ivSelected.setImageResource(R.drawable.ic_vector_unselected);
                 holder.ivSelected.setColorFilter(ThemeManager.getSecondaryTextColor());
-                holder.ivSelected.setAlpha(0.5f);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    holder.ivSelected.setAlpha(0.5f);
+                }
             }
         } else {
             holder.ivSelected.setVisibility(View.GONE);
@@ -311,20 +311,20 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         }
 
         if (mShowTime)
-        if (this.date.getYear() > item.date.getYear()) {
-            // если отправили больше года назад
-            sdf.applyPattern("d MMM, yyyy"); // 23 Окт, 2015
-        } else if (this.date.getMonth() > item.date.getMonth()) {
-            // если отправили больше месяца назад
-            sdf.applyPattern("d MMM"); // 23 Окт
-        } else if (this.date.getDate() > item.date.getDate()) {
-            // Следовательно этот месяц, но несколько дней назад
-            // так же
-            sdf.applyPattern("d MMM"); // 23 Окт
-        } else {
-            // если сегодня
-            sdf.applyPattern("HH:mm"); // 15:57
-        }
+            if (this.date.getYear() > item.date.getYear()) {
+                // если отправили больше года назад
+                sdf.applyPattern("d MMM, yyyy"); // 23 Окт, 2015
+            } else if (this.date.getMonth() > item.date.getMonth()) {
+                // если отправили больше месяца назад
+                sdf.applyPattern("d MMM"); // 23 Окт
+            } else if (this.date.getDate() > item.date.getDate()) {
+                // Следовательно этот месяц, но несколько дней назад
+                // так же
+                sdf.applyPattern("d MMM"); // 23 Окт
+            } else {
+                // если сегодня
+                sdf.applyPattern("HH:mm"); // 15:57
+            }
 
         holder.tvDate.setVisibility(mShowTime ? View.VISIBLE : View.GONE);
 
@@ -338,8 +338,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                     if (item.message.isChat()) {
                         if (!item.message.is_out) {
                             holder.tvDate.setText(Html.fromHtml("<b>" + item.user.first_name + "</b>"));
-                                    holder.tvDate.append(",  ");
-                         }
+                            holder.tvDate.append(",  ");
+                        }
                         holder.tvDate.append(sdf.format(item.date));
                     } else {
                         holder.tvDate.setText(sdf.format(item.date));
@@ -389,7 +389,9 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                         if (holder.llAttachContainer.getVisibility() == View.GONE)
                             holder.llAttachContainer.setVisibility(View.VISIBLE);
 
-                        if (holder.tvBody.getVisibility() == View.GONE) {
+                        if (TextUtils.isEmpty(item.message.body) && !item.message.emoji) {
+                            holder.tvBody.setVisibility(View.GONE);
+                        } else {
                             holder.tvBody.setVisibility(View.VISIBLE);
                         }
 
@@ -550,9 +552,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                             holder.llAttachContainer.setVisibility(View.VISIBLE);
 
                         View audioitem = View.inflate(mContext, R.layout.attachment_audio_item, null);
-//                        audioitem.setPadding(6, 0, 6, 0);
-//                        IconicsDrawable iconPlay = new IconicsDrawable(mContext, GoogleMaterial.Icon.gmd_play_circle_outline);
-//                        iconPlay.color(tm.getSecondaryTextColor());
+
                         audioitem.setLayoutParams(new LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -581,17 +581,11 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
 
                         tvTitle.setText(att.audio.artist);
                         tvDes.setText(att.audio.title);
-//                        tvArtist.setTextColor(tm.getPrimaryTextColor());
 
-//                        tvTitle.setText(att.audio.title);
-//                        tvTitle.setTypeface(mTypeface);
-//                        tvTitle.setTextColor(tm.getSecondaryTextColor());
-
-//                        tvTime.setText(new SimpleDateFormat("MM:ss").format(att.audio.duration));
-//                        tvTime.setTypeface(mTypeface);
-//                        tvTime.setTextColor(tm.getSecondaryTextColor());
-
-
+                        if (!isNightTheme && (!item.message.is_out && !isColorInMessages) ||
+                                (item.message.is_out && !isColorOutMessages)) {
+                            ViewUtil.setFilter(btnPlay, ThemeManager.getThemeColor(getContext()));
+                        }
                         break;
 
                     case VKAttachment.TYPE_STICKER:
@@ -832,7 +826,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         public TextView tvDate;
         public CircleImageView ivPhoto;
         public ImageView ivSelected;
-        public Space spaceSelected;
+        public android.support.v4.widget.Space spaceSelected;
 
         public ViewHolder(View v) {
             llContainer = (LinearLayout) v.findViewById(R.id.llMessageContainer);
@@ -842,7 +836,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
             tvDate = (TextView) v.findViewById(R.id.tvMessageDate);
             ivPhoto = (CircleImageView) v.findViewById(R.id.ivMessagePhoto);
             ivSelected = (ImageView) v.findViewById(R.id.ivMessageSelected);
-            spaceSelected = (Space) v.findViewById(R.id.spaceSelected);
+            spaceSelected = (android.support.v4.widget.Space) v.findViewById(R.id.spaceSelected);
         }
     }
 

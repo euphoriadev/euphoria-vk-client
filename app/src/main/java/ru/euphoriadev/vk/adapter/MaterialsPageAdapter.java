@@ -1,11 +1,9 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.PermissionChecker;
 
 import ru.euphoriadev.vk.HistoryAttachmentFragment;
 import ru.euphoriadev.vk.R;
@@ -64,10 +62,6 @@ public class MaterialsPageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         fragments[position] = HistoryAttachmentFragment.newInstance(chat_id, user_id, position);
         return fragments[position];
-    }
-
-    public Fragment[] getFragments() {
-        return fragments;
     }
 
     @Override

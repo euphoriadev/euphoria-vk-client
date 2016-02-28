@@ -5,10 +5,12 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
+import ru.euphoriadev.vk.common.PrefManager;
+
 
 public class Account {
 
-    public static final String API_ID = "4510232"; // ID TimeVK
+    public static final String API_ID = "4510232"; // Standalone Euphoria ID
     public String access_token; // токен
     public String fullName, photo, status = "";
     public long user_id; // ID пользователя
@@ -41,7 +43,8 @@ public class Account {
 
     /**
      * Обновление значение переменной
-     * @param key Ключ, для обновление
+     *
+     * @param key   Ключ, для обновление
      * @param value Переменная для изминения
      */
     public void update(String key, String value) {
@@ -51,7 +54,8 @@ public class Account {
 
     /**
      * Обновления значение
-     * @param key Ключ, для обновление
+     *
+     * @param key   Ключ, для обновление
      * @param value long переменная для изминения
      */
     public void update(String key, long value) {
@@ -61,6 +65,7 @@ public class Account {
 
     /**
      * Восстановленние переменных аккаунта
+     *
      * @return
      */
     public Account restore() {
@@ -81,6 +86,7 @@ public class Account {
         editor.remove("user_id");
         editor.remove("photo");
         editor.remove("fullName");
-        editor.apply();
+
+        PrefManager.apply(editor);
     }
 }

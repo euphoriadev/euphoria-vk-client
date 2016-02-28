@@ -121,6 +121,6 @@ public class VKAttachment implements Serializable {
     }
 
     public static ArrayList<VKAttachment> parseArray(JSONArray source) {
-       return parseAttachments(source, 0, 0, null);
+        return parseAttachments(source, 0, 0, null);
     }
 }

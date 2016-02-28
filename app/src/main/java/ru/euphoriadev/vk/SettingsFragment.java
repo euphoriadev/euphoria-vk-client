@@ -16,6 +16,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -27,9 +28,9 @@ import ru.euphoriadev.vk.service.OnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.CrashManager;
-import ru.euphoriadev.vk.util.PrefManager;
-import ru.euphoriadev.vk.util.ThemeManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
@@ -80,6 +81,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_WALLPAPER_PATH = "message_wallpaper_path";
     public static final String KEY_IS_JOIN_GROUP = "is_join_group";
     public static final String KEY_IS_LIVE_ONLINE_SERVICE = "is_live_online_service";
+    public static final String KEY_MESSAGE_COUNT = "message_count";
 
     /** Web url for check updates this app */
     public static final String UPDATE_URL = "http://timeteam.3dn.ru/timevk_up.txt";
@@ -125,6 +127,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     Toast.makeText(getActivity(), "Please restart application", Toast.LENGTH_LONG).show();
                 }
 
+                View rootView = getView();
+                if (rootView != null) {
+                    ViewCompat.setLayerType(rootView, ViewCompat.LAYER_TYPE_HARDWARE, null);
+                }
                 getActivity().overridePendingTransition(R.anim.alpha_out, R.anim.alpha_in);
                 return true;
             }
@@ -172,11 +178,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     @Override
                     public void onDismiss(DialogInterface dialogInterface) {
                         // почему-то на 4.0,3 вылет с ошибкой
-                        TaskStackBuilder.create(getActivity())
-                                .addNextIntent(new Intent(getActivity(), BasicActivity.class))
-                                .addNextIntent(getActivity().getIntent())
-                                .startActivities();
-                        getActivity().overridePendingTransition(R.anim.alpha_out, R.anim.alpha_in);
+                        try {
+                            TaskStackBuilder.create(getActivity())
+                                    .addNextIntent(new Intent(getActivity(), BasicActivity.class))
+                                    .addNextIntent(getActivity().getIntent())
+                                    .startActivities();
+                            getActivity().overridePendingTransition(R.anim.alpha_out, R.anim.alpha_in);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        ThemeManager.updateThemeValues();
 
                     }
                 });
@@ -236,7 +247,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         CheckBoxPreference boxHeaderGravity = new MaterialCheckBoxPreference(getActivity());
         boxHeaderGravity.setTitle("Изменить положение заголовка");
         boxHeaderGravity.setKey(KEY_GRAVITY_DRAWER_HEADER);
-        boxHeaderGravity.setSummary("Установить заголовок боковой шторке по середине");
+        boxHeaderGravity.setSummary("Установить заголовок боковой шторке по центру");
         boxHeaderGravity.setDefaultValue(false);
 
         categoryUI.addPreference(boxHeaderGravity);
@@ -561,7 +572,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         categoryAbout.addPreference(groupScreen);
 
-        if (BuildConfig.DEBUG) {
+        if (true) {
             PreferenceCategory debugCategory = new MaterialPreferenceCategory(getActivity());
             debugCategory.setTitle("For developers");
 
@@ -659,7 +670,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 //        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"igmorozkin@gmail.com"});
 //        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
 //        emailIntent.putExtra(Intent.EXTRA_TEXT, "Hey, Euphoria app is crashed, please fix!");
-        emailIntent .putExtra(Intent.EXTRA_STREAM, filePath);
+        emailIntent.putExtra(Intent.EXTRA_STREAM, filePath);
         try {
             startActivity(Intent.createChooser(emailIntent, "Send mail..."));
         } catch (android.content.ActivityNotFoundException ex) {

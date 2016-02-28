@@ -23,7 +23,7 @@ import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeUtils;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 
 //import android.support.v7.internal.widget.ThemeUtils;
 

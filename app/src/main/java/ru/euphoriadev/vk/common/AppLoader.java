@@ -1,9 +1,8 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.common;
 
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -19,7 +18,9 @@ import java.util.concurrent.Executors;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
-import ru.euphoriadev.vk.vkapi.VKApi;
+import ru.euphoriadev.vk.napi.VKApi;
+import ru.euphoriadev.vk.util.CrashManager;
+import ru.euphoriadev.vk.util.ThemeUtils;
 
 /**
  * Created by Igor on 16.11.15.
@@ -30,7 +31,9 @@ public class AppLoader extends Application {
     public static final String APP_DIR = "Euphoria";
 
     public static volatile Context appContext;
-    /** Cached important preferences */
+    /**
+     * Cached important preferences
+     */
     public boolean isDarkTheme;
     public boolean writeLog;
     public String themeName;
@@ -43,8 +46,6 @@ public class AppLoader extends Application {
     public static AppLoader getLoader(Context applicationContext) {
         return (AppLoader) applicationContext;
     }
-
-    /** Methods for themes **/
 
     public static AppLoader getLoader() {
         return (AppLoader) appContext;
@@ -65,11 +66,12 @@ public class AppLoader extends Application {
         createAppDir();
 
         CrashManager.init();
-        VKApi.init(new VKApi.VKUserAccount().restore());
+        VKApi.init(new VKApi.VKUserConfig().restore());
     }
 
     /**
      * Apply theme to activity, without {@link Activity#recreate()}
+     *
      * @param withLocale true if you want to change language
      */
     public void applyTheme(Activity activity, boolean withLocale, boolean drawingStatusBar) {
@@ -117,7 +119,6 @@ public class AppLoader extends Application {
 
     /**
      * Apply theme to activity, without {@link Activity#recreate()}
-     * @param activity
      */
     public void applyTheme(Activity activity) {
         applyTheme(activity, true, false);
@@ -125,8 +126,8 @@ public class AppLoader extends Application {
 
     /**
      * Получение Header-а шторки, основывайсь на текущей теме.
+     *
      * @param withSolidBackground учитывать настройки
-     * @return
      */
     public Drawable getDrawerHeader(Context context, boolean withSolidBackground) {
         if (makingDrawerHeader.equals("blur_photo")) {
@@ -139,19 +140,43 @@ public class AppLoader extends Application {
         }
         int drawableId;
         switch (themeName.toUpperCase()) {
-            case "DARK":   drawableId = R.drawable.drawer_header_dark; break;
-            case "BLACK":  drawableId = R.drawable.drawer_header_black;  break;
-            case "INDIGO": drawableId = R.drawable.drawer_header; break;
-            case "RED":    drawableId = R.drawable.drawer_header_black;  break;
-            case "ORANGE": drawableId = R.drawable.drawer_header_orange2; break;
-            case "BLUE_GREY": drawableId = R.drawable.drawer_header; break;
-            case "PINK":  drawableId = R.drawable.drawer_header_pink; break;
-            case "TEAL":  drawableId = R.drawable.drawer_header_black; break;
-            case "DEEP_ORANGE": drawableId = R.drawable.drawer_header_orange2; break;
-            case "BROWN": drawableId = R.drawable.drawer_header; break;
-            case "GREEN": drawableId = R.drawable.drawer_header_green; break;
+            case "DARK":
+                drawableId = R.drawable.drawer_header_dark;
+                break;
+            case "BLACK":
+                drawableId = R.drawable.drawer_header_black;
+                break;
+            case "INDIGO":
+                drawableId = R.drawable.drawer_header;
+                break;
+            case "RED":
+                drawableId = R.drawable.drawer_header_black;
+                break;
+            case "ORANGE":
+                drawableId = R.drawable.drawer_header_orange2;
+                break;
+            case "BLUE_GREY":
+                drawableId = R.drawable.drawer_header;
+                break;
+            case "PINK":
+                drawableId = R.drawable.drawer_header_pink;
+                break;
+            case "TEAL":
+                drawableId = R.drawable.drawer_header_black;
+                break;
+            case "DEEP_ORANGE":
+                drawableId = R.drawable.drawer_header_orange2;
+                break;
+            case "BROWN":
+                drawableId = R.drawable.drawer_header;
+                break;
+            case "GREEN":
+                drawableId = R.drawable.drawer_header_green;
+                break;
 
-            default: drawableId = R.drawable.drawer_header; break;
+            default:
+                drawableId = R.drawable.drawer_header;
+                break;
         }
         return appContext.getResources().getDrawable(drawableId);
     }
@@ -192,6 +217,7 @@ public class AppLoader extends Application {
 
     /**
      * Создание папки приложения
+     *
      * @return true если папку создалась, false = если папка уже была ранее создана
      */
     private boolean createAppDir() {

@@ -15,8 +15,8 @@ import ru.euphoriadev.vk.adapter.VideosAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.api.model.VKVideo;
-import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by user on 23.11.15.

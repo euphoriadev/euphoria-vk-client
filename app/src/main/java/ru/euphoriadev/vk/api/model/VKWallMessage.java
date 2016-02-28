@@ -67,11 +67,11 @@ public class VKWallMessage implements Serializable {
         }
         JSONArray copy_history_json = o.optJSONArray("copy_history");
         if (copy_history_json != null) {
-            wm.copy_history = new ArrayList<VKWallMessage>();
+            wm.copy_history = new ArrayList<>();
             for (int i = 0; i < copy_history_json.length(); ++i) {
                 JSONObject history_item = copy_history_json.optJSONObject(i);
 
-                //empty items happen sometimes, seems to be bug in API
+                // empty items happen sometimes, seems to be bug in API
                 if (history_item.isNull("id"))
                     continue;
 
@@ -81,7 +81,7 @@ public class VKWallMessage implements Serializable {
         JSONArray attachments = o.optJSONArray("attachments");
         JSONObject geo_json = o.optJSONObject("geo");
         //владельцем опроса является to_id. Даже если добавить опрос в группу от своего имени, то from_id буду я, но опрос всё-равно будет принадлежать группе.
-   //   wm.attachments = Attachment.parseAttachments(attachments, wm.to_id, wm.copy_owner_id, geo_json);
+        //   wm.attachments = Attachment.parseAttachments(attachments, wm.to_id, wm.copy_owner_id, geo_json);
         wm.attachments = VKAttachment.parseAttachments(attachments, wm.owner_id, wm.copy_owner_id, geo_json);
         if (o.has("comments")) {
             JSONObject jcomments = o.optJSONObject("comments");

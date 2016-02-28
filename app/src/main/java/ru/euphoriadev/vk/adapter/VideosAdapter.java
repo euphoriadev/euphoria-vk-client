@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.api.model.VKVideo;
-import ru.euphoriadev.vk.util.AppLoader;
+import ru.euphoriadev.vk.common.AppLoader;
 
 /**
  * Created by user on 23.11.15.

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="72dp"
               android:gravity="center_vertical"
@@ -13,11 +14,14 @@
         android:layout_height="45dp"
         android:layout_marginRight="16dp"
         android:paddingRight="16dp"
-        android:src="@drawable/camera_b"/>
+        android:src="@drawable/camera_b"
+        app:border_color="@android:color/white"
+        app:border_width="1dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -55,10 +59,16 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/secondary_text_dark"/>
 
-
         </LinearLayout>
 
     </LinearLayout>
 
+    <ImageButton
+        android:visibility="gone"
+        android:id="@+id/buttonApprovesRequest"
+        style="?android:borderlessButtonStyle"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_people_white"/>
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.common;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,10 +24,16 @@ import ru.euphoriadev.vk.BaseThemedActivity;
 import ru.euphoriadev.vk.BasicActivity;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ResourcesLoader;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.ThemeUtils;
+import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
  * Created by Igor on 23.12.15.
- *
+ * <p/>
  * A Simple Theme Manager
  */
 public class ThemeManager {
@@ -36,42 +42,18 @@ public class ThemeManager {
     }
     public static final int DEFAULT_COLOR = ResourcesLoader.getColor(R.color.md_red_500); // Red 500
     public static final int DEFAULT_ACCENT_COLOR = ResourcesLoader.getColor(R.color.md_teal_500); // Teal 500
-
     public static final String PREF_KEY_THEME_COLOUR = "color_theme";
     public static final String PREF_KEY_FORCED_LOCALE = SettingsFragment.KEY_FORCED_LOCALE;
     public static final String PREF_KEY_IS_DARK_THEME = SettingsFragment.KEY_IS_NIGHT_MODE;
     public static final String PREF_KEY_DRAWER_HEADER = SettingsFragment.KEY_MAKING_DRAWER_HEADER;
     public static final String PREF_KEY_BLUR_RADIUS = SettingsFragment.KEY_BLUR_RADIUS;
     public static final String PREF_KEY_MESSAGE_WALLPAPER_PATH = SettingsFragment.KEY_WALLPAPER_PATH;
-
-    /** Drawer header states **/
+    /**
+     * Drawer header states
+     **/
     public static final int DRAWER_HEADER_DEFAULT = 0;
     public static final int DRAWER_HEADER_SOLID_BACKGROUND = 1;
     public static final int DRAWER_HEADER_BLUR_PHOTO = 2;
-
-    /**
-     * Index for colours
-     */
-    private static final int COLOUR_RED = 0;
-    private static final int COLOUR_PINK = 1;
-    private static final int COLOUR_PURPLE = 2;
-    private static final int COLOUR_DEEP_PURPLE = 3;
-    private static final int COLOUR_INDIGO = 4;
-    private static final int COLOUR_BLUR = 5;
-    private static final int COLOUR_LIGHT_BLUE = 6;
-    private static final int COLOUR_CYAN = 7;
-    private static final int COLOUR_TEAL = 8;
-    private static final int COLOUR_GREEN = 9;
-    private static final int COLOUR_LIGHT_GREEN = 11;
-    private static final int COLOUR_LIME = 11;
-    private static final int COLOUR_YELLOW = 12;
-    private static final int COLOUR_AMBER = 13;
-    private static final int COLOUR_ORANGE = 14;
-    private static final int COLOUR_DEEP_ORANGE = 15;
-    private static final int COLOUR_BROWN = 16;
-    private static final int COLOUR_GREY = 17;
-    private static final int COLOUR_BLUE_GREY = 18;
-    private static final int COLOUR_BLACK = 19;
     /**
      * Colours, copied from http://www.google.com/design/spec/style/color.html#color-ui-color-palette
      */
@@ -157,7 +139,6 @@ public class ThemeManager {
 //    }};
 
     public static final int[][] COLOURS = ResourcesLoader.getThemeColoursPalette(AppLoader.appContext);
-
     /**
      * These are the colors that go in the initial palette.
      */
@@ -183,7 +164,29 @@ public class ThemeManager {
             COLOURS[18][5], // Blue Grey
             Color.BLACK  // Full Black
     };
-
+    /**
+     * Index for colours
+     */
+    private static final int COLOUR_RED = 0;
+    private static final int COLOUR_PINK = 1;
+    private static final int COLOUR_PURPLE = 2;
+    private static final int COLOUR_DEEP_PURPLE = 3;
+    private static final int COLOUR_INDIGO = 4;
+    private static final int COLOUR_BLUR = 5;
+    private static final int COLOUR_LIGHT_BLUE = 6;
+    private static final int COLOUR_CYAN = 7;
+    private static final int COLOUR_TEAL = 8;
+    private static final int COLOUR_GREEN = 9;
+    private static final int COLOUR_LIGHT_GREEN = 11;
+    private static final int COLOUR_LIME = 11;
+    private static final int COLOUR_YELLOW = 12;
+    private static final int COLOUR_AMBER = 13;
+    private static final int COLOUR_ORANGE = 14;
+    private static final int COLOUR_DEEP_ORANGE = 15;
+    private static final int COLOUR_BROWN = 16;
+    private static final int COLOUR_GREY = 17;
+    private static final int COLOUR_BLUE_GREY = 18;
+    private static final int COLOUR_BLACK = 19;
     /**
      * This configures whether the text is
      * black (0) or
@@ -233,13 +236,30 @@ public class ThemeManager {
     }, {    // White
             0
     }};
-
-
     /**
      * Style ids
      */
     private static final SparseIntArray sDarkThemes = new SparseIntArray(20);
     private static final SparseIntArray sLightThemes = new SparseIntArray(20);
+    /**
+     * Drawer Headers res
+     **/
+    private static final SparseIntArray sDrawerHeaders = new SparseIntArray(20);
+    /**
+     * Cached theme values
+     */
+    private static String sLocale;
+    private static String sMessageWallpaperPath;
+    private static int sColourTheme = -1;
+    private static int sAccentColor = -1;
+    private static int sThemeColor = -1;
+    private static int sTextPrimaryDarkColor = -1;
+    private static int sTextSecondaryDarkColor = -1;
+    private static int sTextPrimaryLightColor = -1;
+    private static int sTextSecondaryLightColor = -1;
+    private static int sDrawerHeaderState = -1;
+    private static boolean sIsDarkTheme;
+    private static boolean isPreferencesLoaded;
 
     static {
         // Dark Styles
@@ -286,10 +306,6 @@ public class ThemeManager {
         sLightThemes.append(PALETTE[18], R.style.AppThemeLight_BlurGrey);
         sLightThemes.append(PALETTE[19], R.style.AppTheme_Black);
 
-    }
-    /** Drawer Headers res **/
-    private static final SparseIntArray sDrawerHeaders = new SparseIntArray(20);
-    static {
         sDrawerHeaders.append(PALETTE[0], R.drawable.drawer_header_black);
         sDrawerHeaders.append(PALETTE[1], R.drawable.drawer_header_pink);
         sDrawerHeaders.append(PALETTE[2], R.drawable.drawer_header_purple);
@@ -300,23 +316,8 @@ public class ThemeManager {
         sDrawerHeaders.append(PALETTE[14], R.drawable.drawer_header_orange2);
         sDrawerHeaders.append(PALETTE[15], R.drawable.drawer_header_orange);
         sDrawerHeaders.append(PALETTE[19], R.drawable.drawer_header_black);
-    }
 
-    /**
-     * Cached theme values
-     */
-    private static String sLocale;
-    private static String sMessageWallpaperPath;
-    private static int sColourTheme = -1;
-    private static int sAccentColor = -1;
-    private static int sThemeColor = -1;
-    private static int sTextPrimaryDarkColor = -1;
-    private static int sTextSecondaryDarkColor = -1;
-    private static int sTextPrimaryLightColor = -1;
-    private static int sTextSecondaryLightColor = -1;
-    private static int sDrawerHeaderState = -1;
-    private static boolean sIsDarkTheme;
-    private static boolean isPreferencesLoaded;
+    }
 
     /**
      * Apply theme to activity, without {@link Activity#recreate()}
@@ -388,14 +389,9 @@ public class ThemeManager {
         sColourTheme = newColourTheme;
     }
 
-
-    public static void setDarkTheme(boolean newDarkThemeValue) {
-        PrefManager.putBoolean(PREF_KEY_IS_DARK_THEME, newDarkThemeValue);
-        sIsDarkTheme = newDarkThemeValue;
-    }
-
     /**
      * Sets color for elements, depending on current theme.
+     *
      * @deprecated View painted depending on the theme itself
      */
     @Deprecated
@@ -450,6 +446,7 @@ public class ThemeManager {
     public static void updateThemeValues() {
         isPreferencesLoaded = false;
         sThemeColor = -1;
+        sAccentColor = -1;
 
         loadThemePreferences(AppLoader.appContext);
     }
@@ -637,6 +634,10 @@ public class ThemeManager {
         return sIsDarkTheme;
     }
 
+    public static void setDarkTheme(boolean newDarkThemeValue) {
+        PrefManager.putBoolean(PREF_KEY_IS_DARK_THEME, newDarkThemeValue);
+        sIsDarkTheme = newDarkThemeValue;
+    }
 
     public static Drawable getDrawerHeader(Context context) {
         loadThemePreferences(AppLoader.appContext);

@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 import ru.euphoriadev.vk.adapter.MaterialsPageAdapter;
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 
 /**

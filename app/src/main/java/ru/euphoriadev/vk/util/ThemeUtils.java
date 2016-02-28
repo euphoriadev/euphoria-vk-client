@@ -13,8 +13,6 @@ import android.util.TypedValue;
  */
 public class ThemeUtils {
 
-    private static final ThreadLocal<TypedValue> TL_TYPED_VALUE = new ThreadLocal<>();
-
     static final int[] DISABLED_STATE_SET = new int[]{-android.R.attr.state_enabled};
     static final int[] FOCUSED_STATE_SET = new int[]{android.R.attr.state_focused};
     static final int[] ACTIVATED_STATE_SET = new int[]{android.R.attr.state_activated};
@@ -24,7 +22,7 @@ public class ThemeUtils {
     static final int[] NOT_PRESSED_OR_FOCUSED_STATE_SET = new int[]{
             -android.R.attr.state_pressed, -android.R.attr.state_focused};
     static final int[] EMPTY_STATE_SET = new int[0];
-
+    private static final ThreadLocal<TypedValue> TL_TYPED_VALUE = new ThreadLocal<>();
     private static final int[] TEMP_ARRAY = new int[1];
 
     public static ColorStateList createDisabledStateList(int textColor, int disabledTextColor) {

@@ -16,14 +16,13 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.security.Permissions;
 import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.helper.FileHelper;
 import ru.euphoriadev.vk.util.PermissionAllower;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.view.TextCircleView;
 
@@ -97,7 +96,7 @@ public class DocsAdapter extends BaseArrayAdapter<VKDocument> {
         long unit = 1024;
         if (sizeInBytes < unit) return sizeInBytes + " B";
         int exp = (int) (Math.log(sizeInBytes) / Math.log(unit));
-        String pre = ("KMGTPE").charAt(exp-1) + ("i");
+        String pre = ("KMGTPE").charAt(exp - 1) + ("i");
         return String.format("%.1f %sB", sizeInBytes / Math.pow(unit, exp), pre);
     }
 

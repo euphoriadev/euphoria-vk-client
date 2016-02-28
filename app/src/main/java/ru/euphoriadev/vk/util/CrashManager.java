@@ -14,16 +14,18 @@ import java.text.SimpleDateFormat;
 
 import ru.euphoriadev.vk.BuildConfig;
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.PrefManager;
 
 /**
  * Created by Igor on 28.01.16.
- *
+ * <p/>
  * Keeps track of errors in this application, and writes them to a file on SD
  */
 public class CrashManager {
-    private static final String TAG = "CrashManager";
-
     public static final String DIR_NAME = "Logs";
+    private static final String TAG = "CrashManager";
+    private static final Thread.UncaughtExceptionHandler sOldHandler = Thread.getDefaultUncaughtExceptionHandler();
     public static final Thread.UncaughtExceptionHandler EXCEPTION_HANDLER = new Thread.UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
@@ -39,8 +41,6 @@ public class CrashManager {
             }
         }
     };
-
-    private static final Thread.UncaughtExceptionHandler sOldHandler = Thread.getDefaultUncaughtExceptionHandler();
 
     private CrashManager() {
         // Empty

@@ -7,13 +7,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class GroupBanItem {
-    
+
     public long id; // TODO for v5.0 - id
     public String first_name;
     public String last_name;
     public String photo_100; //not documented
     public BanInfo banInfo;
-    
+
     public static GroupBanItem parse(JSONObject o) throws NumberFormatException, JSONException {
         GroupBanItem item = new GroupBanItem();
         if (o.isNull("id"))
@@ -32,7 +32,7 @@ public class GroupBanItem {
         }
         return item;
     }
-    
+
     public static ArrayList<GroupBanItem> parseAll(JSONArray array) throws NumberFormatException, JSONException {
         ArrayList<GroupBanItem> items = new ArrayList<GroupBanItem>();
         if (array == null)
@@ -41,7 +41,7 @@ public class GroupBanItem {
         for (int i = 0; i < category_count; ++i) {
             if (!(array.get(i) instanceof JSONObject))
                 continue;
-            JSONObject o = (JSONObject)array.get(i);
+            JSONObject o = (JSONObject) array.get(i);
             GroupBanItem item = parse(o);
             if (item == null || item.id == 0)
                 continue; //TODO skip group, so as no full info 

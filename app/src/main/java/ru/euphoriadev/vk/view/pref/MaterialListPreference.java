@@ -38,8 +38,7 @@ public class MaterialListPreference extends ListPreference {
     @Override
     protected void showDialog(Bundle state) {
         super.showDialog(state);
-        }
-
+    }
 
 
     @Override

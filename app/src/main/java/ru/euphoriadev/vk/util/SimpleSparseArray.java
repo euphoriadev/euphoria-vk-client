@@ -2,6 +2,8 @@ package ru.euphoriadev.vk.util;
 
 import java.util.Arrays;
 
+import ru.euphoriadev.vk.common.ResourcesLoader;
+
 /**
  * Created by Igor on 05.02.16.
  * <p/>
@@ -153,6 +155,13 @@ public class SimpleSparseArray implements Cloneable {
     }
 
     /**
+     * Returns the number of capacity in this
+     */
+    public int capacity() {
+        return mKeys.length;
+    }
+
+    /**
      * Get key at index
      *
      * @param index the index to find key
@@ -225,14 +234,14 @@ public class SimpleSparseArray implements Cloneable {
 
         StringBuilder buffer = new StringBuilder(mSize * 16);
         buffer.append('{');
-        for (int i=0; i<mSize; i++) {
+        for (int i = 0; i < mSize; i++) {
             if (i > 0) {
                 buffer.append(", ");
             }
             int key = keyAt(i);
+            int value = valueAt(i);
             buffer.append(key);
             buffer.append('=');
-            int value = valueAt(i);
             buffer.append(value);
         }
         buffer.append('}');

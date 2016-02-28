@@ -384,7 +384,7 @@ public class FloatingActionButton extends ImageButton {
 
     public void attachToListView(@NonNull AbsListView listView,
                                  ScrollDirectionListener scrollDirectionListener,
-                                 AbsListView.OnScrollListener  onScrollListener,
+                                 AbsListView.OnScrollListener onScrollListener,
                                  SwipeRefreshLayout swipeLayout) {
         AbsListViewScrollDetectorImpl scrollDetector = new AbsListViewScrollDetectorImpl();
         scrollDetector.setScrollDirectionListener(scrollDirectionListener);
@@ -443,7 +443,7 @@ public class FloatingActionButton extends ImageButton {
         public void setOnScrollListener(AbsListView.OnScrollListener onScrollListener, SwipeRefreshLayout refreshLayout) {
             mOnScrollListener = onScrollListener;
             if (refreshLayout != null)
-            mRefreshLayout = refreshLayout;
+                mRefreshLayout = refreshLayout;
         }
 
         @Override
@@ -477,7 +477,7 @@ public class FloatingActionButton extends ImageButton {
             }
 
 
-           // Toast.makeText(getContext(), "onScroll!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "onScroll!", Toast.LENGTH_SHORT).show();
 
             super.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
         }

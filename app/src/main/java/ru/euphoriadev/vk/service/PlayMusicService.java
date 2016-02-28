@@ -100,7 +100,6 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
 //                        .setMediaSession(mediaSession.getSessionToken()));
 
 
-
         Notification notification = mBuilder.build();
         notification.flags = Notification.FLAG_ONGOING_EVENT;
 
@@ -173,8 +172,8 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
             mDatabase = DBHelper.get(this).getWritableDatabase();
         }
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM " + DBHelper.AUDIOS_TABLE +
-                " WHERE " + DBHelper.URL +
-                " = '" + lastPlayUrl + "'",
+                        " WHERE " + DBHelper.URL +
+                        " = '" + lastPlayUrl + "'",
                 null);
         if (cursor.getCount() <= 0) {
             cursor.close();
@@ -198,7 +197,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
         }
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM " + DBHelper.AUDIOS_TABLE +
                         " WHERE " + DBHelper.URL +
-                        " = ?" ,
+                        " = ?",
                 new String[]{lastPlayUrl});
         if (cursor.getCount() <= 0) {
             cursor.close();

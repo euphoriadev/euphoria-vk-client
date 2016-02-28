@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.view.CircleCheckBox;
 
 /**
@@ -226,8 +228,12 @@ public class ViewUtil {
 
 
         Drawable resource = ThemeManager.isDarkTheme() ?
-                AndroidUtils.getDrawable(view.getContext(), android.R.drawable.dialog_holo_dark_frame)
-                : AndroidUtils.getDrawable(view.getContext(), android.R.drawable.dialog_holo_light_frame);
+                AndroidUtils.getDrawable(view.getContext(),
+                        Build.VERSION.SDK_INT >= 9 ? android.R.drawable.dialog_holo_dark_frame
+                                : android.R.drawable.alert_dark_frame)
+                : AndroidUtils.getDrawable(view.getContext(),
+                Build.VERSION.SDK_INT >= 9 ? android.R.drawable.dialog_holo_light_frame
+                        : android.R.drawable.alert_light_frame);
 
         LayerDrawable shadowDrawable = new LayerDrawable(new Drawable[]{resource, view.getBackground()});
         ViewUtil.setBackground(view, shadowDrawable);

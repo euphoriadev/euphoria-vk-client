@@ -4,7 +4,7 @@ import java.net.HttpURLConnection;
 
 /**
  * Created by Igor on 02.02.16.
- *
+ * <p/>
  * Class for configuration the http request
  */
 public class HttpRequest {
@@ -13,6 +13,8 @@ public class HttpRequest {
     public String url;
     public String methodName;
     public HttpParams params;
+    public HttpEntity entry;
+    public boolean useCaches;
     public boolean enableCompression = true;
 
     /**
@@ -35,6 +37,21 @@ public class HttpRequest {
         this.url = url;
         this.methodName = methodName;
         this.params = params;
+    }
+
+    /**
+     * Create a new HTTP Request with params and entry
+     *
+     * @param url        URL address at which to send request, example: "http://google.com"
+     * @param methodName the http method name to be used, e.g. GET, POST
+     * @param params     the http params list
+     * @param entry      the entry to write in {@link java.io.OutputStream} of {@link HttpURLConnection}
+     */
+    public HttpRequest(String url, String methodName, HttpParams params, HttpEntity entry) {
+        this.url = url;
+        this.methodName = methodName;
+        this.params = params;
+        this.entry = entry;
     }
 
     /**

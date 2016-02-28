@@ -40,8 +40,8 @@ public class KeyboardUtil {
             if ((heightDiffDp - initialDpDiff) > 100) { // if more than 100 pixels, its probably a keyboard...
                 // check if the padding is 0 (if yes set the padding for the keyboard)
 //                if (contentView.getPaddingBottom() == 0) {
-                    // set the padding of the contentView for the keyboard
-                    contentView.setPadding(0, 0, 0, (int) UIUtils.convertDpToPixel((heightDiffDp - initialDpDiff), decorView.getContext()));
+                // set the padding of the contentView for the keyboard
+                contentView.setPadding(0, 0, 0, (int) UIUtils.convertDpToPixel((heightDiffDp - initialDpDiff), decorView.getContext()));
 //                }
             } else {
                 //check if the padding is != 0 (if yes reset the padding)

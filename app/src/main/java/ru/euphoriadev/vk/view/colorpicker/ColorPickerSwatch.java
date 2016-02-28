@@ -10,43 +10,43 @@ import android.widget.ImageView;
 import ru.euphoriadev.vk.R;
 
 public class ColorPickerSwatch extends FrameLayout implements View.OnClickListener {
-	private ImageView mCheckmarkImage;
-	private int mColor;
-	private OnColorSelectedListener mOnColorSelectedListener;
-	private ImageView mSwatchImage;
+    private ImageView mCheckmarkImage;
+    private int mColor;
+    private OnColorSelectedListener mOnColorSelectedListener;
+    private ImageView mSwatchImage;
 
-	public ColorPickerSwatch(Context paramContext, int color, boolean checked, OnColorSelectedListener onColorSelectedListener) {
-		super(paramContext);
-		this.mColor = color;
-		this.mOnColorSelectedListener = onColorSelectedListener;
-		LayoutInflater.from(paramContext).inflate(R.layout.color_picker_swatch, this);
-		this.mSwatchImage = ((ImageView) findViewById(R.id.color_picker_swatch));
-		this.mCheckmarkImage = ((ImageView) findViewById(R.id.color_picker_checkmark));
-		setColor(color);
-		setChecked(checked);
-		setOnClickListener(this);
-	}
+    public ColorPickerSwatch(Context paramContext, int color, boolean checked, OnColorSelectedListener onColorSelectedListener) {
+        super(paramContext);
+        this.mColor = color;
+        this.mOnColorSelectedListener = onColorSelectedListener;
+        LayoutInflater.from(paramContext).inflate(R.layout.color_picker_swatch, this);
+        this.mSwatchImage = ((ImageView) findViewById(R.id.color_picker_swatch));
+        this.mCheckmarkImage = ((ImageView) findViewById(R.id.color_picker_checkmark));
+        setColor(color);
+        setChecked(checked);
+        setOnClickListener(this);
+    }
 
-	private void setChecked(boolean checked) {
-		if (checked) {
-			this.mCheckmarkImage.setVisibility(View.VISIBLE);
-			return;
-		}
-		this.mCheckmarkImage.setVisibility(View.GONE);
-	}
+    private void setChecked(boolean checked) {
+        if (checked) {
+            this.mCheckmarkImage.setVisibility(View.VISIBLE);
+            return;
+        }
+        this.mCheckmarkImage.setVisibility(View.GONE);
+    }
 
-	public void onClick(View view) {
-		if (this.mOnColorSelectedListener != null)
-			this.mOnColorSelectedListener.onColorSelected(this.mColor);
-	}
+    public void onClick(View view) {
+        if (this.mOnColorSelectedListener != null)
+            this.mOnColorSelectedListener.onColorSelected(this.mColor);
+    }
 
-	protected void setColor(int color) {
-		Drawable[] drawables = new Drawable[1];
-		drawables[0] = getContext().getResources().getDrawable(R.drawable.color_picker_swatch);
-		this.mSwatchImage.setImageDrawable(new ColorStateDrawable(drawables, color));
-	}
+    protected void setColor(int color) {
+        Drawable[] drawables = new Drawable[1];
+        drawables[0] = getContext().getResources().getDrawable(R.drawable.color_picker_swatch);
+        this.mSwatchImage.setImageDrawable(new ColorStateDrawable(drawables, color));
+    }
 
-	public interface OnColorSelectedListener {
-		void onColorSelected(int color);
-	}
+    public interface OnColorSelectedListener {
+        void onColorSelected(int color);
+    }
 }

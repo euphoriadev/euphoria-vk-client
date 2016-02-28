@@ -409,4 +409,5 @@
     <string name="wallpaper_change">Change wallpaper</string>
     <string name="wallpaper_remove">Remove wallpaper</string>
     <string name="exit_message">Press once again to exit</string>
+    <string name="delete_dialog_confirm">Sure you want to delete dialog? You cannot restore this dialog!</string>
 </resources>

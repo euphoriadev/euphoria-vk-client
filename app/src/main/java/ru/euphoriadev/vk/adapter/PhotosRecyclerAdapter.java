@@ -21,7 +21,7 @@ import ru.euphoriadev.vk.util.AndroidUtils;
 /**
  * Created by Igor on 15.02.16.
  */
-public class PhotosRecyclerAdapter extends RecyclerView.Adapter<PhotosRecyclerAdapter.ViewHolder>{
+public class PhotosRecyclerAdapter extends RecyclerView.Adapter<PhotosRecyclerAdapter.ViewHolder> {
     private Activity activity;
     private ArrayList<VKPhoto> photos;
     private LayoutInflater inflater;

@@ -1,14 +1,17 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.common;
 
 import android.content.Context;
 
 import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.SimpleSparseArray;
 
 import static ru.euphoriadev.vk.R.color.*;
 
 /**
  * Created by Igor on 05.02.16.
- *
+ * <p/>
  * Simple class for load resources
  */
 public class ResourcesLoader {
@@ -22,7 +25,7 @@ public class ResourcesLoader {
         isLoadedColors = true;
 
         // Red
-        sColors.put(md_red_50,  getColor(context, R.color.md_red_50));
+        sColors.put(md_red_50, getColor(context, R.color.md_red_50));
         sColors.put(md_red_100, getColor(context, R.color.md_red_100));
         sColors.put(md_red_200, getColor(context, R.color.md_red_200));
         sColors.put(md_red_300, getColor(context, R.color.md_red_300));
@@ -34,7 +37,7 @@ public class ResourcesLoader {
         sColors.put(md_red_900, getColor(context, R.color.md_red_900));
 
         // Pink
-        sColors.put(md_pink_50,  getColor(context, R.color.md_pink_50));
+        sColors.put(md_pink_50, getColor(context, R.color.md_pink_50));
         sColors.put(md_pink_100, getColor(context, R.color.md_pink_100));
         sColors.put(md_pink_200, getColor(context, R.color.md_pink_200));
         sColors.put(md_pink_300, getColor(context, R.color.md_pink_300));
@@ -46,7 +49,7 @@ public class ResourcesLoader {
         sColors.put(md_pink_900, getColor(context, R.color.md_pink_900));
 
         // Purple
-        sColors.put(md_purple_50,  getColor(context, R.color.md_purple_50));
+        sColors.put(md_purple_50, getColor(context, R.color.md_purple_50));
         sColors.put(md_purple_100, getColor(context, R.color.md_purple_100));
         sColors.put(md_purple_200, getColor(context, R.color.md_purple_200));
         sColors.put(md_purple_300, getColor(context, R.color.md_purple_300));
@@ -58,7 +61,7 @@ public class ResourcesLoader {
         sColors.put(md_purple_900, getColor(context, R.color.md_purple_900));
 
         // Deep Purple
-        sColors.put(md_deep_purple_50,  getColor(context, R.color.md_deep_purple_50));
+        sColors.put(md_deep_purple_50, getColor(context, R.color.md_deep_purple_50));
         sColors.put(md_deep_purple_100, getColor(context, R.color.md_deep_purple_100));
         sColors.put(md_deep_purple_200, getColor(context, R.color.md_deep_purple_200));
         sColors.put(md_deep_purple_300, getColor(context, R.color.md_deep_purple_300));
@@ -82,7 +85,7 @@ public class ResourcesLoader {
         sColors.put(md_indigo_900, getColor(context, R.color.md_indigo_900));
 
         // Blue
-        sColors.put(md_blue_50,  getColor(context, R.color.md_blue_50));
+        sColors.put(md_blue_50, getColor(context, R.color.md_blue_50));
         sColors.put(md_blue_100, getColor(context, R.color.md_blue_100));
         sColors.put(md_blue_200, getColor(context, R.color.md_blue_200));
         sColors.put(md_blue_300, getColor(context, R.color.md_blue_300));
@@ -94,7 +97,7 @@ public class ResourcesLoader {
         sColors.put(md_blue_900, getColor(context, R.color.md_blue_900));
 
         // Light Blue
-        sColors.put(md_light_blue_50,  getColor(context, R.color.md_light_blue_50));
+        sColors.put(md_light_blue_50, getColor(context, R.color.md_light_blue_50));
         sColors.put(md_light_blue_100, getColor(context, R.color.md_light_blue_100));
         sColors.put(md_light_blue_200, getColor(context, R.color.md_light_blue_200));
         sColors.put(md_light_blue_300, getColor(context, R.color.md_light_blue_300));
@@ -106,7 +109,7 @@ public class ResourcesLoader {
         sColors.put(md_light_blue_900, getColor(context, R.color.md_light_blue_900));
 
         // Cyan
-        sColors.put(md_cyan_50,  getColor(context, R.color.md_cyan_50));
+        sColors.put(md_cyan_50, getColor(context, R.color.md_cyan_50));
         sColors.put(md_cyan_100, getColor(context, R.color.md_cyan_100));
         sColors.put(md_cyan_200, getColor(context, R.color.md_cyan_200));
         sColors.put(md_cyan_300, getColor(context, R.color.md_cyan_300));
@@ -118,7 +121,7 @@ public class ResourcesLoader {
         sColors.put(md_cyan_900, getColor(context, R.color.md_cyan_900));
 
         // Teal
-        sColors.put(md_teal_50,  getColor(context, R.color.md_teal_50));
+        sColors.put(md_teal_50, getColor(context, R.color.md_teal_50));
         sColors.put(md_teal_100, getColor(context, R.color.md_teal_100));
         sColors.put(md_teal_200, getColor(context, R.color.md_teal_200));
         sColors.put(md_teal_300, getColor(context, R.color.md_teal_300));
@@ -130,7 +133,7 @@ public class ResourcesLoader {
         sColors.put(md_teal_900, getColor(context, R.color.md_teal_900));
 
         // Green
-        sColors.put(md_green_50,  getColor(context, R.color.md_green_50));
+        sColors.put(md_green_50, getColor(context, R.color.md_green_50));
         sColors.put(md_green_100, getColor(context, R.color.md_green_100));
         sColors.put(md_green_200, getColor(context, R.color.md_green_200));
         sColors.put(md_green_300, getColor(context, R.color.md_green_300));
@@ -142,7 +145,7 @@ public class ResourcesLoader {
         sColors.put(md_green_900, getColor(context, R.color.md_green_900));
 
         // Light Green
-        sColors.put(md_light_green_50,  getColor(context, R.color.md_light_green_50));
+        sColors.put(md_light_green_50, getColor(context, R.color.md_light_green_50));
         sColors.put(md_light_green_100, getColor(context, R.color.md_light_green_100));
         sColors.put(md_light_green_200, getColor(context, R.color.md_light_green_200));
         sColors.put(md_light_green_300, getColor(context, R.color.md_light_green_300));
@@ -154,7 +157,7 @@ public class ResourcesLoader {
         sColors.put(md_light_green_900, getColor(context, R.color.md_light_green_900));
 
         // Lime
-        sColors.put(md_lime_50,  getColor(context, R.color.md_lime_50));
+        sColors.put(md_lime_50, getColor(context, R.color.md_lime_50));
         sColors.put(md_lime_100, getColor(context, R.color.md_lime_100));
         sColors.put(md_lime_200, getColor(context, R.color.md_lime_200));
         sColors.put(md_lime_300, getColor(context, R.color.md_lime_300));
@@ -166,7 +169,7 @@ public class ResourcesLoader {
         sColors.put(md_lime_900, getColor(context, R.color.md_lime_900));
 
         // Yellow
-        sColors.put(md_yellow_50,  getColor(context, R.color.md_yellow_50));
+        sColors.put(md_yellow_50, getColor(context, R.color.md_yellow_50));
         sColors.put(md_yellow_100, getColor(context, R.color.md_yellow_100));
         sColors.put(md_yellow_200, getColor(context, R.color.md_yellow_200));
         sColors.put(md_yellow_300, getColor(context, R.color.md_yellow_300));
@@ -178,7 +181,7 @@ public class ResourcesLoader {
         sColors.put(md_yellow_900, getColor(context, R.color.md_yellow_900));
 
         // Amber
-        sColors.put(md_amber_50,  getColor(context, R.color.md_amber_50));
+        sColors.put(md_amber_50, getColor(context, R.color.md_amber_50));
         sColors.put(md_amber_100, getColor(context, R.color.md_amber_100));
         sColors.put(md_amber_200, getColor(context, R.color.md_amber_200));
         sColors.put(md_amber_300, getColor(context, R.color.md_amber_300));
@@ -190,7 +193,7 @@ public class ResourcesLoader {
         sColors.put(md_amber_900, getColor(context, R.color.md_amber_900));
 
         // Orange
-        sColors.put(md_orange_50,  getColor(context, R.color.md_orange_50));
+        sColors.put(md_orange_50, getColor(context, R.color.md_orange_50));
         sColors.put(md_orange_100, getColor(context, R.color.md_orange_100));
         sColors.put(md_orange_200, getColor(context, R.color.md_orange_200));
         sColors.put(md_orange_300, getColor(context, R.color.md_orange_300));
@@ -202,7 +205,7 @@ public class ResourcesLoader {
         sColors.put(md_orange_900, getColor(context, R.color.md_orange_900));
 
         // Deep Orange
-        sColors.put(md_deep_orange_50,  getColor(context, R.color.md_deep_orange_50));
+        sColors.put(md_deep_orange_50, getColor(context, R.color.md_deep_orange_50));
         sColors.put(md_deep_orange_100, getColor(context, R.color.md_deep_orange_100));
         sColors.put(md_deep_orange_200, getColor(context, R.color.md_deep_orange_200));
         sColors.put(md_deep_orange_300, getColor(context, R.color.md_deep_orange_300));
@@ -214,7 +217,7 @@ public class ResourcesLoader {
         sColors.put(md_deep_orange_900, getColor(context, R.color.md_deep_orange_900));
 
         // Brown
-        sColors.put(md_brown_50,  getColor(context, R.color.md_brown_50));
+        sColors.put(md_brown_50, getColor(context, R.color.md_brown_50));
         sColors.put(md_brown_100, getColor(context, R.color.md_brown_100));
         sColors.put(md_brown_200, getColor(context, R.color.md_brown_200));
         sColors.put(md_brown_300, getColor(context, R.color.md_brown_300));
@@ -226,7 +229,7 @@ public class ResourcesLoader {
         sColors.put(md_brown_900, getColor(context, R.color.md_brown_900));
 
         // Grey
-        sColors.put(md_grey_50,  getColor(context, R.color.md_grey_50));
+        sColors.put(md_grey_50, getColor(context, R.color.md_grey_50));
         sColors.put(md_grey_100, getColor(context, R.color.md_grey_100));
         sColors.put(md_grey_200, getColor(context, R.color.md_grey_200));
         sColors.put(md_grey_300, getColor(context, R.color.md_grey_300));
@@ -238,7 +241,7 @@ public class ResourcesLoader {
         sColors.put(md_grey_900, getColor(context, R.color.md_grey_900));
 
         // Blue Grey
-        sColors.put(md_blue_grey_50,  getColor(context, R.color.md_blue_grey_50));
+        sColors.put(md_blue_grey_50, getColor(context, R.color.md_blue_grey_50));
         sColors.put(md_blue_grey_100, getColor(context, R.color.md_blue_grey_100));
         sColors.put(md_blue_grey_200, getColor(context, R.color.md_blue_grey_200));
         sColors.put(md_blue_grey_300, getColor(context, R.color.md_blue_grey_300));
@@ -248,6 +251,7 @@ public class ResourcesLoader {
         sColors.put(md_blue_grey_700, getColor(context, R.color.md_blue_grey_700));
         sColors.put(md_blue_grey_800, getColor(context, R.color.md_blue_grey_800));
         sColors.put(md_blue_grey_900, getColor(context, R.color.md_blue_grey_900));
+
     }
 
     public static int getColor(int resId) {

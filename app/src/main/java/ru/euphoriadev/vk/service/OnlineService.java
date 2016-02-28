@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.util.Account;
-import ru.euphoriadev.vk.util.PrefManager;
+import ru.euphoriadev.vk.common.PrefManager;
 
 public class OnlineService extends IntentService {
 

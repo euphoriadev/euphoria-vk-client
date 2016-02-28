@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,7 @@ import ru.euphoriadev.vk.util.AndroidUtils;
 /**
  * Created by user on 10.06.15.
  */
-public class AudioListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class AudioListFragment extends AbstractFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     Api api;
     Account account;
@@ -52,7 +51,8 @@ public class AudioListFragment extends Fragment implements SwipeRefreshLayout.On
 
     }
 
-    private void setRefreshing(final boolean refreshing) {
+    @Override
+    public void setRefreshing(final boolean refreshing) {
         refreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -151,7 +151,7 @@ public class AudioListFragment extends Fragment implements SwipeRefreshLayout.On
      * Обновление или вставка песен в базу данных
      *
      * @param database база данных
-     * @param audios список аудиозаписей, которые необходимо занести
+     * @param audios   список аудиозаписей, которые необходимо занести
      */
     private void updateAudios(SQLiteDatabase database, ArrayList<VKAudio> audios) {
         ContentValues cv = new ContentValues();

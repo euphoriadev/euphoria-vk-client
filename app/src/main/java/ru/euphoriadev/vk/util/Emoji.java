@@ -24,28 +24,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.PrefManager;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 
 /**
  * Created by Igor on 27.01.16.
- *
+ * <p/>
  * Emoji symbols contained in text messages in form of special characters.
  * If the system where to display the symbols, not their support,
  * it is necessary to display the characters using any available set of emoji icons.
  * In this case, all messages containing the characters you want to replace,
  * contain a special box emoji;
  * if this field does not come, the message can not be processed
- *
+ * <p/>
  * http://vk.com/dev//emoji
  */
 public class Emoji {
-    /** URL link for load emoji images */
+    /**
+     * URL link for load emoji images
+     */
     public static final String BASE_EMOJI_URL = "http://vk.com/images/emoji/";
     public static final String EMOJI_DIR_NAME = "Emojis";
 
     private static final HashMap<String, String> sEmojiUnicodes = new HashMap<>();
+
     static {
         sEmojiUnicodes.put("\uD83D\uDE0A", "D83DDE0A");
         sEmojiUnicodes.put("\uD83D\uDE03", "D83DDE03");
@@ -241,8 +246,8 @@ public class Emoji {
     }
 
     private static class LoadEmojiTask extends AsyncTask<Void, String, Void> {
-        private Context mContext;
         ProgressDialog dialog;
+        private Context mContext;
 
         public LoadEmojiTask(Context context) {
             this.mContext = context;
@@ -324,7 +329,8 @@ public class Emoji {
                     bitmap = null;
                 }
             }
-            System.gc();;
+            System.gc();
+            ;
         }
     }
 

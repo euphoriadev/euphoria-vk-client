@@ -39,9 +39,19 @@
     </string-array>
 
     <string-array name="friends_sort_array">
-        <item>All Friends</item>
+        <item>All</item>
+        <item>Best</item>
+        <item>Colleagues</item>
+        <item>Relatives</item>
+        <item>University</item>
+        <item>School</item>
+    </string-array>
+
+    <string-array name="tab_friends_array">
+        <item>All friends</item>
         <item>Online</item>
-        <item>Offline</item>
+        <item>Followers</item>
+        <item>Suggestions</item>
     </string-array>
 
 </resources>

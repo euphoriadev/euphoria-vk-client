@@ -56,13 +56,12 @@ import ru.euphoriadev.vk.util.Account;
  * VK Api. Модифицированная мной версия от разработчиков Kate Mobile
  * SDK ВКонтакте для основных мобильных платформ: iOS, Android и Windows Phone
  * — сокращает время интеграции API ВКонтакте и предоставляет дополнительные преимущества
- *
+ * <p/>
  * Подробнее - http://vk.com/dev/main
- *
+ * <p/>
  * TODO: Некоторые методы были скрыти от пользователей
  * Такие как gifts.send - отправка подарка
  * Полный список можно получить здесь https://vkapi.zf-projects.ru/methods-list
- *
  */
 public class Api {
     public static final String BASE_URL = "https://api.vk.com/method/";
@@ -447,6 +446,7 @@ public class Api {
         }
         return null;
     }
+
     /**
      * methods for friends **
      */
@@ -1051,12 +1051,13 @@ public class Api {
     }
 
     // Получение 1.5к сообщений в истории перписки
-    public ArrayList<VKMessage> getMessagesHistoryWithExecute(Integer user_id, Integer chat_id, long me, long offset) throws JSONException, IOException, KException {
+    public ArrayList<VKMessage> getMessagesHistoryWithExecute(Integer user_id, Integer chat_id, long offset) throws JSONException, IOException, KException {
         String var;
         if (chat_id != 0) {
-            var = "\"chat_id\":"+ chat_id + ",\n" +
-                    "\"user_id\":"+ 0 + ",\n";
-        } else var = "\"user_id\":"+ user_id + ",\n";
+            var = "\"chat_id\":" + chat_id + ",\n" +
+                   "\"rev\":" + "1" + ",\n" +
+                    "\"user_id\":" + 0 + ",\n";
+        } else var = "\"user_id\":" + user_id + ",\n" + "\"rev\":" + "1" + ",\n" ;
 
         String code =
                 "var offset = " + offset + ";\n" +
@@ -1566,14 +1567,7 @@ public class Api {
     }
 
     private ArrayList<VKPhoto> parsePhotos(JSONArray array) throws JSONException {
-        ArrayList<VKPhoto> photos = new ArrayList<VKPhoto>();
-        int category_count = array.length();
-        for (int i = 0; i < category_count; ++i) {
-            JSONObject o = (JSONObject) array.get(i);
-            VKPhoto p = VKPhoto.parse(o);
-            photos.add(p);
-        }
-        return photos;
+        return VKPhoto.parsePhotos(array);
     }
 
     //http://vk.com/dev/wall.addComment
@@ -1837,10 +1831,10 @@ public class Api {
 
     //http://vk.com/dev/users.search
     public ArrayList<VKFullUser> searchUser(String q, String fields, Long count, Long offset, Integer sort,
-                                        Integer city, Integer country, String hometown, Integer university_country, Integer university, Integer university_year,
-                                        Integer sex, Integer status, Integer age_from, Integer age_to, Integer birth_day, Integer birth_month, Integer birth_year,
-                                        Integer online, Integer has_photo, Integer school_country, Integer school_city, Integer school, Integer school_year,
-                                        String religion, String interests, String company, String position, Long gid) throws IOException, JSONException, KException {
+                                            Integer city, Integer country, String hometown, Integer university_country, Integer university, Integer university_year,
+                                            Integer sex, Integer status, Integer age_from, Integer age_to, Integer birth_day, Integer birth_month, Integer birth_year,
+                                            Integer online, Integer has_photo, Integer school_country, Integer school_city, Integer school, Integer school_year,
+                                            String religion, String interests, String company, String position, Long gid) throws IOException, JSONException, KException {
         VKParams params = new VKParams("users.search");
         params.put("q", q);
         params.put("count", count);
@@ -1903,10 +1897,10 @@ public class Api {
     }
 
     public ArrayList<VKFullUser> searchUserExtended(String q, String fields, Long count, Long offset, Integer sort,
-                                                Integer city, Integer country, String hometown, Integer university_country, Integer university, Integer university_year,
-                                                Integer sex, Integer status, Integer age_from, Integer age_to, Integer birth_day, Integer birth_month, Integer birth_year,
-                                                Integer online, Integer has_photo, Integer school_country, Integer school_city, Integer school, Integer school_year,
-                                                String religion, String interests, String company, String position, Long gid) throws IOException, JSONException, KException {
+                                                    Integer city, Integer country, String hometown, Integer university_country, Integer university, Integer university_year,
+                                                    Integer sex, Integer status, Integer age_from, Integer age_to, Integer birth_day, Integer birth_month, Integer birth_year,
+                                                    Integer online, Integer has_photo, Integer school_country, Integer school_city, Integer school, Integer school_year,
+                                                    String religion, String interests, String company, String position, Long gid) throws IOException, JSONException, KException {
         String uids = Utils.parseProfileId(q);
         if (uids != null && uids.length() > 0 && (offset == null || offset == 0)) {
             Log.i(TAG, "Search with uid = " + uids);
@@ -2041,7 +2035,7 @@ public class Api {
     }
 
     //http://vk.com/dev/users.getFollowers
-    public ArrayList<VKFullUser> getFollowers(Long uid, int offset, int count, String fields, String name_case) throws IOException, JSONException, KException {
+    public ArrayList<VKUser> getFollowers(Integer uid, int offset, int count, String fields, String name_case) throws IOException, JSONException, KException {
         VKParams params = new VKParams("users.getFollowers");
         params.put("user_id", uid);
         if (offset > 0)
@@ -2057,7 +2051,7 @@ public class Api {
         JSONObject root = sendRequest(params);
         JSONObject response = root.getJSONObject("response");
         JSONArray array = response.optJSONArray("items");
-        return VKFullUser.parseUsers(array);
+        return VKUser.parseUsers(array);
     }
 
     //http://vk.com/dev/messages.deleteDialog
@@ -2677,14 +2671,14 @@ public class Api {
      */
 
     //http://vk.com/dev/friends.getSuggestions
-    public ArrayList<VKFullUser> getSuggestions(String filter, String fields) throws IOException, JSONException, KException {
+    public ArrayList<VKUser> getSuggestions(String filter, String fields) throws IOException, JSONException, KException {
         VKParams params = new VKParams("friends.getSuggestions");
         params.put("filter", filter);   //mutual, contacts, mutual_contacts
         params.put("fields", fields);
         JSONObject root = sendRequest(params);
         JSONObject response = root.optJSONObject("response");
         JSONArray array = response.optJSONArray("items");
-        return VKFullUser.parseUsers(array);
+        return VKUser.parseUsers(array);
     }
 
     //http://vk.com/dev/account.importContacts
@@ -3226,21 +3220,21 @@ public class Api {
         return VKGift.parseGifts(response.optJSONArray("items"));
     }
 
-    // FIXME: 20.11.15
     /**
-     *
      * Отправка подарка
      * TODO: Данный метод был удален из документации, однако он работает
-     * @param user_ids IDs пользователей, которым отправляются подарки
-     * @param message текст сообщения
-     * @param isPrivate - флаг, отвечающий за тип подарка: публичный\приватный
-     * @param gift_id подарка, можно его достать из m.vk.com версии.  ID подарка будет написан в адресной строке
-     * @param guid уникальный индентификатор, чтобы предотвратить повторную отправку. - любое число
+     * UPD: Не работает,  Access denied: method allowed only for official app
      *
-     * В случае недостатка голосов - вернет ошибку "Not enough money on owner's balance"
+     * @param user_ids  IDs пользователей, которым отправляются подарки
+     * @param message   текст сообщения
+     * @param isPrivate - флаг, отвечающий за тип подарка: публичный\приватный
+     * @param gift_id   подарка, можно его достать из m.vk.com версии.  ID подарка будет написан в адресной строке
+     * @param guid      уникальный индентификатор, чтобы предотвратить повторную отправку. - любое число
+     *                  <p/>
+     *                  В случае недостатка голосов - вернет ошибку "Not enough money on owner's balance"
      */
     // https://vk.com/dev/gifts.send
-    public void sendGift(ArrayList<Long> user_ids, String message, boolean isPrivate, int gift_id, int guid) throws IOException, JSONException, KException {
+    public void sendGift(Collection<Integer> user_ids, String message, boolean isPrivate, int gift_id, int guid) throws IOException, JSONException, KException {
         VKParams params = new VKParams("gifts.send");
         params.put("user_ids", arrayToString(user_ids));
         params.put("gift_id", gift_id);
@@ -3283,8 +3277,6 @@ public class Api {
 
         return new JSONObject(Api.sendRequestInternal(url, "", true));
     }
-
-
 
 
 }

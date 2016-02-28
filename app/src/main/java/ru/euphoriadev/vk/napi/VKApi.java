@@ -1,17 +1,24 @@
-package ru.euphoriadev.vk.vkapi;
+package ru.euphoriadev.vk.napi;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Process;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
+import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -26,9 +33,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ru.euphoriadev.vk.BuildConfig;
+import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.api.model.VKMessage;
+import ru.euphoriadev.vk.api.model.VKPhoto;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpEntity;
 import ru.euphoriadev.vk.http.HttpParams;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
@@ -36,14 +47,16 @@ import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.AppLoader;
-import ru.euphoriadev.vk.util.PrefManager;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.util.ArrayUtil;
+import ru.euphoriadev.vk.common.PrefManager;
 
 /**
  * Created by Igor on 15.01.16.
  * <p/>
- * a Simple new VK Library for execute request.
+ * Simple new VK Library for execute request.
+ * All classes are placed into this, for convenience and compactness.
+ * <p/>
  * This library is a "mixture" of "VK-SDK" and "VK-Android-SDK by Thest1" library.
  * For more information about VK API - please, visit the official documentation
  * https://vk.com/dev/main.
@@ -52,17 +65,34 @@ import ru.euphoriadev.vk.util.ThreadExecutor;
  * because their list can be obtained by following this link:
  * https://vkapi.zf-projects.ru/methods-list
  * <p/>
- * <p/>
  * Example to init api and execute users.get request:
  * <pre>
- *      VKApi.init(VKApi.VKUserAccount.from(account));
- *      String response = VKApi.users()
- *               .get()
- *               .userId(1)
- *               .fields("photo_50, nickname")
- *               .execute();
+ *    VKApi.init(VKApi.VKUserConfig.from(account));
+ *    JSONObject response = VKApi.users()
+ *             .get()
+ *             .userId(1)
+ *             .fields("photo_50, nickname")
+ *             .execute();
  *
- *      // return users in json object
+ *    // return users in json object
+ * </pre>
+ * <p/>
+ * You can also login via the official standalone app. e.g. to send gifts:
+ * <pre>
+ *    VKApi.authorization("Vasya Pupkin", "Pass228", new VKApi.VKOnAuthorizationListener() {
+ *         @Override
+ *         public void onSuccess(VKApi.VKUserConfig newConfig) {
+ *             // authorization in successfully
+ *             Log.w("Auth", "Auth success! user id: " + newConfig.userId);
+ *         }
+ *
+ *         @Override
+ *         public void onError(VKApi.VKException e) {
+ *             // authorization is failed
+ *             Log.w("Auth", "Auth failed: " + e.errorMessage);
+ *         }
+ *     });
+ *
  * </pre>
  */
 
@@ -76,7 +106,7 @@ public class VKApi {
     public static final VKOnResponseListener DEFAULT_RESPONSE_LISTENER = new VKOnResponseListener() {
         @Override
         public void onResponse(VKRequest request, JSONObject responseJson) {
-            Log.i(TAG, responseJson.toString());
+//            Log.i(TAG, responseJson.toString());
         }
 
         @Override
@@ -84,6 +114,7 @@ public class VKApi {
             exception.printStackTrace();
             AndroidUtils.post(new RunnableToast(AppLoader.appContext, exception.getMessage(), true));
         }
+
     };
 
     /**
@@ -92,8 +123,18 @@ public class VKApi {
     private static final ExecutorService VK_SINGLE_EXECUTOR = Executors.newSingleThreadExecutor();
     private static volatile VKApi instance;
 
-    private VKUserAccount mAccount;
+    private VKUserConfig mUserConfig;
     private AsyncHttpClient mClient;
+
+    /**
+     * Private constructor, Нou don't have use it
+     *
+     * @see #init(VKUserConfig)
+     */
+    private VKApi(VKUserConfig account) {
+        this.mUserConfig = account;
+        this.mClient = new AsyncHttpClient(null, 1);
+    }
 
     /**
      * Init VKApi to send requests
@@ -101,21 +142,11 @@ public class VKApi {
      * @param account the vk account,
      *                on behalf of which to send requests to server VK
      */
-    public static synchronized VKApi init(VKUserAccount account) {
+    public static synchronized VKApi init(VKUserConfig account) {
         if (instance == null) {
             instance = new VKApi(account);
         }
         return instance;
-    }
-
-    /**
-     * Private constructor, Нou don't have use it
-     *
-     * @see #init(VKUserAccount)
-     */
-    private VKApi(VKUserAccount account) {
-        this.mAccount = account;
-        this.mClient = new AsyncHttpClient(null, 1);
     }
 
     /**
@@ -131,8 +162,17 @@ public class VKApi {
     /**
      * Return current account from api
      */
-    public static VKUserAccount getAccount() {
-        return getInstance().mAccount;
+    public static VKUserConfig getUserConfig() {
+        return getInstance().mUserConfig;
+    }
+
+    /**
+     * Set the config for execute request with user access token and id
+     *
+     * @param newConfig the new config to set
+     */
+    public static void setUserConfig(VKUserConfig newConfig) {
+        getInstance().mUserConfig = newConfig;
     }
 
     /**
@@ -154,6 +194,13 @@ public class VKApi {
      */
     public static VKFriends friends() {
         return new VKFriends();
+    }
+
+    /**
+     * Methods for photos
+     */
+    public static VKPhotos photos() {
+        return new VKPhotos();
     }
 
     /**
@@ -198,12 +245,26 @@ public class VKApi {
     }
 
     /**
-     * Direct authorization with Official client vk.
+     * Returns message uploader for upload photos in dialog
+     */
+    public static VKMessageUploader getMessageUploader() {
+        return new VKMessageUploader();
+    }
+
+    /**
+     * Returns document uploader for upload files
+     */
+    public static VKDocUploader getDocUploader() {
+        return new VKDocUploader();
+    }
+
+    /**
+     * Direct authorization with Official client vk id.
      * Read more: http://vk.com/dev/auth_direct
      */
-    public static void authorization(String login, String password, final VKOnResponseListener listener) {
-        String client_secret = "hHbZxrka2uZ6jB1inYsH";
-        String client_id = "2274003";
+    public static void authorization(String login, String password, final VKOnAuthorizationListener listener) {
+        final String client_secret = "hHbZxrka2uZ6jB1inYsH";
+        final int client_id = VKIdentifiers.ANDROID_OFFICIAL;
 
         final String url = "https://oauth.vk.com/token";
 
@@ -216,26 +277,33 @@ public class VKApi {
         params.addParam("scope", VKScope.getAllPermissions());
         params.addParam("v", API_VERSION);
 
-        ThreadExecutor.execute(new Runnable() {
+        HttpRequest request = new HttpRequest(url, "GET", params);
+        getInstance().mClient.execute(request, new HttpRequest.OnResponseListener() {
             @Override
-            public void run() {
+            public void onResponse(AsyncHttpClient client, HttpResponse response) {
+                JSONObject json = response.getContentAsJson();
                 try {
-                    HttpResponse response = getInstance().mClient.execute(new HttpRequest(url, "GET", params));
-                    JSONObject json = response.getContentAsJson();
                     VKUtil.checkErrors(url, json);
+
                     if (listener != null) {
-                        listener.onResponse(null, json);
+                        listener.onSuccess(VKUserConfig.from(json, client_id));
                     }
                 } catch (VKException e) {
                     if (DEBUG) e.printStackTrace();
                     if (listener != null) {
                         listener.onError(e);
                     }
-                } catch (Exception e) {
-                    if (DEBUG) e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(AsyncHttpClient client, HttpResponseCodeException exception) {
+                if (listener != null) {
+                    listener.onError(VKException.from(url, VKErrorCodes.USER_AUTHORIZATION_FAILED, exception));
                 }
             }
         });
+
     }
 
     /**
@@ -255,15 +323,13 @@ public class VKApi {
             return;
         }
         getInstance().mClient.close();
-        VK_SINGLE_EXECUTOR.shutdown();
     }
 
-
     /**
-     * Account it store the necessary data to run the query on behalf of user
+     * Account config it store the necessary data to run the query on behalf of user
      * such as the token, email, api id and user id
      */
-    public static class VKUserAccount {
+    public static class VKUserConfig {
         public static final String ACCESS_TOKEN = "access_token";
         public static final String USER_ID = "user_id";
         public static final String EMAIL = "email";
@@ -285,7 +351,7 @@ public class VKApi {
         public int userId;
 
         /**
-         * Api id of standalone vk app
+         * Api id of standalone vk app, used only by authorization
          */
         public int apiId;
 
@@ -296,7 +362,7 @@ public class VKApi {
          * @param email       the email of current user (not necessarily)
          * @param userId      the user id of current user
          */
-        public VKUserAccount(String accessToken, @Nullable String email, int userId, int apiId) {
+        public VKUserConfig(String accessToken, @Nullable String email, int userId, int apiId) {
             this.accessToken = accessToken;
             this.email = email;
             this.userId = userId;
@@ -306,25 +372,42 @@ public class VKApi {
         /**
          * Empty Constructor
          */
-        public VKUserAccount() {
-
+        public VKUserConfig() {
         }
 
         /**
-         * Create new vk account and restore properties from sd
+         * Create new vk account and restore properties from file on SD Card
          */
-        public VKUserAccount(File file) {
+        public VKUserConfig(File file) {
             this.restore(file);
         }
 
         /**
-         * Create new VKUserAccount from {@link Account}, this is to support
+         * Create new VKUserConfig from {@link Account}, this is to support
          *
          * @param account the old account to get properties (access_token, userId)
-         * @return new VKUserAccount with properties {@link Account}
+         * @return new VKUserConfig with properties from {@link Account}
          */
-        public static VKUserAccount from(Account account) {
-            return new VKUserAccount(account.access_token, null, (int) account.user_id, Integer.parseInt(Account.API_ID));
+        public static VKUserConfig from(Account account) {
+            return new VKUserConfig(account.access_token, null, (int) account.user_id, Integer.parseInt(Account.API_ID));
+        }
+
+        /**
+         * Creates new VKUserConfig {@link JSONObject} source
+         *
+         * @param source the source to get properties
+         * @param apiId  the id of standalone app
+         */
+        public static VKUserConfig from(JSONObject source, int apiId) {
+            if (VKUtil.isEmpty(source)) {
+                return null;
+            }
+            VKUserConfig config = new VKUserConfig();
+            config.accessToken = source.optString(ACCESS_TOKEN);
+            config.userId = source.optInt(USER_ID);
+            config.email = source.optString(EMAIL);
+            config.apiId = apiId;
+            return config;
         }
 
         /**
@@ -338,7 +421,6 @@ public class VKApi {
                 PrefManager.putString(EMAIL, email);
                 PrefManager.putLong(USER_ID, userId);
                 PrefManager.putLong(API_ID, userId);
-
                 return true;
             } catch (Exception e) {
                 if (DEBUG) e.printStackTrace();
@@ -372,7 +454,7 @@ public class VKApi {
          *
          * @return this account
          */
-        public VKUserAccount restore() {
+        public VKUserConfig restore() {
             this.accessToken = PrefManager.getString(ACCESS_TOKEN);
             this.userId = (int) PrefManager.getLong(USER_ID);
             this.apiId = PrefManager.getInt(API_ID);
@@ -385,7 +467,7 @@ public class VKApi {
          *
          * @return this account
          */
-        public VKUserAccount restore(File file) {
+        public VKUserConfig restore(File file) {
             try {
                 String readText = FileUtils.readFileToString(file);
                 JSONObject json = new JSONObject(readText);
@@ -399,6 +481,21 @@ public class VKApi {
                 if (DEBUG) e.printStackTrace();
             }
             return this;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder result = new StringBuilder(64);
+            result.append("UserConfig {\n");
+            result.append(USER_ID).append(" ").append(userId).append(", ");
+            result.append(ACCESS_TOKEN).append(" ").append(accessToken).append(", ");
+            result.append(API_ID).append(" ").append(apiId).append(", ");
+            if (!TextUtils.isEmpty(email)) {
+                result.append(EMAIL).append(" ").append(email).append(", ");
+            }
+            result.append("\n}");
+
+            return result.toString();
         }
 
         /**
@@ -421,9 +518,13 @@ public class VKApi {
 
         /**
          * Returns detailed information on users
-         *
+         * <p/>
          * NOTE: This is an open method; it does not require an access_token
          * http://vk.com/dev/users.get
+         *
+         * @see VKMessageMethodSetter#userIds(int...)
+         * @see VKMessageMethodSetter#fields(String)
+         * @see VKMessageMethodSetter#nameCase(String)
          */
         public VKUserMethodSetter get() {
             return new VKUserMethodSetter(new VKRequest("users.get", new VKParams()));
@@ -431,9 +532,30 @@ public class VKApi {
 
         /**
          * Returns a list of users matching the search criteria
-         *
+         * <p/>
          * NOTE: This method doesn't require any specific rights.
          * http://vk.com/dev/users.search
+         *
+         * @see VKUserSearchMethodSetter#q(String)
+         * @see VKUserSearchMethodSetter#sort(int)
+         * @see VKUserSearchMethodSetter#offset(int)
+         * @see VKUserSearchMethodSetter#count(int)
+         * @see VKMessageMethodSetter#fields(String)
+         * @see VKUserSearchMethodSetter#city(int)
+         * @see VKUserSearchMethodSetter#country(int)
+         * @see VKUserSearchMethodSetter#hometown(int)
+         * @see VKUserSearchMethodSetter#university(int)
+         * @see VKUserSearchMethodSetter#universityCountry(int)
+         * @see VKUserSearchMethodSetter#universityYear(int)
+         * @see VKUserSearchMethodSetter#sex(int)
+         * @see VKUserSearchMethodSetter#status(int)
+         * @see VKUserSearchMethodSetter#ageFrom(int)
+         * @see VKUserSearchMethodSetter#ageTo(int)
+         * @see VKUserSearchMethodSetter#birthDay(int)
+         * @see VKUserSearchMethodSetter#birthMonth(int)
+         * @see VKUserSearchMethodSetter#birthYear(int)
+         * @see VKUserSearchMethodSetter#online(boolean)
+         * @see VKUserSearchMethodSetter#hasPhoto(boolean)
          */
         public VKUserSearchMethodSetter search() {
             return new VKUserSearchMethodSetter(new VKRequest("users.search", new VKParams()));
@@ -441,9 +563,11 @@ public class VKApi {
 
         /**
          * Returns information whether a user installed the application
-         *
+         * <p/>
          * NOTE: This method doesn't require any specific rights
          * http://vk.com/dev/users.isAppUser
+         *
+         * @see VKMethodSetter#userId(int)
          */
         public VKUserMethodSetter isAppUser() {
             return new VKUserMethodSetter(new VKRequest(("users.isAppUser"), new VKParams()));
@@ -451,9 +575,15 @@ public class VKApi {
 
         /**
          * Returns a list of IDs of users and communities followed by the user
-         *
+         * <p/>
          * NOTE: This is an open method; it does not require an access_token.
          * http://vk.com/dev/users.getSubscriptions
+         *
+         * @see VKUserMethodSetter#userId(int)
+         * @see VKUserMethodSetter#offset(int)
+         * @see VKUserMethodSetter#count(int)
+         * @see VKUserMethodSetter#fields(String)
+         * @see VKUserMethodSetter#extended(boolean)
          */
         public VKUserMethodSetter getSubscriptions() {
             return new VKUserMethodSetter(new VKRequest(("users.getSubscriptions"), new VKParams()));
@@ -462,9 +592,15 @@ public class VKApi {
         /**
          * Returns a list of IDs of followers of the user in question,
          * sorted by date added, most recent first.
-         *
+         * <p/>
          * NOTE: This is an open method; it does not require an access_token
          * http://vk.com/dev/users.getFollowers
+         *
+         * @see VKMethodSetter#userId(int)
+         * @see VKMethodSetter#offset(int)
+         * @see VKMethodSetter#count(int)
+         * @see VKMethodSetter#fields(String)
+         * @see VKMethodSetter#nameCase(String)
          */
         public VKUserMethodSetter getFollowers() {
             return new VKUserMethodSetter(new VKRequest(("users.getFollowers"), new VKParams()));
@@ -472,8 +608,12 @@ public class VKApi {
 
         /**
          * Reports (submits a complain about) a user.
-         *
+         * <p/>
          * http://vk.com/dev/users.report
+         *
+         * @see VKMethodSetter#userId(int)
+         * @see VKUserMethodSetter#type(String)
+         * @see VKUserMethodSetter#comment(String)
          */
         public VKUserMethodSetter report() {
             return new VKUserMethodSetter(new VKRequest(("users.report"), new VKParams()));
@@ -482,8 +622,16 @@ public class VKApi {
         /**
          * The index of the current location of the user,
          * and returns a list of users that are near
-         *
+         * <p/>
          * http://vk.com/dev/users.getNearby
+         *
+         * @see VKUserMethodSetter#latitude(float)
+         * @see VKUserMethodSetter#longitude(float)
+         * @see VKUserMethodSetter#accuracy(int)
+         * @see VKUserMethodSetter#timeout(int)
+         * @see VKUserMethodSetter#radius(int)
+         * @see VKMethodSetter#fields(String)
+         * @see VKMethodSetter#nameCase(String)
          */
         public VKUserMethodSetter getNearby() {
             return new VKUserMethodSetter(new VKRequest(("users.getNearby"), new VKParams()));
@@ -502,6 +650,14 @@ public class VKApi {
          * Returns a list of the current user's incoming or outgoing private messages
          * <p/>
          * http://vk.com/dev/messages.get
+         *
+         * @see VKMessageMethodSetter#out(boolean)
+         * @see VKMethodSetter#offset(int)
+         * @see VKMethodSetter#count(int)
+         * @see VKMessageMethodSetter#timeOffset(int)
+         * @see VKMessageMethodSetter#filters(int)
+         * @see VKMessageMethodSetter#previewLength(int)
+         * @see VKMessageMethodSetter#lastMessageId(int)
          */
         public VKMessageMethodSetter get() {
             return new VKMessageMethodSetter(new VKRequest(("messages.get"), new VKParams()));
@@ -511,6 +667,12 @@ public class VKApi {
          * Returns the list of dialogs of the current user
          * <p/>
          * http://vk.com/dev/messages.getDialogs
+         *
+         * @see VKMethodSetter#offset(int)
+         * @see VKMethodSetter#count(int)
+         * @see VKMessageMethodSetter#startMessageId(int)
+         * @see VKMessageMethodSetter#previewLength(int)
+         * @see VKMessageMethodSetter#unread(boolean)
          */
         public VKMessageMethodSetter getDialogs() {
             return new VKMessageMethodSetter(new VKRequest(("messages.getDialogs"), new VKParams()));
@@ -520,6 +682,9 @@ public class VKApi {
          * Returns messages by their IDs
          * <p/>
          * http://vk.com/dev/messages.getById
+         *
+         * @see VKMessageMethodSetter#messageIds(int...)
+         * @see VKMessageMethodSetter#previewLength(int)
          */
         public VKMessageMethodSetter getById() {
             return new VKMessageMethodSetter(new VKRequest(("messages.getById"), new VKParams()));
@@ -761,6 +926,58 @@ public class VKApi {
     }
 
     /**
+     * Api methods for photos
+     * <p/>
+     * http://vk.com/dev/photos
+     */
+    public static class VKPhotos {
+
+        /**
+         * Returns the server address for photo upload in a private message for a user.
+         * When uploaded successfully, the photo can be saved using
+         * the photos.saveMessagesPhoto method.
+         * <p/>
+         * Result:
+         * Returns an object with an upload_url, aid and mid fields.
+         * <p/>
+         * http://vk.com/dev/photos.getMessagesUploadServer
+         */
+        public VKMethodSetter getMessagesUploadServer() {
+            return new VKMethodSetter(new VKRequest("photos.getMessagesUploadServer"));
+        }
+
+        /**
+         * Returns the server address for photo upload onto a user's wall.
+         * When uploaded successfully, the photo can be saved using
+         * the photos.saveWallPhoto method
+         * <p/>
+         * Result:
+         * Returns an object with an upload_url field
+         * <p/>
+         * http://vk.com/dev/photos.getWallUploadServer
+         */
+        public VKMethodSetter getWallUploadServer() {
+            return new VKMethodSetter(new VKRequest("photos.getWallUploadServer"));
+        }
+
+        /**
+         * Saves a photo after being successfully uploaded.
+         * URL obtained with photos.getMessagesUploadServer method
+         *
+         * @param server the server in integer returned when photo upload
+         * @param photo  parameter returned when photo upload to the server
+         */
+        public VKMethodSetter saveMessagesPhoto(int server, String photo, String hash) {
+            VKRequest request = new VKRequest("photos.saveMessagesPhoto");
+            request.params.put(VKConst.SERVER, server);
+            request.params.put(VKConst.PHOTO, photo);
+            request.params.put(VKConst.HASH, hash);
+
+            return new VKMethodSetter(request);
+        }
+    }
+
+    /**
      * Api methods for friends
      * <p/>
      * http://vk.com/dev/friends
@@ -986,6 +1203,12 @@ public class VKApi {
 
     }
 
+    /**
+     * /**
+     * Api methods for account
+     * <p/>
+     * http://vk.com/dev/account
+     */
     public static class VKAccount {
 
 
@@ -1023,9 +1246,9 @@ public class VKApi {
     }
 
     /**
-     * Common setters, e.g. fields, user_ids, offset
+     * Empty setter, does not contain methods
      */
-    public static class VKMethodSetter {
+    public static class VKEmptyMethodSetter {
         protected VKRequest request;
 
         /**
@@ -1033,8 +1256,22 @@ public class VKApi {
          *
          * @param request the request which set params
          */
-        public VKMethodSetter(VKRequest request) {
+        public VKEmptyMethodSetter(VKRequest request) {
             this.request = request;
+        }
+    }
+
+    /**
+     * Common setters, e.g. fields, user_ids, offset
+     */
+    public static class VKMethodSetter extends VKEmptyMethodSetter {
+        /**
+         * Create new VKMethodSetter
+         *
+         * @param request the request which set params
+         */
+        public VKMethodSetter(VKRequest request) {
+            super(request);
         }
 
         /**
@@ -1044,7 +1281,6 @@ public class VKApi {
             this.request.params.put(VKConst.USER_IDS, VKUtil.arrayToString(ids));
             return this;
         }
-
 
         /**
          * User IDs or screen names (screen_name). By default, current user ID.
@@ -1088,6 +1324,14 @@ public class VKApi {
         }
 
         /**
+         * ID of community, e.g. photos.getWallUploadServer
+         */
+        public VKMethodSetter groupId(int groupId) {
+            this.request.params.put(VKConst.GROUP_ID, groupId);
+            return this;
+        }
+
+        /**
          * Profile fields
          */
         public VKMethodSetter fields(String fields) {
@@ -1097,6 +1341,8 @@ public class VKApi {
 
         /**
          * Number of users/messages/audios... to return
+         * NOTE: even when using the offset parameter for information available
+         * only the first 1000 results!
          */
         public VKMethodSetter count(int count) {
             this.request.params.put(VKConst.COUNT, count);
@@ -1158,20 +1404,34 @@ public class VKApi {
         }
 
         /**
-         * Execute request and convert to {@link JSONObject}
+         * Uses a separate config for this request (Access Token)
+         */
+        public VKMethodSetter withConfig(VKUserConfig config) {
+            this.request.params.put(VKConst.ACCESS_TOKEN, config.accessToken);
+            return this;
+        }
+
+        /**
+         * Executes request and convert to {@link JSONObject}
          */
         public JSONObject execute() throws HttpResponseCodeException {
             return this.request.execute();
         }
 
         /**
-         * ASYNC (in new Thread) Execute request and convert to {@link String}
+         * ASYNC (in new Thread) Executes request and convert to {@link String}
          *
          * @param listener callback for a successful.
          *                 Called in main (UI) thread
          */
         public void execute(VKOnResponseListener listener) {
-            new VKAsyncRequestTask(listener).executeOnExecutor(VK_SINGLE_EXECUTOR, request);
+            final VKAsyncRequestTask task = new VKAsyncRequestTask(listener);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                task.executeOnExecutor(VK_SINGLE_EXECUTOR, request);
+            } else {
+                task.execute(request);
+            }
         }
 
     }
@@ -1189,23 +1449,6 @@ public class VKApi {
         public VKUserMethodSetter(VKRequest request) {
             super(request);
         }
-
-        /** Setters for users.get */
-
-        /**
-         * Case for declension of user name and surname:
-         * nom — nominative (default)
-         * gen — genitive
-         * dat — dative
-         * acc — accusative
-         * ins — instrumental
-         * abl — prepositional
-         */
-        public VKUserMethodSetter nameCase(String nameCase) {
-            this.request.params.put(VKConst.NAME_CASE, nameCase);
-            return this;
-        }
-
 
         /** Setters for users.getSubscriptions */
 
@@ -1464,6 +1707,7 @@ public class VKApi {
             return this;
         }
 
+        // to be continued...
     }
 
     /**
@@ -1511,7 +1755,7 @@ public class VKApi {
          * If the 4 flag is set, the 1 and 2 flags are not considered
          */
         public VKMessageMethodSetter filters(int filters) {
-            this.request.params.put(VKConst.FIELDS, filters);
+            this.request.params.put(VKConst.FILTERS, filters);
             return this;
         }
 
@@ -1604,10 +1848,10 @@ public class VKApi {
 
         /**
          * Sort order:
-         * 1 — return messages in chronological order.
-         * 0 — return messages in reverse chronological order
+         * true —  return messages in chronological order (reverse).
+         * false — return messages in reverse chronological order (default)
          */
-        public VKMessageMethodSetter rev(int rev) {
+        public VKMessageMethodSetter rev(boolean rev) {
             this.request.params.put(VKConst.REV, rev);
             return this;
         }
@@ -1665,7 +1909,6 @@ public class VKApi {
         }
 
         /**
-         * (Required if message is not set.)
          * List of objects attached to the message, separated by commas
          */
         public final VKMessageMethodSetter attachment(Collection<String> attachments) {
@@ -1675,7 +1918,6 @@ public class VKApi {
 
 
         /**
-         * (Required if message is not set.)
          * List of objects attached to the message, separated by commas
          */
         public final VKMessageMethodSetter attachment(String... attachments) {
@@ -1684,7 +1926,6 @@ public class VKApi {
         }
 
         /**
-         * (Required if message is not set.)
          * List of objects attached to the message, separated by commas
          */
         public final VKMessageMethodSetter forwardMessages(Collection<String> ids) {
@@ -2178,7 +2419,6 @@ public class VKApi {
         }
     }
 
-
     /**
      * Class for execution and configuration API-requests
      */
@@ -2246,7 +2486,7 @@ public class VKApi {
 
         private String getSignedUrl() {
             if (!params.containsKey(VKConst.ACCESS_TOKEN)) {
-                params.put(VKConst.ACCESS_TOKEN, VKApi.getAccount().accessToken);
+                params.put(VKConst.ACCESS_TOKEN, VKApi.getUserConfig().accessToken);
             }
             if (!params.containsKey(VKConst.VERSION)) {
                 params.put(VKConst.VERSION, API_VERSION);
@@ -2369,7 +2609,7 @@ public class VKApi {
          * @return true of list is null or empty
          */
         public static boolean isEmpty(Collection list) {
-            return list == null || list.isEmpty();
+            return ArrayUtil.isEmpty(list);
         }
 
         /**
@@ -2413,7 +2653,7 @@ public class VKApi {
 
                 throw exception;
             }
-            // probably, if use execute method, http://vk.com/dev/execute
+            // if use execute method, http://vk.com/dev/execute
             if (source.has("execute_errors")) {
                 JSONArray errorsArray = source.optJSONArray("execute_errors");
                 if (errorsArray.length() <= 0) {
@@ -2438,8 +2678,6 @@ public class VKApi {
                 throw exception;
             }
         }
-
-
     }
 
     /**
@@ -2575,7 +2813,7 @@ public class VKApi {
          * 2. The field names must be fully equal to key name from json.
          * 3. Not necessarily, but it is better to use
          * primitive types (int, char) instead of wrappers (Integer, Long).
-         *
+         * <p/>
          * NOTE: So far, this is an experimental feature, may not function properly
          *
          * @param source the json to parse value on object
@@ -2666,7 +2904,6 @@ public class VKApi {
          * @param componentType the component type of array item
          * @param jsonArray     the json array to parse
          * @return instance of array, to set to array field in class
-         *
          * @see Field#getType()
          * @see Class#isArray()
          * @see Class#getComponentType()
@@ -2711,7 +2948,21 @@ public class VKApi {
          * @param source standard VK server response
          */
         public static JSONArray responseArray(JSONObject source) {
-            return source.optJSONArray(VKConst.RESPONSE);
+            if (source.has(VKConst.RESPONSE)) {
+                Object json = source.opt(VKConst.RESPONSE);
+                if (json instanceof JSONObject) {
+                    // response is object: {response: {...}}
+                    source = (JSONObject) json;
+                } else if (json instanceof JSONArray) {
+                    // response is array: {response: [...]}
+                    return ((JSONArray) json);
+                }
+            }
+
+            // items in response: {response: {...
+            // items: [...]
+            // }}
+            return source.optJSONArray(VKConst.ITEMS);
         }
 
         public static <T> T newInstance(Class<T> c) {
@@ -2726,168 +2977,6 @@ public class VKApi {
             }
             return null;
         }
-
-    }
-
-    /**
-     * Constants for api. List is not full
-     */
-    public class VKConst {
-        /** Commons */
-        public static final String RESPONSE = "response";
-        public static final String ITEMS = "items";
-
-        public static final String USER_ID = "user_id";
-        public static final String USER_IDS = "user_ids";
-        public static final String OWNER_ID = "owner_id";
-        public static final String FIELDS = "fields";
-        public static final String SORT = "sort";
-        public static final String OFFSET = "offset";
-        public static final String COUNT = "count";
-
-        /** Auth */
-        public static final String VERSION = "v";
-        public static final String HTTPS = "https";
-        public static final String LANG = "lang";
-        public static final String ACCESS_TOKEN = "access_token";
-        public static final String SIG = "sig";
-
-        /** Get users */
-        public static final String NAME_CASE = "name_case";
-
-        /** Messages */
-        public static final String MESSAGE_IDS = "message_ids";
-        public static final String MESSAGE_ID = "message_id";
-        public static final String IMPORTANT = "important";
-        public static final String OUT = "out";
-        public static final String TIME_OFFSET = "time_offset";
-        public static final String FILTERS = "filters";
-        public static final String LAST_MESSAGE_ID = "last_message_id";
-        public static final String START_MESSAGE_ID = "start_message_id";
-        public static final String PREVIEW_LENGTH = "preview_length";
-        public static final String UNREAD = "unread";
-        public static final String PEER_ID = "peer_id";
-        public static final String DOMAIN = "domain";
-        public static final String CHAT_ID = "chat_id";
-        public static final String GUID = "guid";
-        public static final String ATTACHMENT = "attachment";
-        public static final String FORWARD_MESSAGES = "forward_messages";
-        public static final String STICKER_ID = "sticker_id";
-        public static final String USE_SSL = "use_ssl";
-        public static final String NEED_PTS = "need_pts";
-        public static final String TS = "ts";
-        public static final String PTS = "pts";
-        public static final String ONLINES = "onlines";
-        public static final String MSGS_LIMIT = "msgs_limit";
-        public static final String MAX_MSG_ID = "max_msg_id";
-        public static final String TITLE = "title";
-        public static final String MEDIA_TYPE = "media_type";
-
-        /** Media types for attachments */
-        public static final String MEDIA_TYPE_AUDIO = "audio";
-        public static final String MEDIA_TYPE_VIDEO = "video";
-        public static final String MEDIA_TYPE_PHOTO = "photo";
-        public static final String MEDIA_TYPE_LINK = "link";
-        public static final String MEDIA_TYPE_DOC = "photo";
-
-        /** Friends */
-        public static final String LIST_ID = "list_id";
-        public static final String LIST_IDS = "list_ids";
-        public static final String SOURCE_UID = "source_uid";
-        public static final String TARGET_UID = "target_uid";
-        public static final String TARGET_UIDS = "target_uids";
-        public static final String NEED_MUTUAL = "need_mutual";
-        public static final String NEED_VIEWED = "need_viewed";
-        public static final String SUGGESTED = "suggested";
-        public static final String TEXT = "text";
-        public static final String RETURN_SYSTEM = "return_system";
-        public static final String NAME = "name";
-        public static final String ADD_USER_IDS = "add_user_ids";
-        public static final String DELETE_USER_IDS = "delete_user_ids";
-        public static final String PHONES = "phones";
-        public static final String FILTER = "filter";
-
-        /** Get subscriptions */
-        public static final String EXTENDED = "extended";
-
-        /** Report users */
-        public static final String TYPE = "type";
-        public static final String COMMENT = "comment";
-
-        /** Get nearby users */
-        public static final String LATITUDE = "latitude";
-        public static final String LONGITUDE = "longitude";
-        public static final String ACCURACY = "accuracy";
-        public static final String TIMEOUT = "timeout";
-        public static final String RADIUS = "timeout";
-
-        /** Search */
-        public static final String Q = "q";
-        public static final String CITY = "city";
-        public static final String COUNTRY = "country";
-        public static final String HOMETOWN = "hometown";
-        public static final String UNIVERSITY_COUNTRY = "university_country";
-        public static final String UNIVERSITY = "university";
-        public static final String UNIVERSITY_YEAR = "university_year";
-        public static final String SEX = "sex";
-        public static final String STATUS = "status";
-        public static final String AGE_FROM = "age_from";
-        public static final String AGE_TO = "age_to";
-        public static final String BIRTH_DAY = "birth_day";
-        public static final String BIRTH_MONTH = "birth_month";
-        public static final String BIRTH_YEAR = "birth_year";
-        public static final String ONLINE = "online";
-        public static final String ONLINE_MOBUILE = "online_mobile";
-        public static final String HAS_PHOTO = "has_photo";
-        public static final String SCHOOL_COUNTRY = "school_country";
-        public static final String SCHOOL_CITY = "school_city";
-        public static final String SCHOOL = "school";
-        public static final String SCHOOL_YEAR = "school_year";
-        public static final String RELIGION = "religion";
-        public static final String INTERESTS = "interests";
-        public static final String COMPANY = "company";
-        public static final String POSITION = "position";
-        public static final String GROUP_ID = "group_id";
-
-        public static final String FRIENDS_ONLY = "friends_only";
-        public static final String FROM_GROUP = "from_group";
-        public static final String MESSAGE = "message";
-        public static final String ATTACHMENTS = "attachments";
-        public static final String SERVICES = "services";
-        public static final String SIGNED = "signed";
-        public static final String PUBLISH_DATE = "publish_date";
-        public static final String LAT = "lat";
-        public static final String LONG = "long";
-        public static final String PLACE_ID = "place_id";
-        public static final String POST_ID = "post_id";
-        public static final String POSTS = "posts";
-
-        /** Errors */
-        public static final String ERROR_CODE = "error_code";
-        public static final String ERROR_MSG = "error_msg";
-        public static final String REQUEST_PARAMS = "request_params";
-
-        /** Captcha */
-        public static final String CAPTCHA_IMG = "captcha_img";
-        public static final String CAPTCHA_SID = "captcha_sid";
-        public static final String CAPTCHA_KEY = "captcha_key";
-        public static final String REDIRECT_URI = "redirect_uri";
-
-        /** Photos */
-        public static final String PHOTO = "photo";
-        public static final String PHOTOS = "photos";
-        public static final String ALBUM_ID = "album_id";
-        public static final String PHOTO_IDS = "photo_ids";
-        public static final String PHOTO_SIZES = "photo_sizes";
-        public static final String REV = "rev";
-        public static final String FEED_TYPE = "feed_type";
-        public static final String FEED = "feed";
-
-        /** Videos */
-        public static final String ADULT = "adult";
-
-        /** Others */
-        public static final String CODE = "code";
 
     }
 
@@ -2955,7 +3044,7 @@ public class VKApi {
      * Thrown when server vk could not handle the request
      * see website to get description of error codes: http://vk.com/dev/errors
      * <p/>
-     * Check {@link VKErrorCodes} for get descriptions of error codes
+     * Check {@link VKErrorCodes} to get descriptions of error codes
      */
     public static class VKException extends HttpResponseCodeException {
         public String url;
@@ -2976,7 +3065,7 @@ public class VKApi {
         public String captchaImg;
 
         /**
-         * In some cases, Vkontakte requires passing a validation procedure of the user,
+         * In some cases, VK requires passing a validation procedure of the user,
          * resulting in since version 5.0 API
          * (for older versions will be prompted captcha_error)
          * any request to API the following error is returned
@@ -2985,11 +3074,30 @@ public class VKApi {
          */
         public String redirectUri;
 
+        /**
+         * Constructs a new {@code VKException}
+         *
+         * @param url          the url of executed request
+         * @param errorMessage the detail error message for this exception
+         * @param errorCode    the error code
+         */
         public VKException(String url, String errorMessage, int errorCode) {
             super(errorMessage, errorCode);
             this.url = url;
             this.errorMessage = errorMessage;
             this.errorCode = errorCode;
+        }
+
+        public static VKException from(String url, int errorCode, Exception e) {
+            if (e instanceof VKException) {
+                return (VKException) e;
+            }
+
+            if (e == null || TextUtils.isEmpty(url)) {
+                return null;
+            }
+
+            return new VKException(url, e.getMessage(), errorCode);
         }
     }
 
@@ -2998,10 +3106,6 @@ public class VKApi {
      * See website http://vk.com/dev/errors
      */
     public static class VKErrorCodes {
-        private VKErrorCodes() {
-            // empty
-        }
-
         /**
          * Unknown error occurred
          */
@@ -3130,12 +3234,238 @@ public class VKApi {
          * You have no access to operations specified with given object(s)
          */
         public static final int PERMISSION_DENIED = 600;
-
         /**
          * Message errors
          */
         public static final int CANNOT_SEND_MESSAGE_BLACK_LIST = 900;
         public static final int CANNOT_SEND_MESSAGE_GROUP = 901;
+        private VKErrorCodes() {
+            // empty
+        }
+
+    }
+
+    /**
+     * IDs of messaging apps
+     */
+    public static class VKIdentifiers {
+        /**
+         * Official clients
+         */
+        public static final int ANDROID_OFFICIAL = 2274003;
+        public static final int IPHONE_OFFICIAL = 3140623;
+        public static final int IPAD_OFFICIAL = 3682744;
+        public static final int WP_OFFICIAL = 3502557;
+        public static final int WINDOWS_OFFICIAL = 3697615;
+
+        /**
+         * Unofficial client, mods and messengers
+         */
+        public static final int KATE_MODILE = 2685278;
+        public static final int EUPHORIA = 4510232;
+        public static final int LYNT = 3469984;
+        public static final int SWEET = 4856309;
+        public static final int AMBERFOG = 4445970;
+        public static final int PHOENIX = 4994316;
+        public static final int MESSENGER = 4894723;
+        public static final int ZEUS = 4831060;
+        public static final int ROCKET = 4757672;
+        public static final int VK_MD = 4967124;
+
+    }
+
+    /**
+     * Constants for api. List is not full
+     */
+    public class VKConst {
+        public static final String ITEMS = "items";
+        public static final String USER_ID = "user_id";
+
+        /**
+         * Commons
+         */
+        public static final String RESPONSE = "response";
+        public static final String USER_IDS = "user_ids";
+        public static final String OWNER_ID = "owner_id";
+        public static final String FIELDS = "fields";
+        public static final String SORT = "sort";
+        public static final String OFFSET = "offset";
+        public static final String COUNT = "count";
+        public static final String UPLOAD_URL = "upload_url";
+        public static final String SERVER = "server";
+
+        /**
+         * Auth
+         */
+        public static final String VERSION = "v";
+        public static final String HTTPS = "https";
+        public static final String LANG = "lang";
+        public static final String ACCESS_TOKEN = "access_token";
+        public static final String SIG = "sig";
+
+        /**
+         * Get users
+         */
+        public static final String NAME_CASE = "name_case";
+
+        /**
+         * Messages
+         */
+        public static final String MESSAGE_IDS = "message_ids";
+        public static final String MESSAGE_ID = "message_id";
+        public static final String IMPORTANT = "important";
+        public static final String OUT = "out";
+        public static final String TIME_OFFSET = "time_offset";
+        public static final String FILTERS = "filters";
+        public static final String LAST_MESSAGE_ID = "last_message_id";
+        public static final String START_MESSAGE_ID = "start_message_id";
+        public static final String PREVIEW_LENGTH = "preview_length";
+        public static final String UNREAD = "unread";
+        public static final String PEER_ID = "peer_id";
+        public static final String DOMAIN = "domain";
+        public static final String CHAT_ID = "chat_id";
+        public static final String GUID = "guid";
+        public static final String ATTACHMENT = "attachment";
+        public static final String FORWARD_MESSAGES = "forward_messages";
+        public static final String STICKER_ID = "sticker_id";
+        public static final String USE_SSL = "use_ssl";
+        public static final String NEED_PTS = "need_pts";
+        public static final String TS = "ts";
+        public static final String PTS = "pts";
+        public static final String ONLINES = "onlines";
+        public static final String MSGS_LIMIT = "msgs_limit";
+        public static final String MAX_MSG_ID = "max_msg_id";
+        public static final String TITLE = "title";
+        public static final String MEDIA_TYPE = "media_type";
+
+        /**
+         * Media types for attachments
+         */
+        public static final String MEDIA_TYPE_AUDIO = "audio";
+        public static final String MEDIA_TYPE_VIDEO = "video";
+        public static final String MEDIA_TYPE_PHOTO = "photo";
+        public static final String MEDIA_TYPE_LINK = "link";
+        public static final String MEDIA_TYPE_DOC = "photo";
+
+        /**
+         * Friends
+         */
+        public static final String LIST_ID = "list_id";
+        public static final String LIST_IDS = "list_ids";
+        public static final String SOURCE_UID = "source_uid";
+        public static final String TARGET_UID = "target_uid";
+        public static final String TARGET_UIDS = "target_uids";
+        public static final String NEED_MUTUAL = "need_mutual";
+        public static final String NEED_VIEWED = "need_viewed";
+        public static final String SUGGESTED = "suggested";
+        public static final String TEXT = "text";
+        public static final String RETURN_SYSTEM = "return_system";
+        public static final String NAME = "name";
+        public static final String ADD_USER_IDS = "add_user_ids";
+        public static final String DELETE_USER_IDS = "delete_user_ids";
+        public static final String PHONES = "phones";
+        public static final String FILTER = "filter";
+
+        /**
+         * Get subscriptions
+         */
+        public static final String EXTENDED = "extended";
+
+        /**
+         * Report users
+         */
+        public static final String TYPE = "type";
+        public static final String COMMENT = "comment";
+
+        /**
+         * Get nearby users
+         */
+        public static final String LATITUDE = "latitude";
+        public static final String LONGITUDE = "longitude";
+        public static final String ACCURACY = "accuracy";
+        public static final String TIMEOUT = "timeout";
+        public static final String RADIUS = "timeout";
+
+        /**
+         * Search
+         */
+        public static final String Q = "q";
+        public static final String CITY = "city";
+        public static final String COUNTRY = "country";
+        public static final String HOMETOWN = "hometown";
+        public static final String UNIVERSITY_COUNTRY = "university_country";
+        public static final String UNIVERSITY = "university";
+        public static final String UNIVERSITY_YEAR = "university_year";
+        public static final String SEX = "sex";
+        public static final String STATUS = "status";
+        public static final String AGE_FROM = "age_from";
+        public static final String AGE_TO = "age_to";
+        public static final String BIRTH_DAY = "birth_day";
+        public static final String BIRTH_MONTH = "birth_month";
+        public static final String BIRTH_YEAR = "birth_year";
+        public static final String ONLINE = "online";
+        public static final String ONLINE_MOBUILE = "online_mobile";
+        public static final String HAS_PHOTO = "has_photo";
+        public static final String SCHOOL_COUNTRY = "school_country";
+        public static final String SCHOOL_CITY = "school_city";
+        public static final String SCHOOL = "school";
+        public static final String SCHOOL_YEAR = "school_year";
+        public static final String RELIGION = "religion";
+        public static final String INTERESTS = "interests";
+        public static final String COMPANY = "company";
+        public static final String POSITION = "position";
+        public static final String GROUP_ID = "group_id";
+
+        public static final String FRIENDS_ONLY = "friends_only";
+        public static final String FROM_GROUP = "from_group";
+        public static final String MESSAGE = "message";
+        public static final String ATTACHMENTS = "attachments";
+        public static final String SERVICES = "services";
+        public static final String SIGNED = "signed";
+        public static final String PUBLISH_DATE = "publish_date";
+        public static final String LAT = "lat";
+        public static final String LONG = "long";
+        public static final String PLACE_ID = "place_id";
+        public static final String POST_ID = "post_id";
+        public static final String POSTS = "posts";
+
+        /**
+         * Errors
+         */
+        public static final String ERROR_CODE = "error_code";
+        public static final String ERROR_MSG = "error_msg";
+        public static final String REQUEST_PARAMS = "request_params";
+
+        /**
+         * Captcha
+         */
+        public static final String CAPTCHA_IMG = "captcha_img";
+        public static final String CAPTCHA_SID = "captcha_sid";
+        public static final String CAPTCHA_KEY = "captcha_key";
+        public static final String REDIRECT_URI = "redirect_uri";
+
+        /**
+         * Photos
+         */
+        public static final String PHOTO = "photo";
+        public static final String PHOTOS = "photos";
+        public static final String ALBUM_ID = "album_id";
+        public static final String PHOTO_IDS = "photo_ids";
+        public static final String PHOTO_SIZES = "photo_sizes";
+        public static final String REV = "rev";
+        public static final String FEED_TYPE = "feed_type";
+        public static final String FEED = "feed";
+
+        /**
+         * Videos
+         */
+        public static final String ADULT = "adult";
+
+        /**
+         * Others
+         */
+        public static final String CODE = "code";
+        public static final String HASH = "hash";
 
     }
 
@@ -3253,6 +3583,289 @@ public class VKApi {
     }
 
     /**
+     * Base class for upload files to server.
+     * Files (photos, audios, videos or documents) are uploaded in several steps:
+     * receiving of URL for uploading {@link #getUploadServer()},
+     * transfer of uploaded files content to the received URL
+     * (note: files shall be transferred in multipart/form-data format)
+     * and saving of information received after uploading
+     * {@link #getSaveRequest(JSONObject)}.
+     * <p/>
+     * <p/>See for more information: https://vk.com/dev/upload_files
+     *
+     * @param <E> the element of upload response object,
+     *            used by {@link VKUploader#getSaveRequest(JSONObject)}
+     * @see VKMessageUploader
+     * @see VKDocUploader
+     */
+    public static abstract class VKUploader<E> {
+        /**
+         * Media types
+         */
+        public static final int TYPE_DOC = 0;   // file
+        public static final int TYPE_PHOTO = 1; // photo
+        public static final int TYPE_VIDEO = 2; // video_file
+        public static final int TYPE_AUDIO = 3; // file
+        protected String mBoundary;
+        protected int mType;
+        private VKOnProgressListener mListener;
+
+        /**
+         * Creates a new VKUploader with type
+         *
+         * @param type the type of the uploaded file (photo, file)
+         */
+        public VKUploader(int type) {
+            this.mBoundary = Long.toHexString(System.currentTimeMillis());
+            this.mType = type;
+        }
+
+        protected static String getMimeType(String url) {
+            String type = null;
+            String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+            if (extension != null) {
+                MimeTypeMap mime = MimeTypeMap.getSingleton();
+                type = mime.getMimeTypeFromExtension(extension);
+            }
+            return type;
+        }
+
+        public Pair<String, String> getContentType() {
+            return new Pair<>("Content-Type", String.format("multipart/form-data; boundary=%s", mBoundary));
+        }
+
+        protected String getFileDescription(File uploadFile) {
+            String fileName = "file";
+            switch (mType) {
+                case TYPE_DOC:
+                    fileName = "file";
+                    break;
+                case TYPE_AUDIO:
+                    fileName = "file";
+                    break;
+
+                case TYPE_PHOTO:
+                    fileName = "photo";
+                    break;
+                case TYPE_VIDEO:
+                    fileName = "video_file";
+                    break;
+            }
+
+            String extension = MimeTypeMap.getFileExtensionFromUrl(uploadFile.getAbsolutePath());
+            return String.format("\r\n--%s\r\n", mBoundary) +
+                    String.format("Content-Disposition: form-data; name=\"%s\"; filename=\"%s.%s\"\r\n", fileName, fileName, extension) +
+                    String.format("Content-Type: %s\r\n\r\n", getMimeType(uploadFile.getAbsolutePath()));
+        }
+
+        private String getBoundaryEnd() {
+            return String.format("\r\n--%s--\r\n", mBoundary);
+        }
+
+        /**
+         * Uploads file to server
+         *
+         * @param file     the file to upload
+         * @param listener the callback that will run on progress change
+         *                 listener called on UI Thread
+         */
+        public E uploadFile(File file, VKOnProgressListener listener) {
+            Log.i(TAG, "Starting upload file: " + file.getName());
+            this.mListener = listener;
+            try {
+                HttpRequest request = new HttpRequest(getUploadServer(), "POST", null, new VKHttpEntry(file));
+                HttpResponse response = getInstance().mClient.execute(request);
+                return getSaveRequest(response.getContentAsJson());
+            } catch (HttpResponseCodeException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        /**
+         * Returns a server address to upload file
+         */
+        protected abstract String getUploadServer();
+
+        /**
+         * After successful upload You can save the file using this method
+         *
+         * @param response the response for successful uploading
+         */
+        protected abstract E getSaveRequest(JSONObject response);
+
+        /**
+         * Class used for build upload multipart data for VK servers
+         */
+        private class VKHttpEntry extends HttpEntity {
+
+            /**
+             * Creates a new HttpEntity with file
+             *
+             * @param file the file for upload to server
+             */
+            public VKHttpEntry(File file) {
+                super(file);
+            }
+
+            @Override
+            public String getContentType() {
+                return VKUploader.this.getContentType().second;
+            }
+
+
+            @Override
+            protected void writeTo(OutputStream os) {
+                if (mListener != null) {
+                    AndroidUtils.runOnUi(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.onStart(getFile());
+                        }
+                    });
+                }
+                FileInputStream fis = null;
+                try {
+                    File uploadFile = getFile();
+                    os.write(getFileDescription(uploadFile).getBytes("UTF-8"));
+
+                    fis = new FileInputStream(uploadFile);
+                    long length = getContentLength();
+                    byte[] buffer = new byte[8192];
+                    int read;
+                    int progress = 0;
+                    while ((read = fis.read(buffer)) != -1) {
+                        os.write(buffer, 0, read);
+                        progress += read;
+
+                        if (mListener != null && length != -1) {
+                            updateProgress(buffer, (int) (progress * 100 / length), length);
+                        }
+                    }
+
+                    os.write(getBoundaryEnd().getBytes("UTF-8"));
+                    updateProgress(buffer, 100, length);
+                    buffer = null;
+
+                    if (mListener != null) {
+                        onSuccess();
+                    }
+                } catch (Exception e) {
+                    if (DEBUG) e.printStackTrace();
+                } finally {
+                    IOUtils.closeQuietly(fis);
+                }
+            }
+
+            private void updateProgress(final byte[] buffer, final int progress, final long total) {
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onProgress(buffer, progress, total);
+                    }
+                });
+            }
+
+            private void onSuccess() {
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onSuccess();
+                    }
+                });
+            }
+
+            @Override
+            public long getContentLength() {
+                try {
+                    return getFile().length() +
+                            getFileDescription(getFile()).getBytes("UTF-8").length +
+                            getBoundaryEnd().getBytes("UTF-8").length;
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                return -1;
+            }
+        }
+    }
+
+    /**
+     * Photo uploader in a private message
+     */
+    public static class VKMessageUploader extends VKUploader<VKPhoto> {
+        /**
+         * Creates a new VKUploader with type
+         */
+        public VKMessageUploader() {
+            super(TYPE_PHOTO);
+        }
+
+        @Override
+        protected String getUploadServer() {
+            try {
+                return VKApi.photos().getMessagesUploadServer()
+                        .execute()
+                        .optJSONObject(VKConst.RESPONSE)
+                        .optString(VKConst.UPLOAD_URL);
+//                return Api.get().getPhotoMessageUploadServer();
+            } catch (Exception e) {
+                if (DEBUG) e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected VKPhoto getSaveRequest(JSONObject response) {
+            try {
+                JSONObject photosResponse = VKApi.photos()
+                        .saveMessagesPhoto(response.optInt("server"),
+                                response.optString("photo"),
+                                response.optString("hash")).execute();
+                return VKPhoto.parsePhotos(VKJsonParser.responseArray(photosResponse)).get(0);
+
+//                return Api.get().saveMessagesPhoto(String.valueOf(response.optInt("server")), response.optString(VKConst.PHOTO), response.optString("hash")).get(0);
+            } catch (Exception e) {
+                if (DEBUG) e.printStackTrace();
+            }
+            return null;
+        }
+
+    }
+
+    /**
+     * Document uploader in your section "Docs"
+     */
+    public static class VKDocUploader extends VKUploader<VKDocument> {
+
+        /**
+         * Creates a new VKUploader with type
+         */
+        public VKDocUploader() {
+            super(VKUploader.TYPE_DOC);
+        }
+
+        @Override
+        protected String getUploadServer() {
+            try {
+                return Api.get().getDocsUploadServer();
+            } catch (Exception e) {
+                if (DEBUG) e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected VKDocument getSaveRequest(JSONObject response) {
+            try {
+                return Api.get().saveDoc(response.optString("file"));
+            } catch (Exception e) {
+                if (DEBUG) e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    /**
      * The response handler, auto parse models
      *
      * @param <E> the class type of object for result
@@ -3279,6 +3892,56 @@ public class VKApi {
     }
 
     /**
+     * Callback for user direct authorization
+     *
+     * @see #authorization(String, String, VKOnAuthorizationListener)
+     */
+    public interface VKOnAuthorizationListener {
+        /**
+         * Called when user authorization is successful
+         *
+         * @param newConfig the authorized user config.
+         *                  contains: access_token, user_id and email
+         */
+        void onSuccess(VKUserConfig newConfig);
+
+        /**
+         * Called when authorization is failed. e.g. captcha needed
+         *
+         * @param e the details info of error
+         */
+        void onError(VKException e);
+    }
+
+    /**
+     * Callback for listen current progress of uploaded file
+     * Used by {@link VKUploader}
+     */
+    public interface VKOnProgressListener {
+        /**
+         * Called before is started uploading file to the server, for example,
+         * we can show notification
+         *
+         * @param file the file for upload into vk server
+         */
+        void onStart(File file);
+
+        /**
+         * Called when progress level has changed
+         *
+         * @param buffer    intermediate buffer data, which are uploading at moment
+         * @param progress  current progress in percent, range [0...100]
+         * @param totalSize the total length of uploading data in bytes
+         */
+        void onProgress(byte[] buffer, int progress, long totalSize);
+
+        /**
+         * Called after a successful file upload and save on the server
+         */
+        void onSuccess();
+    }
+
+    /**
      * Callback for Async execute
      */
     public interface VKOnResponseListener {
@@ -3292,13 +3955,11 @@ public class VKApi {
 
         /**
          * Called when an error occurs on the server side
-         * <p/>
          * Visit website to get description of error codes: http://vk.com/dev/errors
          * and {@link VKErrorCodes}
          * It is useful if the server requires you to enter a captcha
          *
-         * @param exception the information of error, e.g.
-         *                  errorMessage, errorCode.
+         * @param exception the information of error
          */
         void onError(VKException exception);
     }

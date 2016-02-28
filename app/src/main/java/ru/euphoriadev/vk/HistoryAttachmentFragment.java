@@ -13,25 +13,21 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import ru.euphoriadev.vk.adapter.AudioAdapter;
-import ru.euphoriadev.vk.adapter.BaseArrayAdapter;
 import ru.euphoriadev.vk.adapter.DocsAdapter;
 import ru.euphoriadev.vk.adapter.MaterialsPageAdapter;
 import ru.euphoriadev.vk.adapter.PhotosRecyclerAdapter;
 import ru.euphoriadev.vk.adapter.VideosAdapter;
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.model.VKAttachment;
 import ru.euphoriadev.vk.api.model.VKAudio;
 import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.api.model.VKMessageAttachment;
 import ru.euphoriadev.vk.api.model.VKPhoto;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ArrayUtil;
-import ru.euphoriadev.vk.util.ThreadExecutor;
-import ru.euphoriadev.vk.vkapi.VKApi;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by user on 17.02.16.
@@ -47,6 +43,18 @@ public class HistoryAttachmentFragment extends Fragment {
 
     RecyclerView recyclerView;
     PhotosRecyclerAdapter photoAdapter;
+
+    public static HistoryAttachmentFragment newInstance(int chat_id, int user_id, int position) {
+
+        Bundle args = new Bundle();
+        args.putInt("chat_id", chat_id);
+        args.putInt("user_id", user_id);
+        args.putInt("position", position);
+
+        HistoryAttachmentFragment fragment = new HistoryAttachmentFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -66,18 +74,6 @@ public class HistoryAttachmentFragment extends Fragment {
 
         loadAttachments();
         return rootView;
-    }
-
-    public static HistoryAttachmentFragment newInstance(int chat_id, int user_id, int position) {
-
-        Bundle args = new Bundle();
-        args.putInt("chat_id", chat_id);
-        args.putInt("user_id", user_id);
-        args.putInt("position", position);
-
-        HistoryAttachmentFragment fragment = new HistoryAttachmentFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     public void setPhotoAdapter(PhotosRecyclerAdapter adapter) {
@@ -118,25 +114,29 @@ public class HistoryAttachmentFragment extends Fragment {
                                 if (photos == null) {
                                     photos = new ArrayList<>(attachments.size());
                                 }
-                                photos.add(messageAttachment.photo); break;
+                                photos.add(messageAttachment.photo);
+                                break;
 
                             case MaterialsPageAdapter.POSITION_VIDEO:
                                 if (videos == null) {
                                     videos = new ArrayList<>(attachments.size());
                                 }
-                                videos.add(new VideosAdapter.VideoItem(VKUser.EMPTY_USER, messageAttachment.video)); break;
+                                videos.add(new VideosAdapter.VideoItem(VKUser.EMPTY_USER, messageAttachment.video));
+                                break;
 
                             case MaterialsPageAdapter.POSITION_AUDIO:
                                 if (audios == null) {
                                     audios = new ArrayList<>(attachments.size());
                                 }
-                                audios.add(messageAttachment.audio); break;
+                                audios.add(messageAttachment.audio);
+                                break;
 
                             case MaterialsPageAdapter.POSITION_DOC:
                                 if (docs == null) {
                                     docs = new ArrayList<>(attachments.size());
                                 }
-                                docs.add(messageAttachment.doc); break;
+                                docs.add(messageAttachment.doc);
+                                break;
                         }
                     }
 
@@ -152,13 +152,16 @@ public class HistoryAttachmentFragment extends Fragment {
                             } else {
                                 switch (position) {
                                     case MaterialsPageAdapter.POSITION_VIDEO:
-                                        setAdapter(new VideosAdapter(getActivity(), finalVideos)); break;
+                                        setAdapter(new VideosAdapter(getActivity(), finalVideos));
+                                        break;
 
                                     case MaterialsPageAdapter.POSITION_AUDIO:
-                                        setAdapter(new AudioAdapter(getActivity(), finalAudios)); break;
+                                        setAdapter(new AudioAdapter(getActivity(), finalAudios));
+                                        break;
 
                                     case MaterialsPageAdapter.POSITION_DOC:
-                                        setAdapter(new DocsAdapter(getActivity(), finalDocs)); break;
+                                        setAdapter(new DocsAdapter(getActivity(), finalDocs));
+                                        break;
                                 }
                             }
                         }

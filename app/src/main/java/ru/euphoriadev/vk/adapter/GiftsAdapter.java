@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 
 /**
  * Created by user on 24.07.15.

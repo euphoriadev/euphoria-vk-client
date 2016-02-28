@@ -3,8 +3,10 @@ package ru.euphoriadev.vk;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;
@@ -18,30 +20,6 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 public class PhotoViewerActivity extends BaseThemedActivity {
     public static final String PHOTO_URL = "photo_url";
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        final ImageView imageView = new ImageView(this);
-        imageView.setBackgroundColor(Color.BLACK);
-        setContentView(imageView);
-
-        String url = getIntent().getStringExtra(PHOTO_URL);
-        if (!TextUtils.isEmpty(url)) {
-            Picasso.with(this).load(url).into(imageView, new Callback() {
-                @Override
-                public void onSuccess() {
-                    new PhotoViewAttacher(imageView);
-                }
-
-                @Override
-                public void onError() {
-
-                }
-            });
-        }
-    }
 
     public static void start(Context context, String url) {
         Intent starter = new Intent(context, PhotoViewerActivity.class);
@@ -64,5 +42,33 @@ public class PhotoViewerActivity extends BaseThemedActivity {
             }
         }
         start(context, url);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+
+        final ImageView imageView = new ImageView(this);
+        imageView.setBackgroundColor(Color.BLACK);
+        setContentView(imageView);
+
+        String url = getIntent().getStringExtra(PHOTO_URL);
+        if (!TextUtils.isEmpty(url)) {
+            Picasso.with(this).load(url).into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    new PhotoViewAttacher(imageView);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
     }
 }

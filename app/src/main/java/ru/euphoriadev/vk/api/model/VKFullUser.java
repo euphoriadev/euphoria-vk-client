@@ -55,8 +55,8 @@ public class VKFullUser implements Serializable {
      * URL необрезанной фотографии формата 400х400
      */
     public String photo_400_orig;
- //   public long city;
- //   public Integer country = null;
+    //   public long city;
+    //   public Integer country = null;
     public Integer timezone = null;
     public String lists;
     public String domain;

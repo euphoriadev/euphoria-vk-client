@@ -1,4 +1,4 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.common;
 
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -6,7 +6,7 @@ import android.os.Build;
 /**
  * Created by Igor on 13.01.16.
  * <p/>
- * Simple updater of Preferences
+ * Simple updater/changer of Preferences
  */
 public class PrefManager {
     /** Default values */
@@ -159,7 +159,7 @@ public class PrefManager {
     }
 
     /**
-     * Apply changes to Preferences.
+     * Apply changes to Preferences on this editor.
      * If build version < 9 - use old method {@link SharedPreferences.Editor#commit()}
      */
     private static void apply() {
@@ -170,7 +170,7 @@ public class PrefManager {
      * Apply changes to Preferences.
      * If build version < 9 - uses old method {@link SharedPreferences.Editor#commit()}
      *
-     * @param editor the editor to apply preferences
+     * @param editor the editor to apply preferences changes
      */
     public static void apply(SharedPreferences.Editor editor) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {

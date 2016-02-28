@@ -6,10 +6,10 @@ import org.json.JSONObject;
 import ru.euphoriadev.vk.api.Api;
 
 public class PhotoTag {
-    
+
     public Long owner_id;
     public long pid;
-    
+
     public long uid;
     public long tag_id;
     public long placer_id;
@@ -34,11 +34,11 @@ public class PhotoTag {
         this.x2 = x2;
         this.y2 = y2;
     }
-    
+
     public static PhotoTag parse(JSONObject o) throws NumberFormatException, JSONException {
         PhotoTag t = new PhotoTag();
         //Баг в API - должно быть user_id - уже исправлен, оставил старое пока для подстраховки, можно удалить уже
-        if(o.has("user_id"))
+        if (o.has("user_id"))
             t.uid = o.getLong("user_id");
         else
             t.uid = o.getLong("photo_id");

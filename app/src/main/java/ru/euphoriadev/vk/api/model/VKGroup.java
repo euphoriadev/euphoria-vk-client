@@ -39,6 +39,7 @@ public class VKGroup implements Serializable {
 
     /**
      * Rights of the user
+     *
      * @see ru.euphoriadev.vk.api.model.VKGroup.AdminLevel
      */
     public int admin_level;
@@ -84,11 +85,9 @@ public class VKGroup implements Serializable {
     public String status;
 
     /**
-     *
      * information from the block contacts public pages
      */
     public ArrayList<Contact> contacts = new ArrayList<>();
-
 
 
     public static VKGroup parse(JSONObject sourse) {
@@ -103,9 +102,15 @@ public class VKGroup implements Serializable {
 
         String type = sourse.optString("type", "group");
         switch (type) {
-            case "group": community.type = Type.GROUP; break;
-            case "page": community.type = Type.PAGE; break;
-            case "event": community.type = Type.EVENT; break;
+            case "group":
+                community.type = Type.GROUP;
+                break;
+            case "page":
+                community.type = Type.PAGE;
+                break;
+            case "event":
+                community.type = Type.EVENT;
+                break;
         }
 
         community.photo_50 = sourse.optString("photo_50");
@@ -137,20 +142,22 @@ public class VKGroup implements Serializable {
 
 
     public static class AdminLevel {
-        private AdminLevel() {}
         public final static int MODERATOR = 1;
         public final static int EDITOR = 2;
         public final static int ADMIN = 3;
+        private AdminLevel() {
+        }
     }
 
     /**
      * status of the group.
      */
     public static class Status {
-        private Status() {}
         public final static int OPEN = 0;
         public final static int CLOSED = 1;
         public final static int PRIVATE = 2;
+        private Status() {
+        }
 
 //        public final static String BANNED = "banned";
 //        public final static String DELETED = "deleted";
@@ -160,10 +167,11 @@ public class VKGroup implements Serializable {
      * Types of communities.
      */
     public static class Type {
-        private Type() {}
         public final static int GROUP = 0;
         public final static int PAGE = 1;
         public final static int EVENT = 2;
+        private Type() {
+        }
     }
 
 

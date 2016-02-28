@@ -54,14 +54,13 @@ public class ChatSettingActivity extends AppCompatActivity {
         tvTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    editChat(v.getText().toString());
-                    Toast.makeText(ChatSettingActivity.this, "Название чата измененно", Toast.LENGTH_LONG).show();
-                    return true;
+                editChat(v.getText().toString());
+                Toast.makeText(ChatSettingActivity.this, "Название чата измененно", Toast.LENGTH_LONG).show();
+                return true;
             }
         });
         getChatInfo();
     }
-
 
 
     public void getChatInfo() {
@@ -73,7 +72,7 @@ public class ChatSettingActivity extends AppCompatActivity {
                     ArrayList<VKFullUser> chatUsers = api.getChatUsers(chatId, "photo_50");
                     final ArrayList<String> profiles = new ArrayList<String>();
                     for (VKFullUser user : chatUsers) {
-                        profiles.add(user.first_name  + " " + user.last_name);
+                        profiles.add(user.first_name + " " + user.last_name);
                     }
                     runOnUiThread(new Runnable() {
                         @Override

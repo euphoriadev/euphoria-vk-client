@@ -45,16 +45,22 @@
         <item>Документы</item>
     </string-array>
 
-    <string-array name="tabs_friends">
+    <string-array name="tab_friends_array">
         <item>Все</item>
-        <item>Оффлайн</item>
         <item>Онлайн</item>
+        <item>Заявки</item>
+        <item>Возможные</item>
     </string-array>
 
+
+
     <string-array name="friends_sort_array">
-        <item>Все друзья</item>
-        <item>Онлайн</item>
-        <item>Оффлайн</item>
+        <item>Все</item>
+        <item>Лучшие</item>
+        <item>Коллеги</item>
+        <item>Родственики</item>
+        <item>По вузу</item>
+        <item>По школу</item>
     </string-array>
 
     <string-array name="font_family_array">

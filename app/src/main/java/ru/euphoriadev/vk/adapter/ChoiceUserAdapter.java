@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**

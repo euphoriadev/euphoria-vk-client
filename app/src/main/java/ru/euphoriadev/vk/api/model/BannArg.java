@@ -13,7 +13,7 @@ public class BannArg {
     public ArrayList<VKGroup> full_groups;
     public ArrayList<VKFullUser> profiles;
     public boolean is_extended;
-    
+
     public BannArg(boolean extended) {
         is_extended = extended;
     }
@@ -29,8 +29,8 @@ public class BannArg {
                 arg.full_groups = VKGroup.parseGroups(jgroups);
             if (jprofiles != null) {
                 arg.profiles = new ArrayList<VKFullUser>();
-                for(int i = 0; i < jprofiles.length(); i++) {
-                    JSONObject jprofile = (JSONObject)jprofiles.get(i);
+                for (int i = 0; i < jprofiles.length(); i++) {
+                    JSONObject jprofile = (JSONObject) jprofiles.get(i);
                     VKFullUser m = VKFullUser.parseFromNews(jprofile);
                     arg.profiles.add(m);
                 }
@@ -40,7 +40,7 @@ public class BannArg {
             if (jgroups != null) {
                 arg.groups = new ArrayList<Long>();
                 int category_count = jgroups.length();
-                for (int i=0; i<category_count; ++i) {
+                for (int i = 0; i < category_count; ++i) {
                     Long id = jgroups.optLong(i, -1);
                     if (id != -1)
                         arg.groups.add(id);
@@ -49,7 +49,7 @@ public class BannArg {
             if (jmembers != null) {
                 arg.members = new ArrayList<Long>();
                 int category_count = jmembers.length();
-                for (int i=0; i<category_count; ++i) {
+                for (int i = 0; i < category_count; ++i) {
                     Long id = jmembers.optLong(i, -1);
                     if (id != -1)
                         arg.members.add(id);

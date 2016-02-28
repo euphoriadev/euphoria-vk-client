@@ -13,6 +13,9 @@ import android.os.Bundle;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.os.AsyncTaskCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -61,19 +64,19 @@ import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
+import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Encrypter;
-import ru.euphoriadev.vk.util.PrefManager;
-import ru.euphoriadev.vk.util.ThemeManager;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
-import ru.euphoriadev.vk.util.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.util.YandexTranslator;
 import ru.euphoriadev.vk.view.FixedListView;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
-import ru.euphoriadev.vk.vkapi.VKApi;
 
 /**
  * Created by Igor on 15.03.15.
@@ -85,6 +88,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     private EditText etMessageText;
     private LinearLayout attachmentPanel;
     private ImageButton buttonAttachment;
+    private View viewShadow;
     private ArrayList<MessageItem> history;
     private MessageCursorAdapter cursorAdapter;
     private MessageAdapter adapter;
@@ -99,6 +103,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     private long lastTypeNotification;
     private boolean forceClose;
     private boolean hideTyping;
+    private boolean mShowShadow;
     /**
      * can I load old messages, If false, then messages are loading
      */
@@ -167,9 +172,13 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setSubtitleTextAppearance(this, android.R.attr.textAppearanceSmall);
-        toolbar.setSubtitleTextColor(Color.WHITE);
+        toolbar.setTitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
+        toolbar.setSubtitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
 
-        final View vshadow = findViewById(R.id.vshadow_history);
+        viewShadow = findViewById(R.id.vshadow_history);
+        if (!ThemeManager.isDarkTheme()) {
+            viewShadow.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.message_drop_shadow_white));
+        }
 
 //        setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -200,13 +209,15 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
 //                // Если находимся в конце списка
-//                if (visibleItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
-//                    // то скрываем тень
+                if (visibleItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
+                    // то скрываем тень
 //                    if (vshadow.getVisibility() == View.VISIBLE) vshadow.setVisibility(View.GONE);
-//                } else {
-//                    // а когда начинаем прокручивать, то она появляется
+                    animateShadow(false);
+                } else {
+                    // а когда начинаем прокручивать, то она появляется
 //                    if (vshadow.getVisibility() == View.GONE) vshadow.setVisibility(View.VISIBLE);
-//                }
+                    animateShadow(true);
+                }
 
 //                // если находися на 10 position списка - грузим старые сообщеньки
                 if (canLoadOldMessages && adapter != null && firstVisibleItem <= 20) {
@@ -293,7 +304,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         }
 
         canLoadOldMessages = false;
-        new LoadMessagesTask(30, 0, from_saved).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        AsyncTask<Void, Void, Void> task = new LoadMessagesTask(30, 0, from_saved);
+        AsyncTaskCompat.executeParallel(task);
         loadWallpaperFromSD();
     }
 
@@ -321,6 +333,25 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             loadWallpaperFromSD();
 
             Log.w("MessageActivity", "image path is " + filePath);
+        }
+    }
+
+    private void animateShadow(boolean show) {
+        if (mShowShadow == show) {
+            return;
+        }
+        mShowShadow = show;
+
+        if (show) {
+            viewShadow.setVisibility(View.VISIBLE);
+            ViewCompat.animate(viewShadow).setDuration(200).withLayer().alpha(1.0f).start();
+        } else {
+            ViewCompat.animate(viewShadow).setDuration(200).alpha(0).withLayer().withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    viewShadow.setVisibility(View.GONE);
+                }
+            }).start();
         }
     }
 
@@ -612,7 +643,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         long wordsCount = 0;
                         while (!stop[0]) {
 
-                            ArrayList<VKMessage> dialogs = api.getMessagesHistoryWithExecute(uid, chat_id, api.getUserId(), count[0]);
+                            ArrayList<VKMessage> dialogs = api.getMessagesHistoryWithExecute(uid, chat_id, count[0]);
 
                             if (dialogs.isEmpty()) {
                                 stop[0] = true;
@@ -1049,32 +1080,32 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                         // error. stopping translate
                         forceClose = true;
                         AndroidUtils.post(new RunnableToast(MessageHistoryActivity.this, R.string.check_internet, true));
-
-                        if (!TextUtils.isEmpty(text)) {
-                            item.message.body = text;
-                        }
-                        count++;
-                        final int finalCount = count;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.setMessage(translateTextWait + "\n" + "Переведенно " + finalCount + " сообщений из " + history.size());
-                            }
-                        });
-                        translateAttachMessages(item.message, translator, languageTo);
+                        continue;
                     }
-                    translator.close();
-
+                    if (!TextUtils.isEmpty(text)) {
+                        item.message.body = text;
+                    }
+                    count++;
+                    final int finalCount = count;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            dialog.dismiss();
-                            if (adapter != null)
-                                adapter.notifyDataSetChanged();
+                            dialog.setMessage(translateTextWait + "\n" + "Переведенно " + finalCount + " сообщений из " + history.size());
                         }
                     });
-
+                    translateAttachMessages(item.message, translator, languageTo);
                 }
+                translator.close();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        if (adapter != null)
+                            adapter.notifyDataSetChanged();
+                    }
+                });
+
             }
         });
     }
@@ -1231,12 +1262,11 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             }
 
             ArrayList<VKUser> vkUsers = getUsersFrom(database);
+            HashSet<Integer> keySet = AndroidUtils.keySet(users);
             if (vkUsers.isEmpty()) {
                 // database not have users... add
-                HashSet<Integer> keySet = AndroidUtils.keySet(users);
                 vkUsers = loadUsersFromNetwork(keySet);
 
-                keySet.clear();
             }
 
             for (int i = 0; i < vkUsers.size(); i++) {
@@ -1256,7 +1286,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             deleteOldMessages(sql);
 
             VKInsertHelper.insertMessages(database, messages, true);
-            VKInsertHelper.updateUsers(database, vkUsers, true);
+            VKInsertHelper.updateUsers(database, loadUsersFromNetwork(keySet), true);
 
             messages.clear();
             messages.trimToSize();
@@ -1266,6 +1296,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             vkUsers = null;
             users.clear();
             users = null;
+            keySet.clear();
+            keySet = null;
             cursor.close();
 
             System.gc();

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.common.AppLoader;
 
 /**
  * Created by Igor on 21.12.15.
@@ -16,10 +17,7 @@ import ru.euphoriadev.vk.SettingsFragment;
  */
 
 public class TypefaceManager {
-    /** Cache of fonts for reuse */
-    private static final SparseArray<Typeface> sTypefaceCache = new SparseArray<>();
-
-    /** Preferences key for fonts */
+    /**Preferences key for fonts */
     public static final String PREF_KEY_FONT_FAMILY = SettingsFragment.KEY_FONT_FAMILY;
     public static final String PREF_KEY_TEXT_WEIGHT = SettingsFragment.KEY_TEXT_WEIGHT;
 
@@ -43,6 +41,8 @@ public class TypefaceManager {
     public static final String DEFAULT_FONT = "Default_font";
     public static final String DEFAULT_FONT_BOLD = "Default_font_Bold";
 
+    /** Cache of fonts for reuse */
+    private static final SparseArray<Typeface> sTypefaceCache = new SparseArray<>();
 
     /** Cached preferences value */
     private static int mFontFamily = -1;
@@ -87,11 +87,21 @@ public class TypefaceManager {
         switch (fontFamily) {
             case FontFamily.ROBOTO:
                 switch (textWeight) {
-                    case TextWeight.THIN: typefaceName = ROBOTO_TINT; break;
-                    case TextWeight.LIGHT: typefaceName = ROBOTO_LIGHT; break;
-                    case TextWeight.NORMAL: typefaceName = ROBOTO_REGULAR; break;
-                    case TextWeight.MEDIUM: typefaceName = ROBOTO_MEDIUM; break;
-                    case TextWeight.BOLD: typefaceName = ROBOTO_BOLD; break;
+                    case TextWeight.THIN:
+                        typefaceName = ROBOTO_TINT;
+                        break;
+                    case TextWeight.LIGHT:
+                        typefaceName = ROBOTO_LIGHT;
+                        break;
+                    case TextWeight.NORMAL:
+                        typefaceName = ROBOTO_REGULAR;
+                        break;
+                    case TextWeight.MEDIUM:
+                        typefaceName = ROBOTO_MEDIUM;
+                        break;
+                    case TextWeight.BOLD:
+                        typefaceName = ROBOTO_BOLD;
+                        break;
                 }
                 break;
 

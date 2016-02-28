@@ -42,7 +42,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-        android:name=".util.AppLoader"
+        android:name=".common.AppLoader"
         android:configChanges="keyboardHidden|orientation"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -67,7 +67,11 @@
         <activity
             android:name=".PrefActivity"
             android:label="@string/prefs"/>
-        <activity android:name=".TestActivity"/>
+
+        <activity
+            android:name=".TestActivity"
+            android:configChanges="keyboardHidden"/>
+
         <activity android:name=".ForwardMessagesActivity"/>
         <activity android:name=".DialogMaterialsActivity"/>
         <activity android:name=".ChatSettingActivity"/>
@@ -105,7 +109,8 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.MediaPlayerReceiver"
+        <receiver
+            android:name=".receiver.MediaPlayerReceiver"
             android:enabled="true"
             android:exported="true">
 

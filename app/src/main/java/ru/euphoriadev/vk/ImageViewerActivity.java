@@ -34,7 +34,7 @@ public class ImageViewerActivity extends Activity {
         webView.getSettings().setBuiltInZoomControls(true);
         // Включаем кеш
         webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-       // полосы прокрутки – внутри изображения, увеличение места для просмотра
+        // полосы прокрутки – внутри изображения, увеличение места для просмотра
         webView.setScrollbarFadingEnabled(true);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         setContentView(webView);
