@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import org.json.JSONException;
 
@@ -40,17 +41,17 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.interfaces.Refreshable;
 import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.AppLoader;
-import ru.euphoriadev.vk.common.PrefManager;
 import ru.euphoriadev.vk.util.RefreshManager;
-import ru.euphoriadev.vk.interfaces.Refreshable;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
 
@@ -366,9 +367,13 @@ public class BasicActivity extends BaseThemedActivity implements
         ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
         ivWallpaper.setVisibility(View.VISIBLE);
 
-        Picasso.with(this)
-                .load(new File(wallpaperPath))
-                .into(ivWallpaper);
+        boolean applyBlur = PrefManager.getBoolean(SettingsFragment.KEY_BLUR_WALLPAPER);
+        RequestCreator creator = Picasso.with(this)
+                .load(new File(wallpaperPath));
+        if (applyBlur) {
+            creator.transform(new AndroidUtils.PicassoBlurTransform(PrefManager.getInt(SettingsFragment.KEY_BLUR_RADIUS)));
+        }
+        creator.into(ivWallpaper);
     }
 
     private void joinInGroup() {

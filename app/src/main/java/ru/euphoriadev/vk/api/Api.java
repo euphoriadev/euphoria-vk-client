@@ -50,6 +50,7 @@ import ru.euphoriadev.vk.api.model.VKStatus;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.api.model.VKVideo;
 import ru.euphoriadev.vk.api.model.VKWallMessage;
+import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.util.Account;
 
 /**
@@ -189,6 +190,10 @@ public class Api {
     }
 
     public int getUserId() {
+        if (mAccount == null) {
+            mAccount = new Account(AppLoader.appContext);
+            mAccount.restore();
+        }
         return (int) mAccount.user_id;
     }
 

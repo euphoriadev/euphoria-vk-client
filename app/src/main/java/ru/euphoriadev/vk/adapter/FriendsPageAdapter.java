@@ -54,6 +54,10 @@ public class FriendsPageAdapter extends FragmentPagerAdapter {
     }
 
     public void clear() {
+        for (FriendsFragment fragment : fragments) {
+            fm.beginTransaction().remove(fragment).commit();
+        }
+
         Arrays.fill(fragments, null);
         Arrays.fill(titles, null);
         fragments = null;

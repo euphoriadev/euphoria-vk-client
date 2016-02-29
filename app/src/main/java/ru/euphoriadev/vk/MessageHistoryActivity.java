@@ -37,6 +37,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import org.json.JSONException;
 
@@ -62,16 +63,16 @@ import ru.euphoriadev.vk.api.model.VKAttachment;
 import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Encrypter;
-import ru.euphoriadev.vk.common.PrefManager;
-import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.util.YandexTranslator;
@@ -162,7 +163,9 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 sendMessage(etMessageText.getText().toString());
             }
         });
-        if (!PrefManager.getBoolean(SettingsFragment.KEY_USE_CAT_ICON_SEND)) {
+        if (PrefManager.getBoolean(SettingsFragment.KEY_USE_CAT_ICON_SEND)) {
+            fabSend.setImageResource(R.drawable.ic_pets_white);
+        } else {
             fabSend.setImageResource(R.drawable.ic_keyboard_arrow_right);
         }
 
@@ -280,6 +283,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             }
         });
 
+
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -330,7 +334,30 @@ public class MessageHistoryActivity extends BaseThemedActivity {
 
             PrefManager.putString(ThemeManager.PREF_KEY_MESSAGE_WALLPAPER_PATH, filePath);
             ThemeManager.updateThemeValues();
-            loadWallpaperFromSD();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MessageHistoryActivity.this);
+            builder.setTitle(getString(R.string.apply_blur));
+            builder.setMessage(getString(R.string.apply_blur_description));
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    PrefManager.putBoolean(SettingsFragment.KEY_BLUR_WALLPAPER, true);
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    PrefManager.putBoolean(SettingsFragment.KEY_BLUR_WALLPAPER, false);
+                }
+            });
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    loadWallpaperFromSD();
+                }
+            });
+            builder.show();
+
 
             Log.w("MessageActivity", "image path is " + filePath);
         }
@@ -1143,10 +1170,16 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         String path = ThemeManager.getWallpaperPath(this);
         ImageView ivWallpaper = (ImageView) findViewById(R.id.ivWallpaper);
         if (!TextUtils.isEmpty(path)) {
+
+            int blurRadius = PrefManager.getInt(SettingsFragment.KEY_BLUR_RADIUS);
+            boolean applyBlur = PrefManager.getBoolean(SettingsFragment.KEY_BLUR_WALLPAPER);
             ivWallpaper.setVisibility(View.VISIBLE);
-            Picasso.with(this)
-                    .load(new File(path))
-                    .into(ivWallpaper);
+            final RequestCreator creator = Picasso.with(this)
+                    .load(new File(path));
+            if (applyBlur) {
+                creator.transform(new AndroidUtils.PicassoBlurTransform(blurRadius));
+            }
+            creator.into(ivWallpaper);
         } else {
             ivWallpaper.setVisibility(View.GONE);
         }

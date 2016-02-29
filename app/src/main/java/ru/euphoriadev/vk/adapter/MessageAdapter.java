@@ -43,14 +43,14 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKAttachment;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ResourcesLoader;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
-import ru.euphoriadev.vk.common.PrefManager;
-import ru.euphoriadev.vk.common.ResourcesLoader;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleImageView;
@@ -126,10 +126,13 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                 colorOutMessages = AndroidUtils.getColor(mContext, R.color.white);
             }
         }
-        boolean isWallpaperBackground = TextUtils.isEmpty(ThemeManager.getWallpaperPath(mContext));
+        boolean isWallpaperBackground = !TextUtils.isEmpty(ThemeManager.getWallpaperPath(mContext));
         if (isWallpaperBackground) {
             colorOutMessages = ThemeManager.alphaColor(colorOutMessages);
             colorInMessages = ThemeManager.alphaColor(colorInMessages);
+
+            colorNotReadingOutMessages = ThemeManager.alphaColor(colorNotReadingOutMessages);
+            colorNotReadingInMessages = ThemeManager.alphaColor(colorNotReadingInMessages);
         }
         widthDisplay = context.getResources().getDisplayMetrics().widthPixels;
 
@@ -145,7 +148,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         cacheMessages = new CacheMessages(CacheMessages.DEFAULT_SIZE);
 
 
-        VKUpdateController.getInstance().addMessageListenr(this);
+        VKUpdateController.getInstance().addMessageListener(this);
 
     }
 

@@ -35,11 +35,11 @@ import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
@@ -79,7 +79,7 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         handler = new Handler(Looper.getMainLooper());
 
         VKUpdateController.getInstance().addUserListener(this);
-        VKUpdateController.getInstance().addMessageListenr(this);
+        VKUpdateController.getInstance().addMessageListener(this);
     }
 
     @Override

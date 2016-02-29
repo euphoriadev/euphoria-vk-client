@@ -57,8 +57,7 @@ public class NoteAdapter extends BaseArrayAdapter<VKNote> {
         ViewUtil.setTypeface(holder.tvText);
         ViewUtil.setTypeface(holder.tvDate);
 
-        holder.cardView.setCardBackgroundColor(loader.getApplicationContext().getResources().getColor(loader.isDarkTheme ?
-                R.color.md_dark_background : R.color.white));
+
         holder.tvTitle.setText(item.title);
         holder.tvText.setText(Html.fromHtml(item.text));
         holder.tvDate.setText(sdf.format(item.date * 1000));

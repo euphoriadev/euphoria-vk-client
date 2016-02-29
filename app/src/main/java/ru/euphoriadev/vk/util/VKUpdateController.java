@@ -44,11 +44,12 @@ public class VKUpdateController {
         addListener(listener);
     }
 
-    public void addMessageListenr(MessageListener listener) {
+    public void addMessageListener(MessageListener listener) {
         addListener(listener);
     }
 
     public void removeListener(MessageListener listener) {
+        Log.w(TAG, "remove message listener: " + listener);
         messageListeners.remove(listener);
     }
 
@@ -61,6 +62,7 @@ public class VKUpdateController {
     }
 
     public void removeListener(UserListener listener) {
+        Log.w(TAG, "remove user listener: " + listener);
         userListeners.remove(listener);
     }
 

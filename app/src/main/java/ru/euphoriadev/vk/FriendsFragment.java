@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -30,13 +29,12 @@ import java.util.ArrayList;
 import ru.euphoriadev.vk.adapter.FriendsAdapter;
 import ru.euphoriadev.vk.adapter.FriendsPageAdapter;
 import ru.euphoriadev.vk.api.Api;
-import ru.euphoriadev.vk.api.model.VKFullUser;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ArrayUtil;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.VKInsertHelper;
 
 /**
@@ -109,7 +107,7 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
 //            }
 //        });
 
-        loadSuggestions();
+        loadUsers(false);
 //        setHasOptionsMenu(true);
         return rootView;
     }
@@ -122,12 +120,7 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
         }
     }
 
-    public void loadSuggestions() {
-        if (!AndroidUtils.isInternetConnection(getActivity())) {
-            Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
-            return;
-        }
-
+    public void loadUsers(final boolean onlyUpdate) {
         if (position != FriendsPageAdapter.POSITION_ONLINE) {
             setRefreshing(true);
         }
@@ -140,9 +133,16 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
                 switch (position) {
                     case FriendsPageAdapter.POSITION_ALL:
                         try {
-                            friends = getUsersFrom(database);
-                            if (!friends.isEmpty()) {
-                                updateAdapter(friends);
+                            if (!onlyUpdate) {
+                                friends = getUsersFrom(database);
+                                if (!friends.isEmpty()) {
+                                    updateAdapter(friends);
+                                }
+                            }
+
+                            if (!AndroidUtils.isInternetConnection(getActivity())) {
+                                Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
+                                return;
                             }
 
                             friends = Api.get().getFriends(Api.get().getUserId(), "hints", null, null, null, null);
@@ -161,14 +161,23 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
                         break;
 
                     case FriendsPageAdapter.POSITION_REQUEST:
-                        ArrayList<VKUser> followers = getFollowersUsers();
-                        updateAdapter(followers);
+                        if (!AndroidUtils.isInternetConnection(getActivity())) {
+                            Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        friends = getFollowersUsers();
+                        updateAdapter(friends);
                         break;
 
                     case FriendsPageAdapter.POSITION_SUGGESTIONS:
                         try {
-                            ArrayList<VKUser> suggestions = Api.get().getSuggestions("mutual", VKUser.FIELDS_DEFAULT);
-                            updateAdapter(suggestions);
+                            if (!AndroidUtils.isInternetConnection(getActivity())) {
+                                Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
+                                return;
+                            }
+
+                            friends = Api.get().getSuggestions("mutual", VKUser.FIELDS_DEFAULT);
+                            updateAdapter(friends);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -207,11 +216,8 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
 
                     Log.w("FriendsFragment", "set adapter, position " + position + ", size " + list.size());
                 } else {
-                    if (!ArrayUtil.isEmpty(list)) {
                         adapter.notifyDataSetChanged();
                         Log.w("FriendsFragment", "update adapter, position " + position + ", size " + list.size());
-
-                    }
 
                 }
                 orderFriends();
@@ -296,8 +302,7 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
 
     @Override
     public void onRefresh() {
-        adapter.clear();
-        loadSuggestions();
+        loadUsers(true);
     }
 
     @Override
@@ -340,9 +345,9 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
     @Override
     public void onDestroy() {
         ((BasicActivity) getActivity()).hideSpinner();
-//        if (adapter != null) {
-//            adapter.clear();
-//        }
+        if (adapter != null) {
+            adapter.clear();
+        }
 
         super.onDestroy();
     }

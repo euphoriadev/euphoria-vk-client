@@ -24,9 +24,6 @@ import ru.euphoriadev.vk.BaseThemedActivity;
 import ru.euphoriadev.vk.BasicActivity;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
-import ru.euphoriadev.vk.common.AppLoader;
-import ru.euphoriadev.vk.common.PrefManager;
-import ru.euphoriadev.vk.common.ResourcesLoader;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
@@ -37,9 +34,6 @@ import ru.euphoriadev.vk.util.ViewUtil;
  * A Simple Theme Manager
  */
 public class ThemeManager {
-    static {
-        ResourcesLoader.loadColors(AppLoader.appContext);
-    }
     public static final int DEFAULT_COLOR = ResourcesLoader.getColor(R.color.md_red_500); // Red 500
     public static final int DEFAULT_ACCENT_COLOR = ResourcesLoader.getColor(R.color.md_teal_500); // Teal 500
     public static final String PREF_KEY_THEME_COLOUR = "color_theme";
@@ -260,6 +254,10 @@ public class ThemeManager {
     private static int sDrawerHeaderState = -1;
     private static boolean sIsDarkTheme;
     private static boolean isPreferencesLoaded;
+
+    static {
+        ResourcesLoader.loadColors(AppLoader.appContext);
+    }
 
     static {
         // Dark Styles
@@ -507,7 +505,7 @@ public class ThemeManager {
     }
 
     /**
-     * Set alpha to color on 10%
+     * Set alpha to color on 15%
      *
      * @param color the color to set alpha
      * @return a new color which is alpha of specified color
@@ -519,13 +517,14 @@ public class ThemeManager {
         int green = Color.green(color);
         int blue = Color.blue(color);
 
-        return Color.argb((int) (alpha * 0.90f), red, green, blue);
+        return Color.argb((int) (alpha * 0.85f), red, green, blue);
     }
 
     /**
      * Set alpha to color
      *
      * @param color the color to set alpha
+     * @param alphaFactor the factor for alpha, range [0...1]
      * @return a new color which is alpha of specified color
      */
     public static int alphaColor(int color, float alphaFactor) {
@@ -637,6 +636,11 @@ public class ThemeManager {
     public static void setDarkTheme(boolean newDarkThemeValue) {
         PrefManager.putBoolean(PREF_KEY_IS_DARK_THEME, newDarkThemeValue);
         sIsDarkTheme = newDarkThemeValue;
+    }
+
+    public static boolean isBlackThemeColor() {
+        loadThemePreferences(AppLoader.appContext);
+        return PALETTE[COLOUR_BLACK] == getThemeColor(AppLoader.appContext);
     }
 
     public static Drawable getDrawerHeader(Context context) {

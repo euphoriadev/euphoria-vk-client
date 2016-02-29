@@ -24,13 +24,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.service.OnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.CrashManager;
-import ru.euphoriadev.vk.common.PrefManager;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
@@ -79,6 +79,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_CHECK_UPDATE = "auto_update";
     public static final String KEY_USE_ALTERNATIVE_UPDATE_MESSAGES = "use_alternative_update_messages";
     public static final String KEY_WALLPAPER_PATH = "message_wallpaper_path";
+    public static final String KEY_BLUR_WALLPAPER = "blur_wallpaper";
     public static final String KEY_IS_JOIN_GROUP = "is_join_group";
     public static final String KEY_IS_LIVE_ONLINE_SERVICE = "is_live_online_service";
     public static final String KEY_MESSAGE_COUNT = "message_count";

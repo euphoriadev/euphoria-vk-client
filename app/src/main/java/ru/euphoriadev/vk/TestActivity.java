@@ -29,6 +29,10 @@ import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKPhoto;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.async.ThreadTask;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.http.AsyncHttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
@@ -36,11 +40,7 @@ import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.interfaces.OnTwiceClickListener;
 import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.util.Emoji;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
-import ru.euphoriadev.vk.async.ThreadTask;
 
 import static ru.euphoriadev.vk.napi.VKApi.TAG;
 import static ru.euphoriadev.vk.napi.VKApi.VKMessageUploader;
@@ -402,6 +402,7 @@ public class TestActivity extends BaseThemedActivity {
 
         rootLayout.addView(button);
 
+        // test
     }
 
     @Override

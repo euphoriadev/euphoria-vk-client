@@ -11,10 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import ru.euphoriadev.vk.adapter.FriendsPageAdapter;
-import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.common.ResourcesLoader;
 import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
@@ -27,7 +24,6 @@ public class FriendsTabsFragment extends Fragment {
     FriendsPageAdapter adapter;
     private AppCompatActivity activity;
     private TabLayout tabLayout;
-    private ArrayList<VKUser> friends;
 
     @Nullable
     @Override
@@ -46,11 +42,13 @@ public class FriendsTabsFragment extends Fragment {
             viewPager.setBackgroundColor(ResourcesLoader.getColor(R.color.md_grey_100));
         }
 
+
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setSelectedTabIndicatorColor(ThemeManager.isBlackThemeColor() ? Color.WHITE : ThemeManager.getThemeColor(getActivity()));
         tabLayout.setBackgroundColor(!ThemeManager.isDarkTheme() ? Color.WHITE : ThemeManager.darkenColor(ThemeUtils.getThemeAttrColor(activity, android.R.attr.windowBackground)));
-        tabLayout.setTabTextColors(ThemeManager.alphaColor(ThemeManager.getThemeColor(activity), 0.5f), ThemeManager.getThemeColor(activity));
+        tabLayout.setTabTextColors(ThemeManager.isBlackThemeColor() ? Color.WHITE : ThemeManager.alphaColor(ThemeManager.getThemeColor(activity), 0.5f), ThemeManager.isBlackThemeColor() ? Color.WHITE : ThemeManager.getThemeColor(activity));
 //      not work =(
 //       loadFriends();
         return rootView;

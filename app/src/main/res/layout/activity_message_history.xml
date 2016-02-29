@@ -116,8 +116,8 @@
                 android:layout_height="20dp"
                 android:layout_gravity="top|right"
                 android:src="@drawable/ic_keyboard_arrow_right"
-                fab:fab_shadow="true"
                 fab:fab_type="mini"/>
+
 
         </LinearLayout>
     </FrameLayout>

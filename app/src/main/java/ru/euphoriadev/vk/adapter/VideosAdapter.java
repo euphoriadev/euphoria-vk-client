@@ -72,8 +72,6 @@ public class VideosAdapter extends ArrayAdapter<VideosAdapter.VideoItem> {
             }
         });
 
-        holder.cardView.setCardBackgroundColor(loader.getApplicationContext().getResources().getColor(loader.isDarkTheme ? R.color.md_dark_background : R.color.md_light_background));
-
         return convertView;
     }
 

@@ -1,10 +1,13 @@
 package ru.euphoriadev.vk.api.model;
 
+import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import ru.euphoriadev.vk.api.Api;
 
@@ -40,6 +43,15 @@ public class VKPhoto implements Serializable {
         this.owner_id = owner_id;
         this.src = src;
         this.src_big = src_big;
+    }
+
+    public static ArrayList<VKPhoto> parsePhotos(JSONArray array) {
+        ArrayList<VKPhoto> photos = new ArrayList<>(array.length());
+
+        for (int i = 0; i < array.length(); i++) {
+            photos.add(parse(array.optJSONObject(i)));
+        }
+        return photos;
     }
 
     public static VKPhoto parse(JSONObject o) {
@@ -109,5 +121,14 @@ public class VKPhoto implements Serializable {
             p.user_id = user_id_array.getString(0);
         }
         return p;
+    }
+
+    public String toAttachmentString() {
+        StringBuilder result = new StringBuilder("photo").append(owner_id).append('_').append(pid);
+        if (!TextUtils.isEmpty(access_key)) {
+            result.append('_');
+            result.append(access_key);
+        }
+        return result.toString();
     }
 }

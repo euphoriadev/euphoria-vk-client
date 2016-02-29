@@ -101,6 +101,10 @@
     <string name="about">О приложении</string>
 
     <string name="changelog">
+        <u>0.9.1</u>
+        • Bugs fix;\n
+        • Возможность заблюрить фон приложения;\n
+        \n
         <u>0.9</u>\n
         • Open Source!;\n
         • Возможность установить фон на чат;\n
@@ -419,4 +423,6 @@
     <string name="prefs_check_auto_update">Автообновление</string>
     <string name="prefs_check_auto_update_description">Проверка обновлений раз в день</string>
     <string name="delete_dialog_confirm">Уверены что хотите удалить диалог? Восстановить его будет невозможно!</string>
+    <string name="apply_blur">Применить размытие?</string>
+    <string name="apply_blur_description">Размыть этот фон в приложении? Текст, как правило, будет выглядеть более четким</string>
 </resources>

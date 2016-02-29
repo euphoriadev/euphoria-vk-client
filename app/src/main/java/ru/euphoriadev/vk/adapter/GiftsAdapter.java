@@ -19,8 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 /**
  * Created by user on 24.07.15.
@@ -76,11 +76,6 @@ public class GiftsAdapter extends BaseAdapter {
         TextView tvDate = (TextView) view.findViewById(R.id.tvGiftDate);
         CardView cardView = (CardView) view.findViewById(R.id.cvGift);
 
-        if (isNightTheme) {
-            cardView.setCardBackgroundColor(Color.parseColor("#424242"));
-        } else {
-            cardView.setCardBackgroundColor(Color.WHITE);
-        }
         tvTitle.setTextColor(colorPrimary);
         tvDate.setTextColor(colorSecondary);
 

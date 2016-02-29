@@ -17,6 +17,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -37,6 +38,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import ru.euphoriadev.vk.R;
+import ru.euphoriadev.vk.util.ThemeUtils;
 
 public class FloatingActionButton extends ImageButton {
     public static final int TYPE_NORMAL = 0;
@@ -119,7 +121,7 @@ public class FloatingActionButton extends ImageButton {
         if (attr != null) {
             try {
                 mColorNormal = attr.getColor(R.styleable.FloatingActionButton_fab_colorNormal,
-                        getColor(R.color.material_blue_500));
+                        ThemeUtils.getThemeAttrColor(context, R.attr.colorAccent));
                 mColorPressed = attr.getColor(R.styleable.FloatingActionButton_fab_colorPressed,
                         darkenColor(mColorNormal));
                 mColorRipple = attr.getColor(R.styleable.FloatingActionButton_fab_colorRipple,
@@ -148,7 +150,7 @@ public class FloatingActionButton extends ImageButton {
         shapeDrawable.getPaint().setColor(color);
 
         if (mShadow && !hasLollipopApi()) {
-            Drawable shadowDrawable = getResources().getDrawable(mType == TYPE_NORMAL ? R.drawable.fab_shadow
+            Drawable shadowDrawable = ContextCompat.getDrawable(getContext(), mType == TYPE_NORMAL ? R.drawable.fab_shadow
                     : R.drawable.fab_shadow_mini);
             LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{shadowDrawable, shapeDrawable});
             layerDrawable.setLayerInset(1, mShadowSize, mShadowSize, mShadowSize, mShadowSize);

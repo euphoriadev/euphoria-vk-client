@@ -410,4 +410,6 @@
     <string name="wallpaper_remove">Remove wallpaper</string>
     <string name="exit_message">Press once again to exit</string>
     <string name="delete_dialog_confirm">Sure you want to delete dialog? You cannot restore this dialog!</string>
+    <string name="apply_blur">Apply blur?</string>
+    <string name="apply_blur_description">To blur photo in this app? The text usually will look more clear</string>
 </resources>
