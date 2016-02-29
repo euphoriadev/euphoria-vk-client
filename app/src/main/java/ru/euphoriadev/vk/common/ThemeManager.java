@@ -34,6 +34,10 @@ import ru.euphoriadev.vk.util.ViewUtil;
  * A Simple Theme Manager
  */
 public class ThemeManager {
+    static {
+        ResourcesLoader.loadColors(AppLoader.appContext);
+    }
+
     public static final int DEFAULT_COLOR = ResourcesLoader.getColor(R.color.md_red_500); // Red 500
     public static final int DEFAULT_ACCENT_COLOR = ResourcesLoader.getColor(R.color.md_teal_500); // Teal 500
     public static final String PREF_KEY_THEME_COLOUR = "color_theme";

@@ -9,7 +9,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 860
-        versionName "0.9 Beta"
+        versionName "0.9.1 Beta"
     }
 
     signingConfigs {
