@@ -260,10 +260,6 @@ public class ThemeManager {
     private static boolean isPreferencesLoaded;
 
     static {
-        ResourcesLoader.loadColors(AppLoader.appContext);
-    }
-
-    static {
         // Dark Styles
         sDarkThemes.append(PALETTE[0], R.style.AppTheme_Red);
         sDarkThemes.append(PALETTE[1], R.style.AppTheme_Pink);
@@ -515,19 +511,13 @@ public class ThemeManager {
      * @return a new color which is alpha of specified color
      */
     public static int alphaColor(int color) {
-        int alpha = Color.alpha(color);
-
-        int red = Color.red(color);
-        int green = Color.green(color);
-        int blue = Color.blue(color);
-
-        return Color.argb((int) (alpha * 0.85f), red, green, blue);
+        return alphaColor(color, 0.85f);
     }
 
     /**
      * Set alpha to color
      *
-     * @param color the color to set alpha
+     * @param color       the color to set alpha
      * @param alphaFactor the factor for alpha, range [0...1]
      * @return a new color which is alpha of specified color
      */
@@ -635,6 +625,10 @@ public class ThemeManager {
     public static boolean isDarkTheme() {
         loadThemePreferences(AppLoader.appContext);
         return sIsDarkTheme;
+    }
+
+    public static boolean isLightTheme() {
+        return !isDarkTheme();
     }
 
     public static void setDarkTheme(boolean newDarkThemeValue) {

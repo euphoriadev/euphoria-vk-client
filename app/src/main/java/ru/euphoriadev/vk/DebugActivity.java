@@ -1,6 +1,7 @@
 package ru.euphoriadev.vk;
 
 import android.animation.LayoutTransition;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
@@ -13,42 +14,35 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
-import ru.euphoriadev.vk.api.model.VKPhoto;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.async.ThreadExecutor;
-import ru.euphoriadev.vk.async.ThreadTask;
-import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.http.HttpClient;
+import ru.euphoriadev.vk.http.HttpException;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
-import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.interfaces.OnTwiceClickListener;
 import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 
 import static ru.euphoriadev.vk.napi.VKApi.TAG;
-import static ru.euphoriadev.vk.napi.VKApi.VKMessageUploader;
 
 /**
  * Created by Igor on 15.07.15.
  */
-public class TestActivity extends BaseThemedActivity {
+public class DebugActivity extends BaseThemedActivity {
     private AppCompatTextView tvResult;
 
     @Override
@@ -78,10 +72,9 @@ public class TestActivity extends BaseThemedActivity {
         tvResult.setTextSize(18);
         rootLayout.addView(tvResult);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm.s", Locale.US);
-        String date = sdf.format(System.currentTimeMillis());
 
         final AppCompatEditText editText = new AppCompatEditText(this);
+        editText.setFocusable(false);
         editText.setHint("Execute code. Tap twice for run");
         editText.setOnClickListener(new OnTwiceClickListener() {
             @Override
@@ -108,7 +101,7 @@ public class TestActivity extends BaseThemedActivity {
             @Override
             public void onClick(View v) {
                 tvResult.append("Network info is available and is connected? \n");
-                tvResult.append(String.valueOf(AndroidUtils.isInternetConnection(TestActivity.this)).concat("\n"));
+                tvResult.append(String.valueOf(AndroidUtils.hasConnection(DebugActivity.this)).concat("\n"));
             }
         });
         rootLayout.addView(buttonCheckConnection);
@@ -235,7 +228,7 @@ public class TestActivity extends BaseThemedActivity {
                             if (e instanceof KException) {
 //                                KException ke = (KException) e;
 //                                if (ke.error_code == VKApi.VKErrorCodes.VALIDATION_REQUIRED) {
-//                                    AndroidUtils.openUrlInBrowser(TestActivity.this, ke.redirect_uri);
+//                                    AndroidUtils.openUrlInBrowser(DebugActivity.this, ke.redirect_uri);
 //                                }
                             }
                             e.printStackTrace();
@@ -311,21 +304,10 @@ public class TestActivity extends BaseThemedActivity {
             @Override
             public void onClick(View v) {
                 tvResult.append("Start downloading emojis...");
-                Emoji.executeDownloadingTask(TestActivity.this);
+                Emoji.executeDownloadingTask(DebugActivity.this);
             }
         });
         rootLayout.addView(buttonDownEmoji);
-
-        AppCompatButton buttonUpload = new AppCompatButton(this);
-        buttonUpload.setText("Upload file");
-        buttonUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tvResult.append("Starting upload file...");
-                uploadFile();
-            }
-        });
-        rootLayout.addView(buttonUpload);
 
         AppCompatButton memoryButton = new AppCompatButton(this);
         memoryButton.setText("Fill memory");
@@ -353,6 +335,33 @@ public class TestActivity extends BaseThemedActivity {
         });
         rootLayout.addView(memoryButton);
 
+        AppCompatButton buttonSqliteClear = new AppCompatButton(this);
+        buttonSqliteClear.setText("Clear cache");
+        buttonSqliteClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SQLiteDatabase database = DBHelper.get(DebugActivity.this).getWritableDatabase();
+                DBHelper.get(DebugActivity.this).dropTables(database);
+                DBHelper.get(DebugActivity.this).onCreate(database);
+            }
+        });
+        rootLayout.addView(buttonSqliteClear);
+
+        AppCompatButton buttonHttp = new AppCompatButton(this);
+        buttonHttp.setText("Test Http Client");
+        buttonHttp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                httpClientTest("http://www.google.com");
+                httpClientTest("https://certs.cac.washington.edu/CAtest");
+                httpClientTest("https://justedhak.com/Files/users.php");
+                httpClientTest("https://www.gooogle.com"); // Not trusted server certificate
+//                httpClientTest("https://api.vk.com/method/messages.getDialogs?access_token=3bfd41456e2019c34f631d7edb73c6dbb9a6812dfefcd64dd86470b7880246625eb95cc87daa9d33d6c97&count=1&lang=en&v=5.44");
+//                httpClientTest("https://raw.githubusercontent.com/DrKLO/Telegram/master/TMessagesProj/src/main/java/org/telegram/messenger/ImageLoader.java");
+            }
+        });
+        rootLayout.addView(buttonHttp);
+
         AppCompatButton buttonClear = new AppCompatButton(this);
         buttonClear.setText("Clear text");
         buttonClear.setOnClickListener(new View.OnClickListener() {
@@ -362,24 +371,6 @@ public class TestActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(buttonClear);
-
-        ThreadTask task = new ThreadTask() {
-            @Override
-            public void onPreExecute() {
-
-            }
-
-            @Override
-            public void doInBackground() {
-
-            }
-
-            @Override
-            public void onPostExecute() {
-
-            }
-        };
-        task.start();
 
         final Button button = new Button(this);
         button.setText("Test scale with animation");
@@ -399,90 +390,62 @@ public class TestActivity extends BaseThemedActivity {
 
             }
         });
-
         rootLayout.addView(button);
-
-        // test
     }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
 
-    private void uploadFile() {
-        new Thread(new Runnable() {
+    private void httpClientTest(final String url) {
+        ThreadExecutor.executeOnSingle(new Runnable() {
             @Override
             public void run() {
+                logHttp("\n ");
+                logHttp("------ Http Client test ------");
+                logHttp("has connection? " + AndroidUtils.hasConnection(DebugActivity.this));
+                logHttp("start connection to " + url + " with GET");
+                final HttpResponse response = HttpClient.executeGet(url);
+                logHttp("response code: " + response.code());
+                logHttp("response message: " + response.message());
 
-                try {
-                    File file = new File(AppLoader.getLoader().getAppDir(), "test.jpg");
-                    VKMessageUploader uploader = VKApi.getMessageUploader();
-                    VKPhoto photo = uploader.uploadFile(file, new VKApi.VKOnProgressListener() {
-                        @Override
-                        public void onStart(File file) {
-                            Toast.makeText(TestActivity.this, "Start loading file: " + file, Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onProgress(byte[] buffer, int progress, long totalSize) {
-                            Log.w(TAG, "progress: " + progress);
-                        }
-
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(TestActivity.this, "Success!", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                    VKApi.messages().send()
-                            .attachment(photo.toAttachmentString())
-                            .message("Message with files!")
-                            .userId(Api.get().getUserId())
-                            .execute();
-
-//                    Api.get().sendMessage(185957061, 0, "Test message with file",
-//                            null, null, Collections.singleton("photo" + photo.pid),
-//                            null, null, null, null, null);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (response.isSuccess()) {
+                    logHttp("connection is success!");
                 }
+                logHttp("get string from response...");
+                logHttp(response.asString());
+                logHttp("------ Http Client test FINISHED ------");
+                logHttp(" ");
             }
-        }).start();
+        });
+    }
+
+    private void logHttp(String message) {
+        Log.w(HttpClient.TAG, message);
     }
 
     private void connectToGoogle() {
-        new Thread(new Runnable() {
+        HttpClient.execute(HttpRequest.builder("https://www.google.com").build(), new HttpRequest.OnResponseListener() {
             @Override
-            public void run() {
-                AsyncHttpClient client = new AsyncHttpClient(TestActivity.this);
-                HttpRequest request = new HttpRequest("https://www.google.com/");
-
-                try {
-                    final HttpResponse response = client.execute(request);
-                    Log.w(AsyncHttpClient.TAG, response.getContentAsString());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            tvResult.append("Connection successfully!\n");
-                            tvResult.append("Response code: " + response.responseCode + "\n");
-                        }
-                    });
-                } catch (final HttpResponseCodeException e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            tvResult.append("Connection failed!\n");
-                            tvResult.append("Response code: " + e.responseCode + "\n");
-                            tvResult.append("Response message: " + e.responseMessage + "\n");
-                        }
-                    });
-                }
-                client.close();
+            public void onResponse(HttpClient client, HttpResponse response) {
+                tvResult.append("Connections to " + response.request().url + " is success!\n");
+                tvResult.append(response.statusLine() + "\n");
             }
-        }).start();
+
+            @Override
+            public void onProgress(char[] buffer, int progress, long totalSize) {
+                 logHttp("progress... " + progress + ", size: " + totalSize);
+            }
+
+            @Override
+            public void onError(HttpClient client, HttpException exception) {
+                tvResult.append("Connections is failed! ");
+                tvResult.append("code: " + exception.responseCode);
+                tvResult.append("message: " + exception.responseMessage);
+            }
+        });
     }
 
 

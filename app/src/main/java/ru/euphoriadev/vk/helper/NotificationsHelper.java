@@ -102,6 +102,10 @@ public class NotificationsHelper {
         return lastId++;
     }
 
+    public Notification getNotificationById(int id) {
+        return sparseNotifications.get(id);
+    }
+
     public int createInboxNotification(final PendingIntent pIntent, final String message, final String userName, final String ticker, final String largeIcon, final String summaryText, final String newLine, final int number, boolean createNewImboxStyle) {
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);

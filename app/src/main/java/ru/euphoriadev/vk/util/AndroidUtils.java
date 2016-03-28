@@ -8,14 +8,18 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -40,6 +44,7 @@ import android.view.ViewAnimationUtils;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.EdgeEffect;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Transformation;
@@ -50,6 +55,7 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -58,15 +64,16 @@ import java.util.HashSet;
 import ru.euphoriadev.vk.BuildConfig;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
+import ru.euphoriadev.vk.adapter.DocsAdapter;
 import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.common.PrefManager;
 import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.FileHelper;
-import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpClient;
+import ru.euphoriadev.vk.http.HttpException;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
-import ru.euphoriadev.vk.http.HttpResponseCodeException;
 
 public class AndroidUtils {
 
@@ -84,7 +91,7 @@ public class AndroidUtils {
 
     // Нужно добавить строчку в manifest:
     // <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    public static boolean isInternetConnection(Context c) {
+    public static boolean hasConnection(Context c) {
         if (c == null) {
             return false;
         }
@@ -172,6 +179,76 @@ public class AndroidUtils {
         return dest;
     }
 
+    public static Drawable setFilter(Drawable drawable, int color) {
+        if (drawable == null) {
+            return null;
+        }
+        ColorFilter colorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        drawable.setColorFilter(colorFilter);
+        return drawable;
+    }
+
+    public static byte[] bytesFrom(Bitmap bitmap) {
+        if (bitmap == null) {
+            return null;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
+
+    public static View getViewByPosition(int position, ListView listView) {
+        final int firstListItemPosition = listView.getFirstVisiblePosition();
+        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+        if (position < firstListItemPosition || position > lastListItemPosition ) {
+            return listView.getAdapter().getView(position, null, listView);
+        } else {
+            final int childIndex = position - firstListItemPosition;
+            return listView.getChildAt(childIndex);
+        }
+    }
+
+//    public static ColorStateList createColorStateList(int defaultColor, int selectedColor) {
+//        final int[][] states = new int[2][];
+//        final int[] colors = new int[2];
+//        int i = 0;
+//
+//        states[i] = View.SELECTED_STATE_SET;
+//        colors[i] = selectedColor;
+//        i++;
+//
+//        // Default enabled state
+//        states[i] = View.EMPTY_STATE_SET;
+//        colors[i] = defaultColor;
+//
+//        return new ColorStateList(states, colors);
+//    }
+
+    public static ColorStateList createColorStateList(int selectedColor, int defaultColor) {
+        final int[][] states = new int[2][];
+        final int[] colors = new int[2];
+        int i = 0;
+
+        states[i] = new int[] { android.R.attr.state_selected };
+        colors[i] = selectedColor;
+        i++;
+
+        // Default enabled state
+        states[i] = new int[] { android.R.attr.state_empty };
+        colors[i] = defaultColor;
+
+        return new ColorStateList(states, colors);
+    }
+
+    public static File rename(File file, String newName) {
+        return new File(file.getParent(), newName);
+    }
+
+    public static Bitmap bitmapFrom(byte[] bytes) {
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
 
     public static int dpFromPx(final Context context, final int px) {
         return (int) (px / context.getResources().getDisplayMetrics().density);
@@ -181,6 +258,14 @@ public class AndroidUtils {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 
+    public static long getCurrentSizeBy(int progress, long totalSize) {
+//      long result = (progress / 100) * totalSize;
+        return (totalSize * progress) / 100;
+    }
+
+    public static String convertBytes(long sizeBytes) {
+        return DocsAdapter.convertBytes(sizeBytes);
+    }
 
     /**
      * This method converts dp unit to equivalent pixels, depending on device density.
@@ -287,14 +372,14 @@ public class AndroidUtils {
             return null;
         }
         if (!input.markSupported()) {
-            input = new BufferedInputStream(input, 4096);
+            input = new BufferedInputStream(input);
         }
         ByteArrayOutputStream output = null;
         try {
-            output = new ByteArrayOutputStream(1024);
+            output = new ByteArrayOutputStream(8192);
             IOUtils.copy(input, output);
             return new ByteArrayInputStream(output.toByteArray());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         } finally {
             if (output != null) {
@@ -394,10 +479,50 @@ public class AndroidUtils {
         return set;
     }
 
+    public static String[] split(String string, char delimiter) {
+        int n = 1;
+        int i = 0;
+        while (true) {
+            i = string.indexOf(delimiter, i);
+            if (i == -1) break;
+            n++;
+            i++;
+        }
+        if (n == 1) return new String[]{string};
+
+        String[] result = new String[n];
+        n = 0;
+        i = 0;
+        int start = 0;
+        while (true) {
+            i = string.indexOf(delimiter, start);
+            if (i == -1) break;
+            result[n++] = string.substring(start, i);
+            start = i + 1;
+        }
+        result[n] = string.substring(start);
+        return result;
+    }
+
+    public static String join(String[] strings, char separator) {
+        StringBuilder buffer = new StringBuilder();
+        boolean first = true;
+        for (String string : strings) {
+            if (!first) {
+                buffer.append(separator);
+            } else {
+                first = false;
+            }
+
+            buffer.append(string);
+        }
+        return buffer.toString();
+    }
+
+
     public static void openUrlInBrowser(Context context, String url) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         context.startActivity(browserIntent);
-
     }
 
     public static void checkUpdate(final Context context, final boolean forceCheck) {
@@ -410,15 +535,13 @@ public class AndroidUtils {
             return;
         }
 
-        AsyncHttpClient client = new AsyncHttpClient(context);
-        HttpRequest request = new HttpRequest(SettingsFragment.UPDATE_URL);
-
-        client.execute(request, new HttpRequest.OnResponseListener() {
+        HttpRequest request = HttpRequest.builder(SettingsFragment.UPDATE_URL).build();
+        HttpClient.execute(request, new HttpRequest.SimpleOnResponseListener() {
             @Override
-            public void onResponse(AsyncHttpClient client, HttpResponse response) {
+            public void onResponse(HttpClient client, HttpResponse response) {
                 PrefManager.putLong(SettingsFragment.LAST_UPDATE_TIME, System.currentTimeMillis());
 
-                JSONObject json = response.getContentAsJson();
+                JSONObject json = response.asJson();
                 if (BuildConfig.VERSION_CODE >= json.optInt("version_code")) {
                     if (!forceCheck) {
                         return;
@@ -436,7 +559,7 @@ public class AndroidUtils {
             }
 
             @Override
-            public void onError(AsyncHttpClient client, final HttpResponseCodeException exception) {
+            public void onError(HttpClient client, final HttpException exception) {
                 runOnUi(new Runnable() {
                     @Override
                     public void run() {
@@ -562,7 +685,12 @@ public class AndroidUtils {
 
         @Override
         public Bitmap transform(Bitmap source) {
-            return FastBlur.doBlur(source, radius);
+            Bitmap blurred = FastBlur.doBlur(source, radius);
+            if (blurred != source) {
+                source.recycle();
+                source = null;
+            }
+            return blurred;
         }
 
         @Override

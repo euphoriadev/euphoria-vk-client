@@ -53,6 +53,7 @@ import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
+import ru.euphoriadev.vk.view.BoundedLinearLayout;
 import ru.euphoriadev.vk.view.CircleImageView;
 
 /**
@@ -61,6 +62,8 @@ import ru.euphoriadev.vk.view.CircleImageView;
 public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKUpdateController.MessageListener {
 
     public static final int DEFAULT_COLOR = ResourcesLoader.getColor(R.color.md_grey_800);
+    public static final int DEFAULT_LIGHT_COLOR = ResourcesLoader.getColor(R.color.md_grey_200);
+
     public static final int DEFAULT_DARK_COLOR = ThemeManager.darkenColor(DEFAULT_COLOR);
     private final Object mLock = new Object();
     public boolean isScrolling;
@@ -110,7 +113,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                 colorNotReadingInMessages = DEFAULT_DARK_COLOR;
             } else {
                 colorNotReadingInMessages = AndroidUtils.getColor(mContext, R.color.secondary_text_default_material_dark);
-                colorInMessages = AndroidUtils.getColor(mContext, R.color.white);
+                colorInMessages = AndroidUtils.getColor(mContext, R.color.md_grey_200);
             }
         }
 
@@ -123,7 +126,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                 colorNotReadingOutMessages = DEFAULT_DARK_COLOR;
             } else {
                 colorNotReadingOutMessages = AndroidUtils.getColor(mContext, R.color.secondary_text_default_material_dark);
-                colorOutMessages = AndroidUtils.getColor(mContext, R.color.white);
+                colorOutMessages = AndroidUtils.getColor(mContext, R.color.md_grey_200);
             }
         }
         boolean isWallpaperBackground = !TextUtils.isEmpty(ThemeManager.getWallpaperPath(mContext));
@@ -146,7 +149,6 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         this.date = new Date(System.currentTimeMillis());
         mHelper = DBHelper.get(mContext);
         cacheMessages = new CacheMessages(CacheMessages.DEFAULT_SIZE);
-
 
         VKUpdateController.getInstance().addMessageListener(this);
 
@@ -302,7 +304,9 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
             }
         }
 
-        holder.tvBody.setMaxWidth(widthDisplay - (widthDisplay / 4));
+//        holder.llContainer.getLayoutParams().width = widthDisplay - (widthDisplay / 4);
+        holder.llContainer.setMaxWidth(widthDisplay - (widthDisplay / 4));
+//        holder.tvBody.setMaxWidth(widthDisplay - (widthDisplay / 4));
         holder.tvBody.setTextColor(primaryTextColor);
         holder.tvDate.setTextColor(ThemeManager.getSecondaryTextColor());
 
@@ -647,21 +651,14 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                         }
 
                         View docItem = View.inflate(mContext, R.layout.list_item_doc, null);
-
-                        TextView tvDocTitle = (TextView) docItem.findViewById(R.id.tvDocTitle);
-                        TextView tvDocSize = (TextView) docItem.findViewById(R.id.tvDocSize);
-//                        ImageView ivDocIcon = (ImageView) docItem.findViewById(R.id.ivDocIcon);
+                        DocsAdapter.getView(docItem, att.document, new DocsAdapter.ViewHolder(docItem));
                         holder.llAttachContainer.addView(docItem);
 
-                        tvDocTitle.setTextColor(primaryTextColor);
-                        tvDocSize.setTextColor(secondaryTextColor);
-
-                        tvDocTitle.setText(att.document.title);
-                        tvDocSize.setText((att.document.size / 1048576) + "MB");
-
-                        ViewUtil.setTypeface(tvDocTitle);
-                        ViewUtil.setTypeface(tvDocSize);
-
+                        ImageView ivDoc = (ImageView) docItem.findViewById(R.id.ivDocDownload);
+                        if (!isNightTheme && (!item.message.is_out && !isColorInMessages) ||
+                                (item.message.is_out && !isColorOutMessages)) {
+                            ViewUtil.setFilter(ivDoc, ThemeManager.getThemeColor(getContext()));
+                        }
                         break;
 
                     case VKAttachment.TYPE_LINK:
@@ -822,7 +819,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
     }
 
     private static class ViewHolder {
-        public LinearLayout llContainer;
+        public BoundedLinearLayout llContainer;
         public LinearLayout llMainContainer;
         public LinearLayout llAttachContainer;
         public TextView tvBody;
@@ -832,7 +829,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         public android.support.v4.widget.Space spaceSelected;
 
         public ViewHolder(View v) {
-            llContainer = (LinearLayout) v.findViewById(R.id.llMessageContainer);
+            llContainer = (BoundedLinearLayout) v.findViewById(R.id.llMessageContainer);
             llMainContainer = (LinearLayout) v.findViewById(R.id.llMessageMainContainer);
             llAttachContainer = (LinearLayout) v.findViewById(R.id.llMessageAttachments);
             tvBody = (TextView) v.findViewById(R.id.tvMessageText);

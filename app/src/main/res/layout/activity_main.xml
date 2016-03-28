@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:fitsSystemWindows="true"
+    android:layerType="hardware"
     android:scrollbars="none"
     tools:context=".BasicActivity"
     tools:openDrawer="start">
@@ -29,6 +30,7 @@
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clipChildren="false"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <include
@@ -59,7 +61,9 @@
         android:layout_gravity="start"
         android:fadeScrollbars="false"
         android:fitsSystemWindows="true"
+        android:layerType="hardware"
         app:headerLayout="@layout/navigation_view_header"
+        app:itemBackground="?android:windowBackground"
         app:menu="@menu/navigation_drawer_menu">
 
 

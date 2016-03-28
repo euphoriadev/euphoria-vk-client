@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.preference.PreferenceManager;
@@ -41,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,15 +52,15 @@ import ru.euphoriadev.vk.adapter.DialogItem;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.napi.VKApi;
+import ru.euphoriadev.vk.sqlite.VKInsertHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.PrefManager;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
-import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.fab.FloatingActionButton;
 
@@ -82,6 +84,9 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
 
     SQLiteDatabase database = null;
     SharedPreferences preferences;
+
+    private static final int SORT_BY_DEFAULT = 90;
+    private static final int SORT_BY_UNREAD = 100;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -172,6 +177,10 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
         swipeLayout.setOnRefreshListener(this);
         swipeLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN, Color.BLACK);
 
+        View shadowToolbar = rootView.findViewById(R.id.toolbarShadow);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            shadowToolbar.setVisibility(View.GONE);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setColorNormal(ThemeManager.getColorAccent(getActivity()));
@@ -219,7 +228,7 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
 
     @Override
     public void onRefresh() {
-        if (AndroidUtils.isInternetConnection(getActivity())) {
+        if (AndroidUtils.hasConnection(getActivity())) {
             loadDialogs(true);
         } else {
             AndroidUtils.showToast(activity, getResources().getString(R.string.check_internet), true);
@@ -427,33 +436,6 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
     private void loadDialogs(final boolean onlyUpdate) {
         AsyncTaskCompat.executeParallel(new AsyncLoadDialogsTask());
 
-        if (AndroidUtils.isInternetConnection(getActivity())) {
-            VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
-                @Override
-                public void onResponse(VKApi.VKRequest request, JSONObject responseJson) {
-                    final JSONObject response = responseJson.optJSONObject("response");
-                    if (response == null) {
-                        return;
-                    }
-                    int messageCount = response.optInt("count");
-                    PrefManager.putInt("message_count", messageCount);
-                    if (getActivity() == null || ((BasicActivity) getActivity()).getSupportActionBar() == null) {
-                        return;
-                    }
-                    ((BasicActivity) getActivity()).getSupportActionBar()
-                            .setTitle(String.format("%s (%s)",
-                                    getResources().getString(R.string.messages),
-                                    PrefManager.getInt(SettingsFragment.KEY_MESSAGE_COUNT, 0)));
-                }
-
-                @Override
-                public void onError(VKApi.VKException exception) {
-
-                }
-            });
-        }
-
-
     }
 
     @Override
@@ -531,7 +513,7 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
      * TODO: на метод наложено ограничение, за один вызов нельзя удалить больше 10000 сообщений
      */
     private void deleteDialog(final long user_id, final long chat_id) {
-        if (!AndroidUtils.isInternetConnection(getActivity())) {
+        if (!AndroidUtils.hasConnection(getActivity())) {
             Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
             return;
         }
@@ -577,17 +559,12 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
     }
 
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         Log.w(TAG, "onCreateOptionsMenu");
         // Inflate the menu;
-        inflater.inflate(R.menu.main_menu, menu);
-
-        // важные
-        MenuItem itemImportant = menu.add(R.string.important_messages).setIcon(R.drawable.ic_star_white);
-        MenuItemCompat.setShowAsAction(itemImportant, MenuItemCompat.SHOW_AS_ACTION_NEVER);
+        inflater.inflate(R.menu.dialogs_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
 
@@ -646,8 +623,11 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getTitle().equals(getActivity().getResources().getString(R.string.important_messages))) {
+        if (item.getItemId() == R.id.action_important) {
             startActivity(new Intent(getActivity(), ImportantMessagesActivity.class));
+        } else if (item.getItemId() == R.id.action_sort_by_unread) {
+            Collections.sort(dialogItems, DialogItem.COMPARATOR_BY_UNREAD);
+            adapter.notifyDataSetChanged();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -718,7 +698,6 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
                 dialogItems = new ArrayList<>(30);
             }
             database = DBHelper.get(getActivity()).getWritableDatabase();
-            ;
 
             // get dialogs from database
             getDialogsFrom(database);
@@ -736,7 +715,10 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
 
             System.gc();
             Log.w(TAG, "onPostExecute: end");
+
+            updateMessagesCount();
         }
+
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -745,7 +727,7 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
 
             Log.w(TAG, "doInBackground: start");
             // if user not have internet connection
-            if (!AndroidUtils.isInternetConnection(getActivity())) {
+            if (!AndroidUtils.hasConnection(getActivity())) {
                 AndroidUtils.runOnUi(new RunnableToast(getActivity(), R.string.check_internet, true));
                 return null;
             }
@@ -843,6 +825,32 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
             return new ArrayList<>(0);
         }
 
+    }
+
+    private void updateMessagesCount() {
+        VKApi.messages().getDialogs().count(1).execute(new VKApi.VKOnResponseListener() {
+            @Override
+            public void onResponse(VKApi.VKRequest request, JSONObject responseJson) {
+                final JSONObject response = responseJson.optJSONObject("response");
+                if (response == null) {
+                    return;
+                }
+                int messageCount = response.optInt("count");
+                PrefManager.putInt(SettingsFragment.KEY_MESSAGE_COUNT, messageCount);
+                if (getActivity() == null || ((BasicActivity) getActivity()).getSupportActionBar() == null) {
+                    return;
+                }
+                ((BasicActivity) getActivity()).getSupportActionBar()
+                        .setTitle(String.format("%s (%s)",
+                                getResources().getString(R.string.messages),
+                                messageCount));
+            }
+
+            @Override
+            public void onError(VKApi.VKException exception) {
+
+            }
+        });
     }
 
 }

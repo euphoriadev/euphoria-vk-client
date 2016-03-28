@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="ru.euphoriadev.vk"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:installLocation="auto">
+<manifest package="ru.euphoriadev.vk"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:installLocation="auto">
 
-    <uses-sdk
-        />
+    <uses-sdk/>
 
     <!--
         Version API Name
@@ -31,7 +29,8 @@
         1.5     3   Cupcake
         1.1     2
         1.0     1   Base
-       <! -->
+       <!
+    -->
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
@@ -67,11 +66,9 @@
         <activity
             android:name=".PrefActivity"
             android:label="@string/prefs"/>
-
         <activity
-            android:name=".TestActivity"
+            android:name=".DebugActivity"
             android:configChanges="keyboardHidden"/>
-
         <activity android:name=".ForwardMessagesActivity"/>
         <activity android:name=".DialogMaterialsActivity"/>
         <activity android:name=".ChatSettingActivity"/>
@@ -81,9 +78,7 @@
         <activity android:name=".CreateChatActivity"/>
         <activity android:name=".MusicPlayerActivity"/>
         <activity android:name=".PhotoViewerActivity"/>
-        <activity
-            android:name=".ImageViewerActivity"
-            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"/>
+        <activity android:name=".FileManagerActivity"/>
 
         <service
             android:name=".service.PlayMusicService"
@@ -97,6 +92,10 @@
             android:name=".service.OnlineService"
             android:enabled="true"
             android:exported="true"/>
+        <service
+            android:name=".service.UploadService"
+            android:enabled="true"
+            android:exported="true"/>
 
         <receiver
             android:name=".receiver.ConnectivityChangeReceiver"
@@ -108,15 +107,12 @@
                 <!-- <action android:name="android.net.wifi.STATE_CHANGE"/> -->
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.MediaPlayerReceiver"
             android:enabled="true"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
-
                 <action android:name="ru.euphoriadev.vk.ACTION_PLAY"/>
                 <action android:name="ru.euphoriadev.vk.ACTION_PAUSE"/>
                 <action android:name="ru.euphoriadev.vk.ACTION_STOP"/>
@@ -126,6 +122,8 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".DocTextViewActivity">
+        </activity>
     </application>
 
 </manifest>

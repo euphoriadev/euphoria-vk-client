@@ -9,16 +9,22 @@ import android.os.Build;
  * Simple updater/changer of Preferences
  */
 public class PrefManager {
-    /** Default values */
+    /**
+     * Default values
+     */
     public static final String DEFAULT_STRING_VALUE = "";
     public static final int DEFAULT_INT_VALUE = 0;
     public static final long DEFAULT_LONG_VALUE = 0;
     public static final boolean DEFAULT_BOOLEAN_VALUE = false;
 
-    /** Preferences for all App */
+    /**
+     * Preferences for all App
+     */
     private static final SharedPreferences sPreferences = AppLoader.getLoader().getPreferences();
 
-    /** Editor for change values of Preference */
+    /**
+     * Editor for change values of Preference
+     */
     private static final SharedPreferences.Editor sEditor = sPreferences.edit();
 
     /**

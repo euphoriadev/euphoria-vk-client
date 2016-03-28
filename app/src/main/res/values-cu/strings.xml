@@ -12,7 +12,7 @@
     <string name="friends">Друзья</string>
     <string name="messages">Сообщения</string>
     <string name="forward_messages">[Пересланные сообщения]</string>
-    <string name="auidos">Аудиозаписи</string>
+    <string name="audios">Аудиозаписи</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="exit">Выход</string>
@@ -29,5 +29,6 @@
     <string name="others">Прочее</string>
     <string name="about">О приложении</string>
     <string name="click_to_update">Нажмите для проверки обновления</string>
+    <string name="success">Success</string>
 
 </resources>

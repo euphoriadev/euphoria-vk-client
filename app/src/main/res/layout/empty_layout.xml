@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+              android:orientation="vertical"
+              android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/ivSentiment"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_sentiment_dissatisfied"/>
+
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?android:textColorSecondary"
+        android:gravity="center"
+        android:text="@string/attach_empty"
+        android:textColor="?android:textColorSecondary"
+        android:textSize="28sp"/>
+
+</LinearLayout>

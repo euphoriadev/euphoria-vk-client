@@ -6,11 +6,6 @@
               android:fitsSystemWindows="true"
               android:orientation="vertical">
 
-    <View
-        android:id="@+id/statusBarBackground"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/main_toolbar"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,9 +21,10 @@
         android:layout_weight="1">
 
         <View
+            android:id="@+id/toolbarShadow"
             android:layout_width="match_parent"
             android:layout_height="6dp"
-            android:background="@drawable/toolbar_dropshadow"/>
+            android:background="@drawable/toolbar_shadow"/>
 
         <ListView
             android:id="@+id/lvImportantMessages"
@@ -41,7 +37,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="6dp"
-            android:background="@drawable/toolbar_dropshadow"/>
+            android:background="@drawable/toolbar_shadow"/>
 
     </FrameLayout>
 

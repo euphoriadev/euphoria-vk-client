@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import ru.euphoriadev.vk.SettingsFragment;
-import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.common.PrefManager;
-import ru.euphoriadev.vk.util.RefreshManager;
 import ru.euphoriadev.vk.interfaces.Refreshable;
+import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.RefreshManager;
 
 /**
  * Created by user on 14.01.16.
@@ -46,13 +46,16 @@ public class ProgressBarPreference extends MaterialPreference implements Refresh
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getTitle());
-        builder.setMessage(getTitle() + ": " + seekBar.getProgress() + 1);
+        builder.setMessage(getTitle() + ": " + (seekBar.getProgress()));
         builder.setView(seekBar);
         builder.setNegativeButton("Cancel", null);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PrefManager.putInt(getKey(), seekBar.getProgress() + 1);
+                if (seekBar.getProgress() <= 0) {
+                    seekBar.setProgress(1);
+                }
+                PrefManager.putInt(getKey(), seekBar.getProgress());
 
                 if (getOnPreferenceChangeListener() != null) {
                     getOnPreferenceChangeListener().onPreferenceChange(ProgressBarPreference.this, seekBar.getProgress());

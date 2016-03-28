@@ -33,9 +33,10 @@ import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.sqlite.VKInsertHelper;
+import ru.euphoriadev.vk.sqlite.VKSqliteHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ArrayUtil;
-import ru.euphoriadev.vk.util.VKInsertHelper;
 
 /**
  * Created by Igor on 16.07.15.
@@ -140,7 +141,7 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
                                 }
                             }
 
-                            if (!AndroidUtils.isInternetConnection(getActivity())) {
+                            if (!AndroidUtils.hasConnection(getActivity())) {
                                 Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
                                 return;
                             }
@@ -161,7 +162,7 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
                         break;
 
                     case FriendsPageAdapter.POSITION_REQUEST:
-                        if (!AndroidUtils.isInternetConnection(getActivity())) {
+                        if (!AndroidUtils.hasConnection(getActivity())) {
                             Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -171,7 +172,7 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
 
                     case FriendsPageAdapter.POSITION_SUGGESTIONS:
                         try {
-                            if (!AndroidUtils.isInternetConnection(getActivity())) {
+                            if (!AndroidUtils.hasConnection(getActivity())) {
                                 Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
                                 return;
                             }
@@ -216,8 +217,10 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
 
                     Log.w("FriendsFragment", "set adapter, position " + position + ", size " + list.size());
                 } else {
-                        adapter.notifyDataSetChanged();
-                        Log.w("FriendsFragment", "update adapter, position " + position + ", size " + list.size());
+                    adapter.clear();
+                    adapter.getValues().addAll(list);
+                    adapter.notifyDataSetChanged();
+                    Log.w("FriendsFragment", "update adapter, position " + position + ", size " + list.size());
 
                 }
                 orderFriends();
@@ -226,21 +229,7 @@ public class FriendsFragment extends AbstractFragment implements SwipeRefreshLay
     }
 
     public ArrayList<VKUser> getUsersFrom(SQLiteDatabase database) {
-        Cursor cursor = database.rawQuery("SELECT * FROM " + DBHelper.FRIENDS_TABLE +
-                " WHERE " + DBHelper.USER_ID +
-                " = " + Api.get().getUserId(), null);
-
-        ArrayList<Integer> ids = new ArrayList<>();
-
-        if (cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(2);
-                ids.add(id);
-            }
-        }
-        cursor.close();
-
-        return DBHelper.get(getActivity()).getUsersFromDB(ArrayUtil.toIntArray(ids));
+        return VKSqliteHelper.getAllFriends(database);
     }
 
     public ArrayList<VKUser> getOnlineFriendsFrom(SQLiteDatabase database) {

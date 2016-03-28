@@ -11,7 +11,7 @@ import android.util.TypedValue;
 import android.view.View;
 
 import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.util.TypefaceManager;
+import ru.euphoriadev.vk.common.TypefaceManager;
 
 /**
  * Created by Igor on 22.02.16.
@@ -49,7 +49,7 @@ public class CircleView extends View {
         mTextPaint.setTextSize(16);
 
         mCirclePaint.setStyle(Paint.Style.FILL);
-        mCirclePaint.setColor(ThemeManager.getThemeColor(context));
+        mCirclePaint.setColor(ThemeManager.isBlackThemeColor() ? Color.WHITE : ThemeManager.getThemeColor(getContext()));
         mCirclePaint.setAntiAlias(true);
 
         mBorderPaint.setStyle(Paint.Style.FILL);

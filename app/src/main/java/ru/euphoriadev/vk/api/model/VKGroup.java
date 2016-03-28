@@ -145,6 +145,7 @@ public class VKGroup implements Serializable {
         public final static int MODERATOR = 1;
         public final static int EDITOR = 2;
         public final static int ADMIN = 3;
+
         private AdminLevel() {
         }
     }
@@ -156,6 +157,7 @@ public class VKGroup implements Serializable {
         public final static int OPEN = 0;
         public final static int CLOSED = 1;
         public final static int PRIVATE = 2;
+
         private Status() {
         }
 
@@ -170,6 +172,7 @@ public class VKGroup implements Serializable {
         public final static int GROUP = 0;
         public final static int PAGE = 1;
         public final static int EVENT = 2;
+
         private Type() {
         }
     }

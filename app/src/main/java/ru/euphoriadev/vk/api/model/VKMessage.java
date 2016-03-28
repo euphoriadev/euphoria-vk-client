@@ -24,75 +24,75 @@ public class VKMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
-     * 	Message ID. (Not returned for forwarded messages), positive number
+     * Message ID. (Not returned for forwarded messages), positive number
      */
     public int mid;
     /**
-     *  For an incoming message, the user ID of the author. For an outgoing message, the user ID of the receiver.
+     * For an incoming message, the user ID of the author. For an outgoing message, the user ID of the receiver.
      */
     public int uid;
     /**
-     *  Date (in Unix time) when the message was sent.
+     * Date (in Unix time) when the message was sent.
      */
     public long date;
     /**
-     *  Title of message or chat.
+     * Title of message or chat.
      */
     public String title;
     /**
-     *  Message text
+     * Message text
      */
     public String body;
     /**
-     *  Message status (false — not read, true — read). (Not returned for forwarded messages
+     * Message status (false — not read, true — read). (Not returned for forwarded messages
      */
     public boolean read_state;
     /**
-     *  type (false — received, true — sent). (Not returned for forwarded messages.)
+     * type (false — received, true — sent). (Not returned for forwarded messages.)
      */
     public boolean is_out;
     /**
-     *  List of media-attachments;
+     * List of media-attachments;
      */
     public ArrayList<VKAttachment> attachments = new ArrayList<>();
     /**
-     *  Chat ID
+     * Chat ID
      */
     public int chat_id;
     /**
-     *  User IDs of chat participants
+     * User IDs of chat participants
      */
     public ArrayList<Long> chat_members;
     /**
-     *  ID of user who started the chat.
+     * ID of user who started the chat.
      */
     public Long admin_id;
     /**
-     *  Number of chat participants.
+     * Number of chat participants.
      */
     public int users_count;
     /**
-     *  Whether the message is deleted (false — no, true — yes).
+     * Whether the message is deleted (false — no, true — yes).
      */
     public boolean is_deleted;
     /**
-     *  Whether the message is important
+     * Whether the message is important
      */
     public boolean is_important;
     /**
-     *  Whether the message contains smiles (false — no, true — yes).
+     * Whether the message contains smiles (false — no, true — yes).
      */
     public boolean emoji;
     /**
-     *  URL of chat image with width size of 50px
+     * URL of chat image with width size of 50px
      */
     public String photo_50;
     /**
-     *  URL of chat image with width size of 100px
+     * URL of chat image with width size of 100px
      */
     public String photo_100;
     /**
-     *  URL of chat image with width size of 200px
+     * URL of chat image with width size of 200px
      */
     public String photo_200;
     /**
@@ -103,6 +103,15 @@ public class VKMessage implements Serializable {
      * Field transferred, if a service message
      */
     public String action;
+    /**
+     * The chat name, for service messages
+     */
+    public String action_text;
+    /**
+     * User ID (if > 0) or email (if < 0), who was invited or kicked
+     */
+    public int action_mid;
+
     public int flag;
 
     public VKMessage(String body, boolean isOut) {
@@ -185,6 +194,8 @@ public class VKMessage implements Serializable {
         message.is_important = source.optLong("important") == 1;
         message.emoji = source.optLong("emoji") == 1;
         message.action = source.optString("action");
+        message.action_text = source.optString("action_text");
+        message.action_mid = source.optInt("action_mid");
         message.photo_50 = source.optString("photo_50");
         message.photo_100 = source.optString("photo_100");
         message.photo_200 = source.optString("photo_200");
@@ -326,32 +337,37 @@ public class VKMessage implements Serializable {
         if (read_state != message.read_state) return false;
         if (uid != message.uid) return false;
         if (users_count != message.users_count) return false;
-        if (admin_id != null ? !admin_id.equals(message.admin_id) : message.admin_id != null) return false;
-        if (attachments != null ? !attachments.equals(message.attachments) : message.attachments != null) return false;
+        if (admin_id != null ? !admin_id.equals(message.admin_id) : message.admin_id != null)
+            return false;
+        if (attachments != null ? !attachments.equals(message.attachments) : message.attachments != null)
+            return false;
         if (body != null ? !body.equals(message.body) : message.body != null) return false;
         if (chat_members != null ? !chat_members.equals(message.chat_members) : message.chat_members != null)
             return false;
-        if (photo_100 != null ? !photo_100.equals(message.photo_100) : message.photo_100 != null) return false;
-        if (photo_200 != null ? !photo_200.equals(message.photo_200) : message.photo_200 != null) return false;
-        if (photo_50 != null ? !photo_50.equals(message.photo_50) : message.photo_50 != null) return false;
+        if (photo_100 != null ? !photo_100.equals(message.photo_100) : message.photo_100 != null)
+            return false;
+        if (photo_200 != null ? !photo_200.equals(message.photo_200) : message.photo_200 != null)
+            return false;
+        if (photo_50 != null ? !photo_50.equals(message.photo_50) : message.photo_50 != null)
+            return false;
         return !(title != null ? !title.equals(message.title) : message.title != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (mid ^ (mid >>> 32));
-        result = 31 * result + (int) (uid ^ (uid >>> 32));
-        result = 31 * result + (int) (date ^ (date >>> 32));
+        int result = (int) (mid ^ (mid>>>32));
+        result = 31 * result + (int) (uid ^ (uid>>>32));
+        result = 31 * result + (int) (date ^ (date>>>32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (body != null ? body.hashCode() : 0);
         result = 31 * result + (read_state ? 1 : 0);
         result = 31 * result + (is_out ? 1 : 0);
         result = 31 * result + (attachments != null ? attachments.hashCode() : 0);
-        result = 31 * result + (int) (chat_id ^ (chat_id >>> 32));
+        result = 31 * result + (int) (chat_id ^ (chat_id>>>32));
         result = 31 * result + (chat_members != null ? chat_members.hashCode() : 0);
         result = 31 * result + (admin_id != null ? admin_id.hashCode() : 0);
-        result = 31 * result + (int) (users_count ^ (users_count >>> 32));
+        result = 31 * result + (int) (users_count ^ (users_count>>>32));
         result = 31 * result + (is_deleted ? 1 : 0);
         result = 31 * result + (is_important ? 1 : 0);
         result = 31 * result + (photo_50 != null ? photo_50.hashCode() : 0);

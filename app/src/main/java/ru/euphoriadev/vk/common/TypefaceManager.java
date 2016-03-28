@@ -1,4 +1,4 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 
 import ru.euphoriadev.vk.SettingsFragment;
-import ru.euphoriadev.vk.common.AppLoader;
 
 /**
  * Created by Igor on 21.12.15.
@@ -17,34 +16,48 @@ import ru.euphoriadev.vk.common.AppLoader;
  */
 
 public class TypefaceManager {
-    /**Preferences key for fonts */
+    /**
+     * Preferences key for fonts
+     */
     public static final String PREF_KEY_FONT_FAMILY = SettingsFragment.KEY_FONT_FAMILY;
     public static final String PREF_KEY_TEXT_WEIGHT = SettingsFragment.KEY_TEXT_WEIGHT;
 
-    /** Default Roboto fonts */
+    /**
+     * Default Roboto fonts
+     */
     public static final String ROBOTO_TINT = "Roboto-Thin.ttf";
     public static final String ROBOTO_LIGHT = "Roboto-Light.ttf";
     public static final String ROBOTO_REGULAR = "Roboto-Regular.ttf";
     public static final String ROBOTO_MEDIUM = "Roboto-Medium.ttf";
     public static final String ROBOTO_BOLD = "Roboto-Bold.ttf";
 
-    /** Roboto Condensed fonts */
+    /**
+     * Roboto Condensed fonts
+     */
     public static final String ROBOTO_CONDENSED_LIGHT = "RobotoCondensed-Light.ttf";
     public static final String ROBOTO_CONDENSED_REGULAR = "RobotoCondensed-Regular.ttf";
     public static final String ROBOTO_CONDENSED_BOLD = "RobotoCondensed-Bold.ttf";
 
-    /** Droid Sans fonts */
+    /**
+     * Droid Sans fonts
+     */
     public static final String DROID_REGULAR = "DroidSans.ttf";
     public static final String DROID_BOLD = "DroidSans-Bold.ttf";
 
-    /** Default fonts */
+    /**
+     * Default fonts
+     */
     public static final String DEFAULT_FONT = "Default_font";
     public static final String DEFAULT_FONT_BOLD = "Default_font_Bold";
 
-    /** Cache of fonts for reuse */
+    /**
+     * Cache of fonts for reuse
+     */
     private static final SparseArray<Typeface> sTypefaceCache = new SparseArray<>();
 
-    /** Cached preferences value */
+    /**
+     * Cached preferences value
+     */
     private static int mFontFamily = -1;
     private static int mTextWeight = -1;
 
@@ -73,6 +86,10 @@ public class TypefaceManager {
             sTypefaceCache.append(typefaceName.hashCode(), typeface);
         }
         return typeface;
+    }
+
+    public static Typeface getTypeface(Context context) {
+        return getTypeface(context, getFontFamily(), getTextWeight());
     }
 
     /**

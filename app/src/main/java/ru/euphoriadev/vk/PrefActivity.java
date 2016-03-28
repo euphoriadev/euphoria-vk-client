@@ -3,9 +3,7 @@ package ru.euphoriadev.vk;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
-import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
@@ -16,8 +14,6 @@ public class PrefActivity extends BaseThemedActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-//        AppLoader.getLoader().applyTheme(PrefActivity.this);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -28,12 +24,11 @@ public class PrefActivity extends BaseThemedActivity {
 
         ViewUtil.setTypeface(getToolbar());
 
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        View statusBarView = findViewById(R.id.statusBarPrefs);
-        AndroidUtils.setStatusBarColor(this, statusBarView);
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.container_prefs, new SettingsFragment()).commit();

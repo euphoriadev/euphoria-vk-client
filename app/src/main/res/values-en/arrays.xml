@@ -10,6 +10,7 @@
         <item>Gifts</item>
     </string-array>
 
+
     <string-array name="online_status_array">
         <item>Offline</item>
         <item>Eternal</item>
@@ -19,23 +20,33 @@
     <string-array name="message_dialog_array">
         <item>Forward</item>
         <item>Copy text</item>
-        <item>To decipher</item>
+        <item>Decrypt</item>
         <item>Translate</item>
         <item>Delete</item>
     </string-array>
 
+    <string-array name="tab_docs_array">
+        <item>All</item>
+        <item>Text</item>
+        <item>Archive</item>
+        <item>Gif</item>
+        <item>Image</item>
+        <item>Audio</item>
+        <item>Video</item>
+        <item>Book</item>
+    </string-array>
 
     <string-array name="prefs_drawer_header_array">
         <item>Default</item>
         <item>Solid background</item>
-        <item>Blur photo of User</item>
+        <item>Blurred avatar</item>
     </string-array>
 
     <string-array name="tabs_material_of_dialog_array">
-        <item>Photos</item>
+        <item>Images</item>
         <item>Videos</item>
         <item>Audios</item>
-        <item>Docs</item>
+        <item>Documents</item>
     </string-array>
 
     <string-array name="friends_sort_array">
@@ -43,8 +54,8 @@
         <item>Best</item>
         <item>Colleagues</item>
         <item>Relatives</item>
-        <item>University</item>
-        <item>School</item>
+        <item>University friends</item>
+        <item>School friends</item>
     </string-array>
 
     <string-array name="tab_friends_array">
@@ -52,6 +63,14 @@
         <item>Online</item>
         <item>Followers</item>
         <item>Suggestions</item>
+    </string-array>
+
+    <string-array name="text_weight_array">
+        <item>Usual</item>
+        <item>Very thin</item>
+        <item>Thin</item>
+        <item>Medium</item>
+        <item>Bold</item>
     </string-array>
 
 </resources>

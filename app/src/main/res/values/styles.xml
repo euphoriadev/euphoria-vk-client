@@ -12,7 +12,8 @@
     </style>
 
     <style name="AppThemeLight" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@color/md_grey_200</item>
+        <!--<item name="android:windowBackground">@color/md_grey_200</item>-->
+        <item name="android:windowBackground">@android:color/white</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="cardBackgroundColor">@android:color/white</item>
 
@@ -27,7 +28,6 @@
     <style name="AlertDialogDark" parent="@android:style/Theme.Dialog">
         <item name="android:windowBackground">@color/cardview_dark_background</item>
     </style>
-
 
 
     <style name="AppTheme.Red">

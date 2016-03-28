@@ -70,7 +70,7 @@ public class VKMessageAttachment {
 
     public static ArrayList<VKMessageAttachment> parseArray(JSONArray items, String type, int next_from) throws JSONException {
         ArrayList<VKMessageAttachment> attachments = new ArrayList<>(items.length());
-        if (items.length() <= 0) {
+        if (items == null || items.length() <= 0) {
             return attachments;
         }
 

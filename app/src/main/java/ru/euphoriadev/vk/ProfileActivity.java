@@ -18,9 +18,9 @@ import com.squareup.picasso.Picasso;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.view.CircleImageView;
 
 /**

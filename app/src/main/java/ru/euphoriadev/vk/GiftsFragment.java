@@ -17,8 +17,8 @@ import ru.euphoriadev.vk.adapter.GiftsAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKGift;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.util.Account;
 
 /**
  * Created by user on 24.07.15.

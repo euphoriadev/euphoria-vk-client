@@ -2,10 +2,13 @@ package ru.euphoriadev.vk;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Process;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -31,11 +34,13 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Target;
 
 import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.KException;
@@ -51,6 +56,7 @@ import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
+import ru.euphoriadev.vk.util.ArrayUtil;
 import ru.euphoriadev.vk.util.RefreshManager;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
@@ -81,8 +87,10 @@ public class BasicActivity extends BaseThemedActivity implements
 //        circularRevealAnimation();
 
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        toolbar.setBackgroundDrawable(null);
         toolbar.setTitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
         toolbar.setSubtitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         setStatusBarColor();
@@ -115,7 +123,7 @@ public class BasicActivity extends BaseThemedActivity implements
         selectItem(R.id.navMessages);
         initDrawerHeader();
 
-        if (AndroidUtils.isInternetConnection(this)) {
+        if (AndroidUtils.hasConnection(this)) {
             trackStats();
             joinInGroup();
         }
@@ -126,6 +134,7 @@ public class BasicActivity extends BaseThemedActivity implements
 
         startService(new Intent(this, LongPollService.class));
         loadWallpaper();
+//        VKSqliteHelper.test();
     }
 
 
@@ -266,7 +275,7 @@ public class BasicActivity extends BaseThemedActivity implements
                 break;
 
             case R.id.navDocs:
-                currentFragment = new DocsFragment();
+                currentFragment = new DocsTabsFragment();
                 break;
 
             case R.id.navNotes:
@@ -338,25 +347,7 @@ public class BasicActivity extends BaseThemedActivity implements
     }
 
     private void trackStats() {
-        ThreadExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    Thread.sleep(1000);
-                    api.trackStatsVisitor();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                    AndroidUtils.runOnUi(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(BasicActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }
-        });
+       VKApi.stats().trackVisitor().execute(null);
     }
 
     private void loadWallpaper() {
@@ -475,6 +466,56 @@ public class BasicActivity extends BaseThemedActivity implements
 
     }
 
+    private void loadHintsFriends() {
+        if (!AndroidUtils.hasConnection(this)) {
+            return;
+        }
+
+        final Menu menuFriends = navigationView.getMenu().addSubMenu("Friends");
+        ThreadExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ArrayList<VKUser> friends = Api.get().getFriends(Api.get().getUserId(), "hints", 5, null, null, null);
+                    if (ArrayUtil.isEmpty(friends)) {
+                        return;
+                    }
+
+                    for (int i = 0; i < friends.size(); i++) {
+                        final VKUser user = friends.get(i);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Picasso.with(BasicActivity.this)
+                                        .load(user.photo_50)
+                                        .config(Bitmap.Config.RGB_565)
+                                        .into(new Target() {
+                                            @Override
+                                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                                Log.w("onBitmapLoaded", user.toString());
+                                                menuFriends.add(user.toString()).setIcon(new BitmapDrawable(getResources(), bitmap));
+                                            }
+
+                                            @Override
+                                            public void onBitmapFailed(Drawable errorDrawable) {
+
+                                            }
+
+                                            @Override
+                                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                            }
+                                        });
+                            }
+                        });
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
     private void initDrawerHeader() {
         if (account == null) {
@@ -517,7 +558,16 @@ public class BasicActivity extends BaseThemedActivity implements
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (ThemeManager.isBlackThemeColor()) {
+//            navigationView.setItemIconTintList(AndroidUtils.createColorStateList(Color.WHITE, ThemeManager.getSecondaryTextColor()));
+//            navigationView.setItemTextColor(AndroidUtils.createColorStateList(Color.WHITE, ThemeManager.getSecondaryTextColor()));
+            navigationView.setItemIconTintList(ColorStateList.valueOf(Color.WHITE));
+            navigationView.setItemTextColor(ColorStateList.valueOf(Color.WHITE));
 
+        }
+
+        // does not work as it should
+//        loadHintsFriends();
     }
 
 
@@ -586,7 +636,7 @@ public class BasicActivity extends BaseThemedActivity implements
             @Override
             public void run() {
                 try {
-                    Thread.sleep(250);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

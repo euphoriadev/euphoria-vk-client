@@ -2,6 +2,8 @@ package ru.euphoriadev.vk.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +58,12 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter<PhotosRecyclerAd
                 PhotoViewerActivity.start(holder.imageView.getContext(), photos.get(position));
             }
         });
-        Picasso.with(activity).load(photos.get(position).src_big).placeholder(R.drawable.camera_b).into(holder.imageView);
+        Picasso.with(activity)
+                .load(photos
+                        .get(position).src_big)
+                .config(Bitmap.Config.RGB_565)
+                .placeholder(R.drawable.camera_b)
+                .into(holder.imageView);
     }
 
     @Override
@@ -71,6 +78,7 @@ public class PhotosRecyclerAdapter extends RecyclerView.Adapter<PhotosRecyclerAd
             super(itemView);
 
             imageView = (ImageView) itemView;
+            ViewCompat.setElevation(imageView, AndroidUtils.pxFromDp(imageView.getContext(), 8));
         }
 
     }

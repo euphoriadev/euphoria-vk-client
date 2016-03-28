@@ -1,6 +1,14 @@
 package ru.euphoriadev.vk.util;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
+
+import ru.euphoriadev.vk.common.AppLoader;
 
 /**
  * Created by Igor on 04.07.15.
@@ -33,33 +41,27 @@ import android.graphics.Bitmap;
  * Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
  */
 public class FastBlur {
-
+    public static final int DEFAULT_RADIUS = 20;
+    private static final RenderScript renderScript = RenderScript.create(AppLoader.appContext);
+    private static final ScriptIntrinsicBlur blurScript = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
     /**
      * Blur bitmap
      *
-     * @param sentBitmap the {@link Bitmap} to blur
-     * @param radius     the radius of blur
+     * @param bitmap the {@link Bitmap} to blur
+     * @param radius the radius of blur
      * @return blurred bitmap
      */
-    public static Bitmap doBlur(Bitmap sentBitmap, int radius) {
-        Bitmap bitmap;
-        if (sentBitmap == null || sentBitmap.isRecycled()) {
+    public static Bitmap doBlur(Bitmap bitmap, int radius) {
+        if (bitmap == null || bitmap.isRecycled()) {
             return null;
         }
 
-//        if (sentBitmap.isMutable()) {
-//            bitmap = sentBitmap;
-//        } else {
-//            bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
-//        }
+        if (!bitmap.isMutable()) {
+            bitmap = bitmap.copy(bitmap.getConfig(), true);
+        }
 
-        if (sentBitmap.isMutable()) {
-            bitmap = sentBitmap;
-        } else
-            bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
-
-        if (radius < 1) {
-            radius = 1;
+        if (radius <= 0) {
+            radius = DEFAULT_RADIUS;
         }
 
         int w = bitmap.getWidth();
@@ -252,11 +254,21 @@ public class FastBlur {
         }
 
         bitmap.setPixels(pix, 0, w, 0, 0, w, h);
+        return bitmap;
+    }
 
-        if (sentBitmap != bitmap) {
-            sentBitmap.recycle();
-            sentBitmap = null;
-        }
-        return (bitmap);
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public static Bitmap renderScriptBlur(Bitmap bitmap, int radius) {
+
+        // this will blur the bitmapOriginal with a radius of 8 and save it in bitmapOriginal
+        final Allocation input = Allocation.createFromBitmap(renderScript, bitmap); //use this constructor for best performance, because it uses USAGE_SHARED mode which reuses memory
+        final Allocation output = Allocation.createTyped(renderScript, input.getType());
+
+        blurScript.setVar(0, radius);
+        blurScript.setInput(input);
+        blurScript.forEach(output);
+        output.copyTo(bitmap);
+
+        return bitmap;
     }
 }

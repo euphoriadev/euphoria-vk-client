@@ -38,18 +38,18 @@ import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKPhoto;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.common.AppLoader;
+import ru.euphoriadev.vk.common.PrefManager;
+import ru.euphoriadev.vk.http.HttpClient;
 import ru.euphoriadev.vk.http.HttpEntity;
+import ru.euphoriadev.vk.http.HttpException;
 import ru.euphoriadev.vk.http.HttpParams;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
-import ru.euphoriadev.vk.http.HttpResponseCodeException;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.util.ArrayUtil;
-import ru.euphoriadev.vk.common.PrefManager;
 
 /**
  * Created by Igor on 15.01.16.
@@ -120,20 +120,19 @@ public class VKApi {
     /**
      * For execute requests on background
      */
-    private static final ExecutorService VK_SINGLE_EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final ExecutorService sSingleExecutor = Executors.newSingleThreadExecutor();
     private static volatile VKApi instance;
 
     private VKUserConfig mUserConfig;
-    private AsyncHttpClient mClient;
 
     /**
      * Private constructor, Нou don't have use it
      *
      * @see #init(VKUserConfig)
+     * @see #getInstance()
      */
     private VKApi(VKUserConfig account) {
         this.mUserConfig = account;
-        this.mClient = new AsyncHttpClient(null, 1);
     }
 
     /**
@@ -151,6 +150,9 @@ public class VKApi {
 
     /**
      * Get initialized VKApi
+     *
+     * @throws IllegalArgumentException when the api is not initialized
+     * @see #init(VKUserConfig)
      */
     public static VKApi getInstance() {
         if (instance == null) {
@@ -167,7 +169,7 @@ public class VKApi {
     }
 
     /**
-     * Set the config for execute request with user access token and id
+     * Change the config for execute request with user access token and id
      *
      * @param newConfig the new config to set
      */
@@ -204,10 +206,24 @@ public class VKApi {
     }
 
     /**
+     * Methods for documents
+     */
+    public static VKDocs docs() {
+        return new VKDocs();
+    }
+
+    /**
      * Methods for account
      */
     public static VKAccount account() {
         return new VKAccount();
+    }
+
+    /**
+     * Methods for stats
+     */
+    public static VKStats stats() {
+        return new VKStats();
     }
 
     /**
@@ -225,7 +241,7 @@ public class VKApi {
         request.params.put(VKConst.CODE, code);
         try {
             return request.execute();
-        } catch (HttpResponseCodeException e) {
+        } catch (HttpException e) {
             if (DEBUG) e.printStackTrace();
         }
         return null;
@@ -241,7 +257,7 @@ public class VKApi {
     public static void execute(String code, VKOnResponseListener listener) {
         VKRequest request = new VKRequest("execute");
         request.params.put(VKConst.CODE, code);
-        new VKAsyncRequestTask(listener).executeOnExecutor(VK_SINGLE_EXECUTOR, request);
+        new VKAsyncRequestTask(listener).executeOnExecutor(sSingleExecutor, request);
     }
 
     /**
@@ -277,11 +293,11 @@ public class VKApi {
         params.addParam("scope", VKScope.getAllPermissions());
         params.addParam("v", API_VERSION);
 
-        HttpRequest request = new HttpRequest(url, "GET", params);
-        getInstance().mClient.execute(request, new HttpRequest.OnResponseListener() {
+        HttpRequest request = HttpRequest.builder(url).params(params).build();
+        HttpClient.execute(request, new HttpRequest.SimpleOnResponseListener() {
             @Override
-            public void onResponse(AsyncHttpClient client, HttpResponse response) {
-                JSONObject json = response.getContentAsJson();
+            public void onResponse(HttpClient client, HttpResponse response) {
+                JSONObject json = response.asJson();
                 try {
                     VKUtil.checkErrors(url, json);
 
@@ -297,7 +313,7 @@ public class VKApi {
             }
 
             @Override
-            public void onError(AsyncHttpClient client, HttpResponseCodeException exception) {
+            public void onError(HttpClient client, HttpException exception) {
                 if (listener != null) {
                     listener.onError(VKException.from(url, VKErrorCodes.USER_AUTHORIZATION_FAILED, exception));
                 }
@@ -322,7 +338,7 @@ public class VKApi {
         if (instance == null) {
             return;
         }
-        getInstance().mClient.close();
+        sSingleExecutor.shutdownNow();
     }
 
     /**
@@ -522,8 +538,8 @@ public class VKApi {
          * NOTE: This is an open method; it does not require an access_token
          * http://vk.com/dev/users.get
          *
-         * @see VKMessageMethodSetter#userIds(int...)
-         * @see VKMessageMethodSetter#fields(String)
+         * @see VKMethodSetter#userIds(int...)
+         * @see VKMethodSetter#fields(String)
          * @see VKMessageMethodSetter#nameCase(String)
          */
         public VKUserMethodSetter get() {
@@ -1204,14 +1220,161 @@ public class VKApi {
     }
 
     /**
-     * /**
+     * Api methods for friends
+     *
+     * http://vk.com/dev/docs
+     */
+    public static class VKDocs {
+
+        /**
+         * Returns detailed information about user or community documents
+         *
+         * Result:
+         * Returns a list of document objects
+         *
+         * See http://vk.com/dev/docs.get
+         *
+         * @see VKMethodSetter#count(int)
+         * @see VKMethodSetter#offset(int)
+         * @see VKMethodSetter#ownerId(int) (int)
+         * @see VKDocMethodSetter#type(int)
+         */
+        public VKDocMethodSetter get() {
+            return new VKDocMethodSetter(new VKRequest("docs.get"));
+        }
+
+        /**
+         * Returns information about documents by their IDs
+         *
+         * Result:
+         * Returns a list of document objects
+         *
+         * See http://vk.com/dev/docs.getById
+         *
+         * @see VKDocMethodSetter#docs(String...)
+         */
+        public VKDocMethodSetter getById() {
+            return new VKDocMethodSetter(new VKRequest("docs.getById"));
+        }
+
+        /**
+         * Returns the server address for document upload
+         *
+         * Result:
+         * Returns an object with an upload_url field.
+         * After the document is uploaded, use the docs.save method.
+         *
+         * See http://vk.com/dev/docs.getUploadServer
+         *
+         * @see VKDocMethodSetter#groupId(int)
+         * @see VKApi#getDocUploader()
+         */
+        public VKDocMethodSetter getUploadServer() {
+            return new VKDocMethodSetter(new VKRequest("docs.getUploadServer"));
+        }
+
+        /**
+         * Saves a document after uploading it to a server.
+         *
+         * Result:
+         * Returns an array of uploaded document objects
+         *
+         * See http://vk.com/dev/docs.save
+         *
+         * @see VKDocMethodSetter#file(String)
+         * @see VKDocMethodSetter#title(String)
+         * @see VKDocMethodSetter#tags(String)
+         */
+        public VKDocMethodSetter save() {
+            return new VKDocMethodSetter(new VKRequest("docs.save"));
+        }
+
+        /**
+         * Deletes a user or community document
+         *
+         * Result:
+         * Returns 1;
+         *
+         * Errors codes:
+         * - 1150	Invalid document id
+         * - 1151	Access to document deleting is denied
+         *
+         * See http://vk.com/dev/docs.delete
+         *
+         * @see VKMethodSetter#ownerId(int) (String)
+         * @see VKDocMethodSetter#docId(int)
+         * @see VKErrorCodes#INVALID_DOC_ID
+         * @see VKErrorCodes#ACCESS_TO_DOC_DENIED
+         */
+        public VKDocMethodSetter delete() {
+            return new VKDocMethodSetter(new VKRequest("docs.delete"));
+        }
+
+        /**
+         * Copies a document to a user's or community's document list
+         *
+         * Result:
+         * Returns the ID of the created document (did).
+         *
+         * See http://vk.com/dev/docs.add
+         *
+         * @see VKMethodSetter#ownerId(int)
+         * @see VKDocMethodSetter#docId(int)
+         * @see VKDocMethodSetter#accessKey(String)
+         */
+        public VKDocMethodSetter add() {
+            return new VKDocMethodSetter(new VKRequest("docs.add"));
+        }
+
+        /**
+         * Edits a document of user or group
+         *
+         * Result:
+         * Returns 1.
+         *
+         * Errors codes:
+         * - 1150	Invalid document id
+         * - 1152	Invalid document title
+         * - 1153	Access to document is denied
+         *
+         * See http://vk.com/dev/docs.edit
+         *
+         * @see VKMethodSetter#ownerId(int)
+         * @see VKDocMethodSetter#docId(int)
+         * @see VKDocMethodSetter#title(String)
+         * @see VKDocMethodSetter#tags(String)
+         *
+         * @see VKErrorCodes#INVALID_DOC_ID
+         * @see VKErrorCodes#INVALID_DOC_TITLE
+         * @see VKErrorCodes#ACCESS_TO_DOC_DENIED
+         */
+        public VKDocMethodSetter edit() {
+            return new VKDocMethodSetter(new VKRequest("docs.edit"));
+        }
+
+        /**
+         * Searches document
+         *
+         * Result:
+         * Returns a list of document objects
+         *
+         * See http://vk.com/dev/docs.search
+         *
+         * @see VKDocMethodSetter#q(String)
+         * @see VKMethodSetter#count(int)
+         * @see VKMethodSetter#offset(int)
+         */
+        public VKDocMethodSetter search() {
+            return new VKDocMethodSetter(new VKRequest("docs.search"));
+        }
+    }
+
+    /**
      * Api methods for account
      * <p/>
      * http://vk.com/dev/account
      */
     public static class VKAccount {
-
-
         /**
          * Returns non-null values of user counters
          * NOTE: This method doesn't require any specific rights.
@@ -1242,7 +1405,63 @@ public class VKApi {
             return new VKMethodSetter(new VKRequest("account.getAppPermissions"));
         }
 
+        /**
+         * Adds user to the banlist.
+         *
+         * Result:
+         * When executed successfully it returns 1.
+         *
+         * See http://vk.com/dev/account.banUser
+         */
+        public VKMethodSetter banUser(int userId) {
+            return new VKMessageMethodSetter(new VKRequest("account.banUser"))
+                    .userId(userId);
+        }
 
+        /**
+         * Deletes user from the banlist.
+         *
+         * Result:
+         * When executed successfully it returns 1.
+         *
+         * See http://vk.com/dev/account.unbanUser
+         */
+        public VKMethodSetter unbanUser(int userId) {
+            return new VKMessageMethodSetter(new VKRequest("account.unbanUser"))
+                    .userId(userId);
+        }
+
+        /**
+         * Returns a user's blacklist.
+         *
+         * Result:
+         * Returns an array of objects with info
+         * about users who are in the current user's blacklist.
+         *
+         * See http://vk.com/dev/account.getBanned
+         *
+         * @see VKMethodSetter#offset(int)
+         * @see VKMethodSetter#count(int)
+         */
+        public VKMethodSetter getBanned() {
+            return new VKMessageMethodSetter(new VKRequest("account.getBanned"));
+        }
+
+
+    }
+
+    /**
+     * Api methods for stats
+     */
+    public static class VKStats {
+
+        /**
+         * Adds information about the current session to the statistics
+         * of the application
+         */
+        public VKMethodSetter trackVisitor() {
+            return new VKMethodSetter(new VKRequest("stats.trackVisitor"));
+        }
     }
 
     /**
@@ -1398,6 +1617,7 @@ public class VKApi {
         /**
          * Need for {@link VKResponseHandler}
          */
+        @Deprecated
         public VKMethodSetter asModel(Object vkModel) {
             this.request.model = vkModel;
             return this;
@@ -1414,7 +1634,7 @@ public class VKApi {
         /**
          * Executes request and convert to {@link JSONObject}
          */
-        public JSONObject execute() throws HttpResponseCodeException {
+        public JSONObject execute() throws VKException {
             return this.request.execute();
         }
 
@@ -1428,7 +1648,7 @@ public class VKApi {
             final VKAsyncRequestTask task = new VKAsyncRequestTask(listener);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                task.executeOnExecutor(VK_SINGLE_EXECUTOR, request);
+                task.executeOnExecutor(sSingleExecutor, request);
             } else {
                 task.execute(request);
             }
@@ -2419,6 +2639,130 @@ public class VKApi {
         }
     }
 
+    public static class VKDocMethodSetter extends VKMethodSetter {
+
+        /**
+         * Create new VKMethodSetter
+         *
+         * @param request the request which set params
+         */
+        public VKDocMethodSetter(VKRequest request) {
+            super(request);
+        }
+
+        /** Setters for docs.get */
+
+        /**
+         * Filter by doc type:
+         * 1 - text documents
+         * 2 - archives
+         * 3 - gif
+         * 4 - images
+         * 5 - audio
+         * 6 - video
+         * 7 - e-books
+         * 8 - unknown
+         */
+        public VKDocMethodSetter type(int type) {
+            this.request.params.put(VKConst.TYPE, type);
+            return this;
+        }
+
+
+        /** Setters for docs.getById */
+
+
+        /**
+         * Document IDs. Example: "66748_91488,66748_91455"
+         */
+        public VKDocMethodSetter docs(String... ids) {
+            this.request.params.put(VKConst.DOCS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+        /**
+         * Document IDs. Example: "66748_91488,66748_91455"
+         */
+        public VKDocMethodSetter docs(Collection<String> ids) {
+            this.request.params.put(VKConst.DOCS, VKUtil.arrayToString(ids));
+            return this;
+        }
+
+
+        /** Setters for docs.getUploadServer */
+
+        /**
+         * Community ID (if the document will be uploaded to the community)
+         */
+        public VKDocMethodSetter groupId(int id) {
+            this.request.params.put(VKConst.GROUP_ID, id);
+            return this;
+        }
+
+
+        /** Setters for docs.save */
+
+        /**
+         * This parameter is returned when the file is uploaded to the server
+         * @see VKApi#getDocUploader()
+         */
+        public VKDocMethodSetter file(String file) {
+            this.request.params.put(VKConst.FILE, file);
+            return this;
+        }
+
+        /**
+         * Document title. Maximum length 128
+         */
+        public VKDocMethodSetter title(String title) {
+            this.request.params.put(VKConst.TITLE, title);
+            return this;
+        }
+
+        /**
+         * Document title
+         */
+        public VKDocMethodSetter tags(String tags) {
+            this.request.params.put(VKConst.TAGS, tags);
+            return this;
+        }
+
+
+        /** Setters for docs.delete */
+
+        /**
+         * Document ID
+         */
+        public VKDocMethodSetter docId(int id) {
+            this.request.params.put(VKConst.DOC_ID, id);
+            return this;
+        }
+
+
+        /** Setters for docs.add */
+
+        /**
+         * Access key. This parameter is required if access_key was
+         * returned with the document's data
+         */
+        public VKDocMethodSetter accessKey(String key) {
+            this.request.params.put(VKConst.ACCESS_KEY, key);
+            return this;
+        }
+
+
+        /** Setters for docs.search */
+
+        /**
+         * Search query string. e.g: Green Slippers.
+         * Maximum length 512
+         */
+        public VKDocMethodSetter q(String q) {
+            this.request.params.put(VKConst.Q, q);
+            return this;
+        }
+    }
+
     /**
      * Class for execution and configuration API-requests
      */
@@ -2504,19 +2848,31 @@ public class VKApi {
         /**
          * Execute request and convert to {@link JSONObject}
          */
-        public JSONObject execute() throws HttpResponseCodeException {
+        public JSONObject execute() throws VKException {
             String url = getSignedUrl();
             HttpRequest request;
 
-            request = new HttpRequest(url, isPost ? "POST" : "GET", null);
+            request = HttpRequest.builder(url)
+                    .method(isPost ? "POST" : "GET")
+                    .build();
 
-            HttpResponse response = getInstance().mClient.execute(request);
+            HttpResponse response = HttpClient.execute(request);
             try {
-                return new JSONObject(response.toString());
-            } catch (JSONException e) {
+                JSONObject json = response.asJson();
+                VKUtil.checkErrors(url, json);
+                return json;
+            } catch (VKException e) {
                 if (DEBUG) e.printStackTrace();
+                if (e.errorCode == VKErrorCodes.TOO_MANY_REQUESTS) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                    return execute();
+                }
+                throw e;
             }
-            return null;
         }
     }
 
@@ -2576,30 +2932,12 @@ public class VKApi {
          * Convert items to {@link String}
          */
         public static <T> String arrayToString(Collection<T> items) {
-            if (isEmpty(items)) {
-                return null;
-            }
-
-            StringBuilder buffer = new StringBuilder(32);
-            for (Object item : items) {
-                buffer.append(item);
-                buffer.append(',');
-            }
-            return buffer.toString();
+            return ArrayUtil.toString(items);
         }
 
         @SafeVarargs
         public static <T> String arrayToString(T... array) {
-            if (array.length == 0) {
-                return null;
-            }
-
-            StringBuilder buffer = new StringBuilder(32);
-            for (Object item : array) {
-                buffer.append(item);
-                buffer.append(',');
-            }
-            return buffer.toString();
+            return ArrayUtil.toString(array);
         }
 
         /**
@@ -3002,20 +3340,13 @@ public class VKApi {
             this.request = request;
             try {
                 response = request.execute();
-                checkError(request, response);
                 return response;
-            } catch (final HttpResponseCodeException e) {
-                if (DEBUG) e.printStackTrace();
-
+            } catch (final VKException e) {
                 if (listener != null) {
                     AndroidUtils.runOnUi(new Runnable() {
                         @Override
                         public void run() {
-                            if (e instanceof VKException) {
-                                listener.onError((VKException) e);
-                            } else {
-                                listener.onError(new VKException(request.getSignedUrl(), e.responseMessage, e.responseCode));
-                            }
+                            listener.onError(e);
                         }
                     });
                 }
@@ -3046,7 +3377,7 @@ public class VKApi {
      * <p/>
      * Check {@link VKErrorCodes} to get descriptions of error codes
      */
-    public static class VKException extends HttpResponseCodeException {
+    public static class VKException extends HttpException {
         public String url;
         public String errorMessage;
         public int errorCode;
@@ -3129,7 +3460,7 @@ public class VKApi {
         /**
          * Too many requests per second
          */
-        public static final int TOO_MANY_REQUESTS_PER_SECOND = 6;
+        public static final int TOO_MANY_REQUESTS = 6;
         /**
          * Permission to perform this action is denied
          */
@@ -3239,6 +3570,22 @@ public class VKApi {
          */
         public static final int CANNOT_SEND_MESSAGE_BLACK_LIST = 900;
         public static final int CANNOT_SEND_MESSAGE_GROUP = 901;
+
+        /**
+         * Invalid document id
+         */
+        public static final int INVALID_DOC_ID = 1150;
+
+        /**
+         * Invalid document id
+         */
+        public static final int INVALID_DOC_TITLE = 1152;
+
+        /**
+         * Access to document deleting is denied
+         */
+        public static final int ACCESS_TO_DOC_DENIED = 1153;
+
         private VKErrorCodes() {
             // empty
         }
@@ -3249,18 +3596,14 @@ public class VKApi {
      * IDs of messaging apps
      */
     public static class VKIdentifiers {
-        /**
-         * Official clients
-         */
+        /** Official clients */
         public static final int ANDROID_OFFICIAL = 2274003;
         public static final int IPHONE_OFFICIAL = 3140623;
         public static final int IPAD_OFFICIAL = 3682744;
         public static final int WP_OFFICIAL = 3502557;
         public static final int WINDOWS_OFFICIAL = 3697615;
 
-        /**
-         * Unofficial client, mods and messengers
-         */
+        /** Unofficial client, mods and messengers */
         public static final int KATE_MODILE = 2685278;
         public static final int EUPHORIA = 4510232;
         public static final int LYNT = 3469984;
@@ -3281,9 +3624,7 @@ public class VKApi {
         public static final String ITEMS = "items";
         public static final String USER_ID = "user_id";
 
-        /**
-         * Commons
-         */
+        /** Commons */
         public static final String RESPONSE = "response";
         public static final String USER_IDS = "user_ids";
         public static final String OWNER_ID = "owner_id";
@@ -3294,23 +3635,17 @@ public class VKApi {
         public static final String UPLOAD_URL = "upload_url";
         public static final String SERVER = "server";
 
-        /**
-         * Auth
-         */
+        /** Auth */
         public static final String VERSION = "v";
         public static final String HTTPS = "https";
         public static final String LANG = "lang";
         public static final String ACCESS_TOKEN = "access_token";
         public static final String SIG = "sig";
 
-        /**
-         * Get users
-         */
+        /** Get users */
         public static final String NAME_CASE = "name_case";
 
-        /**
-         * Messages
-         */
+        /** Messages */
         public static final String MESSAGE_IDS = "message_ids";
         public static final String MESSAGE_ID = "message_id";
         public static final String IMPORTANT = "important";
@@ -3338,18 +3673,14 @@ public class VKApi {
         public static final String TITLE = "title";
         public static final String MEDIA_TYPE = "media_type";
 
-        /**
-         * Media types for attachments
-         */
+        /** Media types for attachments */
         public static final String MEDIA_TYPE_AUDIO = "audio";
         public static final String MEDIA_TYPE_VIDEO = "video";
         public static final String MEDIA_TYPE_PHOTO = "photo";
         public static final String MEDIA_TYPE_LINK = "link";
         public static final String MEDIA_TYPE_DOC = "photo";
 
-        /**
-         * Friends
-         */
+        /** Friends */
         public static final String LIST_ID = "list_id";
         public static final String LIST_IDS = "list_ids";
         public static final String SOURCE_UID = "source_uid";
@@ -3366,29 +3697,21 @@ public class VKApi {
         public static final String PHONES = "phones";
         public static final String FILTER = "filter";
 
-        /**
-         * Get subscriptions
-         */
+        /** Get subscriptions */
         public static final String EXTENDED = "extended";
 
-        /**
-         * Report users
-         */
+        /** Report users */
         public static final String TYPE = "type";
         public static final String COMMENT = "comment";
 
-        /**
-         * Get nearby users
-         */
+        /*** Get nearby users */
         public static final String LATITUDE = "latitude";
         public static final String LONGITUDE = "longitude";
         public static final String ACCURACY = "accuracy";
         public static final String TIMEOUT = "timeout";
         public static final String RADIUS = "timeout";
 
-        /**
-         * Search
-         */
+        /** Search */
         public static final String Q = "q";
         public static final String CITY = "city";
         public static final String COUNTRY = "country";
@@ -3429,24 +3752,18 @@ public class VKApi {
         public static final String POST_ID = "post_id";
         public static final String POSTS = "posts";
 
-        /**
-         * Errors
-         */
+        /** Errors */
         public static final String ERROR_CODE = "error_code";
         public static final String ERROR_MSG = "error_msg";
         public static final String REQUEST_PARAMS = "request_params";
 
-        /**
-         * Captcha
-         */
+        /** Captcha */
         public static final String CAPTCHA_IMG = "captcha_img";
         public static final String CAPTCHA_SID = "captcha_sid";
         public static final String CAPTCHA_KEY = "captcha_key";
         public static final String REDIRECT_URI = "redirect_uri";
 
-        /**
-         * Photos
-         */
+        /** Photos */
         public static final String PHOTO = "photo";
         public static final String PHOTOS = "photos";
         public static final String ALBUM_ID = "album_id";
@@ -3456,14 +3773,17 @@ public class VKApi {
         public static final String FEED_TYPE = "feed_type";
         public static final String FEED = "feed";
 
-        /**
-         * Videos
-         */
+        /** Docs */
+        public static final String DOCS = "docs";
+        public static final String FILE = "file";
+        public static final String TAGS = "tags";
+        public static final String DOC_ID = "doc_id";
+        public static final String ACCESS_KEY = "access_key";
+
+        /** Videos */
         public static final String ADULT = "adult";
 
-        /**
-         * Others
-         */
+        /** Others */
         public static final String CODE = "code";
         public static final String HASH = "hash";
 
@@ -3599,16 +3919,14 @@ public class VKApi {
      * @see VKDocUploader
      */
     public static abstract class VKUploader<E> {
-        /**
-         * Media types
-         */
+        /** Media types */
         public static final int TYPE_DOC = 0;   // file
         public static final int TYPE_PHOTO = 1; // photo
         public static final int TYPE_VIDEO = 2; // video_file
         public static final int TYPE_AUDIO = 3; // file
         protected String mBoundary;
         protected int mType;
-        private VKOnProgressListener mListener;
+        protected VKOnProgressListener mListener;
 
         /**
          * Creates a new VKUploader with type
@@ -3652,9 +3970,9 @@ public class VKApi {
                     break;
             }
 
-            String extension = MimeTypeMap.getFileExtensionFromUrl(uploadFile.getAbsolutePath());
+//            String extension = MimeTypeMap.getFileExtensionFromUrl(uploadFile.getAbsolutePath());
             return String.format("\r\n--%s\r\n", mBoundary) +
-                    String.format("Content-Disposition: form-data; name=\"%s\"; filename=\"%s.%s\"\r\n", fileName, fileName, extension) +
+                    String.format("Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n", fileName, uploadFile.getName()) +
                     String.format("Content-Type: %s\r\n\r\n", getMimeType(uploadFile.getAbsolutePath()));
         }
 
@@ -3669,18 +3987,12 @@ public class VKApi {
          * @param listener the callback that will run on progress change
          *                 listener called on UI Thread
          */
-        public E uploadFile(File file, VKOnProgressListener listener) {
+        public void uploadFile(File file, final VKOnProgressListener<E> listener) {
             Log.i(TAG, "Starting upload file: " + file.getName());
             this.mListener = listener;
-            try {
-                HttpRequest request = new HttpRequest(getUploadServer(), "POST", null, new VKHttpEntry(file));
-                HttpResponse response = getInstance().mClient.execute(request);
-                return getSaveRequest(response.getContentAsJson());
-            } catch (HttpResponseCodeException e) {
-                e.printStackTrace();
-            }
-            return null;
+            new VKUploadFileTask(file).execute();
         }
+
 
         /**
          * Returns a server address to upload file
@@ -3692,7 +4004,58 @@ public class VKApi {
          *
          * @param response the response for successful uploading
          */
-        protected abstract E getSaveRequest(JSONObject response);
+        protected abstract E getSaveRequest(JSONObject response) throws Exception;
+
+        /**
+         * The task for async uploading file on server
+         */
+        private class VKUploadFileTask extends AsyncTask<Void, Void, Void> {
+            private File mFile;
+
+            public VKUploadFileTask(File file) {
+                this.mFile = file;
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected Void doInBackground(Void... params) {
+                HttpRequest request = HttpRequest.builder(getUploadServer())
+                        .method(HttpRequest.METHOD_POST)
+                        .entry(new VKHttpEntry(mFile))
+                        .build();
+                HttpResponse response = null;
+                try {
+                    response = HttpClient.execute(request);
+                    E saved = getSaveRequest(response.asJson());
+                    if (mListener != null && saved != null) {
+                        onSuccess(saved);
+                    }
+                } catch (Exception e) {
+                    if (DEBUG) e.printStackTrace();
+                    onError(new VKException(null, e.getMessage(), VKErrorCodes.UNKNOWN_ERROR));
+
+                }
+                return null;
+            }
+
+            void onSuccess(final E object) {
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onSuccess(object);
+                    }
+                });
+            }
+
+            void onError(final VKException e) {
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onError(e);
+                    }
+                });
+            }
+        }
 
         /**
          * Class used for build upload multipart data for VK servers
@@ -3713,6 +4076,14 @@ public class VKApi {
                 return VKUploader.this.getContentType().second;
             }
 
+            private void updateProgress(final byte[] buffer, final int progress, final long totalSize) {
+                AndroidUtils.runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onProgress(buffer, progress, totalSize);
+                    }
+                });
+            }
 
             @Override
             protected void writeTo(OutputStream os) {
@@ -3747,32 +4118,11 @@ public class VKApi {
                     updateProgress(buffer, 100, length);
                     buffer = null;
 
-                    if (mListener != null) {
-                        onSuccess();
-                    }
                 } catch (Exception e) {
                     if (DEBUG) e.printStackTrace();
                 } finally {
                     IOUtils.closeQuietly(fis);
                 }
-            }
-
-            private void updateProgress(final byte[] buffer, final int progress, final long total) {
-                AndroidUtils.runOnUi(new Runnable() {
-                    @Override
-                    public void run() {
-                        mListener.onProgress(buffer, progress, total);
-                    }
-                });
-            }
-
-            private void onSuccess() {
-                AndroidUtils.runOnUi(new Runnable() {
-                    @Override
-                    public void run() {
-                        mListener.onSuccess();
-                    }
-                });
             }
 
             @Override
@@ -3855,13 +4205,8 @@ public class VKApi {
         }
 
         @Override
-        protected VKDocument getSaveRequest(JSONObject response) {
-            try {
-                return Api.get().saveDoc(response.optString("file"));
-            } catch (Exception e) {
-                if (DEBUG) e.printStackTrace();
-            }
-            return null;
+        protected VKDocument getSaveRequest(JSONObject response) throws Exception {
+            return Api.get().saveDoc(response.optString("file"), null);
         }
     }
 
@@ -3896,13 +4241,14 @@ public class VKApi {
      *
      * @see #authorization(String, String, VKOnAuthorizationListener)
      */
-    public interface VKOnAuthorizationListener {
+    public interface VKOnAuthorizationListener extends VKCallback<VKUserConfig> {
         /**
          * Called when user authorization is successful
          *
          * @param newConfig the authorized user config.
          *                  contains: access_token, user_id and email
          */
+        @Override
         void onSuccess(VKUserConfig newConfig);
 
         /**
@@ -3910,6 +4256,7 @@ public class VKApi {
          *
          * @param e the details info of error
          */
+        @Override
         void onError(VKException e);
     }
 
@@ -3917,7 +4264,7 @@ public class VKApi {
      * Callback for listen current progress of uploaded file
      * Used by {@link VKUploader}
      */
-    public interface VKOnProgressListener {
+    public interface VKOnProgressListener<E> extends VKCallback<E> {
         /**
          * Called before is started uploading file to the server, for example,
          * we can show notification
@@ -3937,8 +4284,36 @@ public class VKApi {
 
         /**
          * Called after a successful file upload and save on the server
+         *
+         * @param uploadObject the object has ben uploaded on server
          */
-        void onSuccess();
+        @Override
+        void onSuccess(E uploadObject);
+
+        /**
+         * Called when uploading is failed
+         *
+         * @param e the details info of error
+         */
+        @Override
+        void onError(VKException e);
+    }
+
+    /**
+     * The base class for vk interfaces
+     */
+    public interface VKCallback<E> {
+        /**
+         * Called when a successful operation
+         */
+        void onSuccess(E response);
+
+        /**
+         * Called when an error occurs on the server side or user
+         *
+         * @param e the information of error
+         */
+        void onError(VKException e);
     }
 
     /**

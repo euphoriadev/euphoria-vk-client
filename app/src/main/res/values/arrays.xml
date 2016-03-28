@@ -52,6 +52,16 @@
         <item>Возможные</item>
     </string-array>
 
+    <string-array name="tab_docs_array">
+        <item>Все</item>
+        <item>Текстовые</item>
+        <item>Архивы</item>
+        <item>Gif</item>
+        <item>Изображения</item>
+        <item>Аудио</item>
+        <item>Видео</item>
+        <item>Книги</item>
+    </string-array>
 
 
     <string-array name="friends_sort_array">

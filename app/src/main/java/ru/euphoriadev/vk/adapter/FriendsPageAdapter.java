@@ -34,7 +34,8 @@ public class FriendsPageAdapter extends FragmentPagerAdapter {
     @Override
     public FriendsFragment getItem(int position) {
         Log.w("FriendsPageAdapter", "getItem " + position);
-        final FriendsFragment instance = FriendsFragment.newInstance(position);;
+        final FriendsFragment instance = FriendsFragment.newInstance(position);
+        ;
         return fragments[position] = instance;
     }
 
@@ -47,6 +48,7 @@ public class FriendsPageAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         return titles[position];
     }
+
 
     @Override
     public int getCount() {

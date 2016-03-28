@@ -12,7 +12,9 @@ import android.util.Log;
 public class PermissionAllower {
     private static final String TAG = "Euphoria.Permission";
 
-    /** Request code for successful granted permission */
+    /**
+     * Request code for successful granted permission
+     */
     public static final int PERMISSION_GRANTED_CODE = 100;
 
     /**
@@ -38,4 +40,6 @@ public class PermissionAllower {
             Log.i(TAG, "Permission " + permissionName + " is granted");
         }
     }
+
+
 }

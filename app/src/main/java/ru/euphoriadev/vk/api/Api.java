@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
+import ru.euphoriadev.vk.BuildConfig;
 import ru.euphoriadev.vk.api.model.AudioAlbum;
 import ru.euphoriadev.vk.api.model.BannArg;
 import ru.euphoriadev.vk.api.model.City;
@@ -68,6 +69,7 @@ public class Api {
     public static final String BASE_URL = "https://api.vk.com/method/";
     public static final String API_VERSION = "5.14";
     static final String TAG = "Kate.Api";
+    static final boolean DEBUG = BuildConfig.DEBUG;
     private final static int MAX_TRIES = 3;
     //TODO: it's not faster, even slower on slow devices. Maybe we should add an option to disable it. It's only good for paid internet connection.
     static boolean enable_compression = true;
@@ -256,8 +258,8 @@ public class Api {
     private JSONObject sendRequest(VKParams params, boolean is_post) throws IOException, JSONException, KException {
         String url = getSignedUrl(params, is_post);
         String body = "";
-        if (is_post)
-            body = params.getParamsString();
+        if (is_post) body = params.getParamsString();
+
         Log.i(TAG, "url=" + url);
         if (body.length() != 0)
             Log.i(TAG, "body = ".concat(body));
@@ -272,7 +274,8 @@ public class Api {
                 processNetworkException(i, ex);
             }
         }
-        Log.i(TAG, "response = ".concat(response));
+        if (DEBUG) Log.i(TAG, "response = ".concat(response));
+
         JSONObject root = new JSONObject(response);
         checkError(root, url);
         return root;
@@ -1060,9 +1063,9 @@ public class Api {
         String var;
         if (chat_id != 0) {
             var = "\"chat_id\":" + chat_id + ",\n" +
-                   "\"rev\":" + "1" + ",\n" +
+                    "\"rev\":" + "1" + ",\n" +
                     "\"user_id\":" + 0 + ",\n";
-        } else var = "\"user_id\":" + user_id + ",\n" + "\"rev\":" + "1" + ",\n" ;
+        } else var = "\"user_id\":" + user_id + ",\n" + "\"rev\":" + "1" + ",\n";
 
         String code =
                 "var offset = " + offset + ";\n" +
@@ -2875,7 +2878,7 @@ public class Api {
     }
 
     //http://vk.com/dev/docs.save
-    public VKDocument saveDoc(String file) throws IOException, JSONException, KException {
+    public VKDocument saveDoc(String file, String title) throws IOException, JSONException, KException {
         VKParams params = new VKParams("docs.save");
         params.put("file", file);
         JSONObject root = sendRequest(params);
@@ -2889,6 +2892,17 @@ public class Api {
         VKParams params = new VKParams("docs.delete");
         params.put("owner_id", owner_id);
         params.put("doc_id", doc_id);
+        JSONObject root = sendRequest(params);
+        int response = root.optInt("response");
+        return response == 1;
+    }
+
+    //http://vk.com/dev/docs.edit
+    public Boolean editDoc(long doc_id, long owner_id, String title) throws IOException, JSONException, KException {
+        VKParams params = new VKParams("docs.edit");
+        params.put("owner_id", owner_id);
+        params.put("doc_id", doc_id);
+        params.put("title", title);
         JSONObject root = sendRequest(params);
         int response = root.optInt("response");
         return response == 1;
@@ -3152,7 +3166,6 @@ public class Api {
         }
 
     }
-
     //http://vk.com/dev/groups.getInvites
     public ArrayList<VKGroup> getGroupsInvites(Long offset, Long count) throws IOException, JSONException, KException {
         VKParams params = new VKParams("groups.getInvites");

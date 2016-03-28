@@ -231,7 +231,7 @@ public class LongPollService extends Service {
                 // we try as long until the user will not have Internet connection
                 while (true) {
                     // user do not have Internet connection
-                    if (!AndroidUtils.isInternetConnection(LongPollService.this)) {
+                    if (!AndroidUtils.hasConnection(LongPollService.this)) {
                         Thread.sleep(3000);
                         continue;
                     }
@@ -241,7 +241,7 @@ public class LongPollService extends Service {
 
                 while (isRunning) {
                     try {
-                        if (!AndroidUtils.isInternetConnection(LongPollService.this)) {
+                        if (!AndroidUtils.hasConnection(LongPollService.this)) {
                             Thread.sleep(3000);
                             continue;
                         }

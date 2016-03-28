@@ -26,14 +26,14 @@
     <string name="already_in_group">Вы уже состоите в группе</string>
     <string name="thank_you">Спасибо!</string>
     <string name="sending">Отправка..</string>
-    <string name="error">Ошибка</string>
+    <string name="error">Ошибка!</string>
     <string name="check_update">Проверить обновление</string>
     <string name="download_dialog">Скачать диалог</string>
     <string name="download_dialog_with">Скачивание диалога</string>
     <string name="started_download_dialog">Начато скачивание диалога</string>
     <string name="enter">Введите</string>
     <string name="login">Вход</string>
-    <string name="login_description">Введите логин и пороль пользователя. Можно ввести как порядковый номер страници (12345678), так и короткий id пользователя начиная со знака "@" (@durov) </string>
+    <string name="login_description">Введите id и токен пользователя. Можно ввести как порядковый номер страници (12345678), так и короткий id пользователя начиная со знака "@" (@durov) </string>
     <string name="download_ask">Скачать?</string>
     <string name="you">Я</string>
     <string name="authorization_successfully">Авторизовались успешно… Пожалуйста подождите…</string>
@@ -73,12 +73,12 @@
 
 
     <string name="delete_dialog">Удалить диалог</string>
-    <string name="delete_doc">Удалить диалог</string>
+    <string name="delete_doc">Удалить документ</string>
     <string name="load_saved_dialog">Загрузить сохраненный диалог</string>
     <string name="exit_for_account_description">Вы уверены, что хотите выйти из аккаунта?</string>
     <string name="creating_chat">Создание чата</string>
     <string name="error_decrypting">Произошла ошибка декодирование</string>
-    <string name="message_copied">Сообщение скопировано</string>
+    <string name="message_copied">Скопировано</string>
     <string name="translator">Яндекс Переводчик</string>
     <string name="translation_text">Перевод текста, Пожалуйста, подождите…</string>
     <string name="important_messages">Важные сообщения</string>
@@ -101,7 +101,19 @@
     <string name="about">О приложении</string>
 
     <string name="changelog">
-        <u>0.9.1</u>
+        <u>1.1</u>\n
+        • Исправлен баг со счетчиком при первом запуске!;\n
+        \n
+        <u>1.0</u>\n
+        • Выход из Beta, йоу!;\n
+        • Возможность отсортировать диалоги по кол-ву непрочитанным сообщениям;\n
+        • Кеширование переведенных сообщений;\n
+        • Обновлен раздел "Документы";\n
+        \n
+        <u>0.9.2</u>\n
+        • Исправление багов с разделом "Материалы беседы";\n
+        \n
+        <u>0.9.1</u>\n
         • Bugs fix;\n
         • Возможность заблюрить фон приложения;\n
         \n
@@ -425,4 +437,18 @@
     <string name="delete_dialog_confirm">Уверены что хотите удалить диалог? Восстановить его будет невозможно!</string>
     <string name="apply_blur">Применить размытие?</string>
     <string name="apply_blur_description">Размыть этот фон в приложении? Текст, как правило, будет выглядеть более четким</string>
+    <string name="attach_empty">Вложения пусты :(</string>
+    <string name="edit_doc">Переименовать</string>
+    <string name="prefs_github_description">Посмотреть исходный код проекта на GitHub</string>
+    <string name="prefs_send_logs">Отправить лог разработчикам</string>
+    <string name="prefs_header_gravity">Изменить положение заголовка</string>
+    <string name="prefs_header_gravity_description">Установить заголовок боковой шторки по центру</string>
+    <string name="success">Успешно</string>
+    <string name="cannot_upload"
+            formatted="false">
+        Файл с данным форматом не может быть загружен на сервер в связи новой политикой ВК.\nПереименовать файл \"%s\" в \"%s\"?</string>
+    <string name="file_large">Файл слишком большой!</string>
+    <string name="file_large_description">Размер текстового файла является слишком большим (%s символов). Все равно отобразить?</string>
+    <string name="loading_text">Загрузка текста…</string>
+    <string name="sort_by_unread">Сортировать по непрочитанным</string>
 </resources>

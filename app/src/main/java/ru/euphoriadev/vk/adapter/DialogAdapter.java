@@ -2,7 +2,6 @@ package ru.euphoriadev.vk.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -30,17 +29,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
-import ru.euphoriadev.vk.ProfileActivity;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.common.TypefaceManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.ThemeUtils;
-import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.CircleView;
@@ -299,7 +297,7 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
 //      Загрузка изображений
         try {
             Picasso.with(context)
-                    .load(message.isChat() ? message.photo_50 == null ? user.photo_50 : message.photo_50 : user.photo_50) // загрузка
+                    .load(TextUtils.isEmpty(message.photo_50) ? user.photo_50 : message.photo_50) // загрузка
                     .placeholder(R.drawable.camera_b) // заглушка
                     .config(Bitmap.Config.RGB_565)
                     .into(holder.ivPhoto);
@@ -311,9 +309,9 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         holder.ivPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, ProfileActivity.class);
-                intent.putExtra("uid", message.uid);
-                context.startActivity(intent);
+//                Intent intent = new Intent(context, ProfileActivity.class);
+//                intent.putExtra("uid", message.uid);
+//                context.startActivity(intent);
             }
         });
 
@@ -351,11 +349,11 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
                     break;
 
                 case "chat_invite_user":
-                    messageActionText = "Вас добавили в чат";
+                    messageActionText = user.toString() + " добавлен(а) в чат";
                     break;
 
                 case "chat_kick_user":
-                    messageActionText = "Вас исключили из чата";
+                    messageActionText = message.action_mid == Api.get().getUserId() ? "Вас исключили из чата" : DBHelper.get(context).getUserFromDB(message.action_mid).toString() + " исключили из чата";
                     break;
 
             }
@@ -503,7 +501,7 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         TextView tvBody;
         TextView tvDate;
         CircleView indicator;
-//        TextView tvUnreadCount;
+        //        TextView tvUnreadCount;
         ImageView ivPhoto;
         ImageView ivLastPhotoUser;
         View onlineIndicator;

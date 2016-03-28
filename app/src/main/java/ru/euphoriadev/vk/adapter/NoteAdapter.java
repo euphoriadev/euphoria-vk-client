@@ -17,7 +17,7 @@ import java.util.Date;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.api.model.VKNote;
 import ru.euphoriadev.vk.common.AppLoader;
-import ru.euphoriadev.vk.util.TypefaceManager;
+import ru.euphoriadev.vk.common.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 /**

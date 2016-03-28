@@ -26,7 +26,7 @@ import java.util.Map;
 import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.common.PrefManager;
-import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpClient;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
 
@@ -267,7 +267,6 @@ public class Emoji {
 
         @Override
         protected Void doInBackground(Void... params) {
-            AsyncHttpClient client = new AsyncHttpClient(mContext);
             File dir = new File(AppLoader.getLoader().getExternalFilesDir().getAbsolutePath() + "/" + AppLoader.APP_DIR + "/" + EMOJI_DIR_NAME);
             dir.mkdirs();
 
@@ -276,7 +275,7 @@ public class Emoji {
                 Log.i("Emoji", url);
 
                 try {
-                    HttpResponse response = client.execute(new HttpRequest(url));
+                    HttpResponse response = HttpClient.execute(HttpRequest.builder(url).build());
                     File file = new File(dir, String.valueOf(entry.getValue().hashCode()));
                     file.createNewFile();
 

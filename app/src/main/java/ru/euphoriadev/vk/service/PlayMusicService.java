@@ -66,7 +66,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnPreparedL
 //        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         mBuilder.setContentTitle(audio.title)
                 .setContentText(audio.artist)
-                .setSmallIcon(R.drawable.ic_audiotrack_white)
+                .setSmallIcon(R.drawable.ic_audiotrack)
                 .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, starterActivity, 0))
                 .addAction(R.drawable.ic_fast_rewind, null, PendingIntent.getService(getApplicationContext(), 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(audio.isPlaying ? R.drawable.ic_pause : R.drawable.ic_play_arrow, null, PendingIntent.getService(getApplicationContext(), 0, mAudio.isPlaying ? pauseIntent : playIntent, PendingIntent.FLAG_UPDATE_CURRENT))

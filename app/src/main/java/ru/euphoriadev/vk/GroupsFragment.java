@@ -26,11 +26,11 @@ import java.util.ArrayList;
 import ru.euphoriadev.vk.adapter.GroupsAdapter;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKGroup;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by user on 13.07.15.
@@ -215,7 +215,7 @@ public class GroupsFragment extends Fragment {
 
                     // Если есть подключение к интернету, то сначала удаляем список групп
                     // а потом на их место загружаем новые и заносим в базу данных
-                    if (AndroidUtils.isInternetConnection(activity)) {
+                    if (AndroidUtils.hasConnection(activity)) {
                         ArrayList<VKGroup> apiGroups = api.getGroups(api.getUserId());
                         if (!apiGroups.isEmpty()) {
                             Cursor c = database.rawQuery("SELECT * FROM " + DBHelper.USER_GROUP_TABLE + " WHERE user_id = " + api.getUserId(), null);

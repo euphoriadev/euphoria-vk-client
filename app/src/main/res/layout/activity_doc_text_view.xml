@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    tools:context="ru.euphoriadev.vk.DocTextViewActivity">
+
+    <include layout="@layout/toolbar"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <View
+            android:id="@+id/toolbarShadow"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:background="@drawable/toolbar_shadow"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/docTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="all"
+                android:hint="@string/loading_text"
+                android:padding="8dp"
+                android:textColor="?android:textColorPrimary"
+                android:textIsSelectable="true"
+                android:textSize="18sp"/>
+
+        </ScrollView>
+
+    </FrameLayout>
+
+</LinearLayout>

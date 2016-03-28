@@ -25,13 +25,13 @@ import android.widget.Toast;
 
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.CrashManager;
 import ru.euphoriadev.vk.common.PrefManager;
 import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.common.TypefaceManager;
 import ru.euphoriadev.vk.service.OnlineService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.CrashManager;
-import ru.euphoriadev.vk.util.TypefaceManager;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerDialog;
 import ru.euphoriadev.vk.view.colorpicker.ColorPickerSwatch;
@@ -232,8 +232,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         blurRadiusPreference.setSummary(R.string.pref_blur_radius_description);
         blurRadiusPreference.setEnabled(PrefManager.getString(KEY_MAKING_DRAWER_HEADER).equalsIgnoreCase("2"));
         blurRadiusPreference.setKey(KEY_BLUR_RADIUS);
-        blurRadiusPreference.setDefaultValue(19);
-        blurRadiusPreference.getSeekBar().setMax(49);
+        blurRadiusPreference.setDefaultValue(20);
+        blurRadiusPreference.getSeekBar().setMax(50);
         blurRadiusPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -246,9 +246,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 
         CheckBoxPreference boxHeaderGravity = new MaterialCheckBoxPreference(getActivity());
-        boxHeaderGravity.setTitle("Изменить положение заголовка");
+        boxHeaderGravity.setTitle(R.string.prefs_header_gravity);
         boxHeaderGravity.setKey(KEY_GRAVITY_DRAWER_HEADER);
-        boxHeaderGravity.setSummary("Установить заголовок боковой шторке по центру");
+        boxHeaderGravity.setSummary(R.string.prefs_header_gravity_description);
         boxHeaderGravity.setDefaultValue(false);
 
         categoryUI.addPreference(boxHeaderGravity);
@@ -438,7 +438,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         Preference preferenceSendLogs = new MaterialPreference(getActivity());
-        preferenceSendLogs.setTitle("Send log to developers");
+        preferenceSendLogs.setTitle(R.string.prefs_send_logs);
         try {
             preferenceSendLogs.setEnabled(CrashManager.getLogsDir().listFiles().length != 0);
         } catch (Exception e) {
@@ -522,7 +522,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         Preference gitHubPreference = new MaterialPreference(getActivity());
         gitHubPreference.setTitle("Open Source");
-        gitHubPreference.setSummary("Посмотреть исходный код проекта на GitHub");
+        gitHubPreference.setSummary(R.string.prefs_github_description);
         gitHubPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -534,7 +534,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         categoryAbout.addPreference(gitHubPreference);
 
         Preference groupScreen = new MaterialPreference(getActivity());
-        groupScreen.setTitle("TimeVK/Euphoria for Android");
+        groupScreen.setTitle("Euphoria for Android");
         groupScreen.setSummary(getActivity().getString(R.string.prefs_group_description));
         groupScreen.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -573,7 +573,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         categoryAbout.addPreference(groupScreen);
 
-        if (true) {
+        if (BuildConfig.DEBUG) {
             PreferenceCategory debugCategory = new MaterialPreferenceCategory(getActivity());
             debugCategory.setTitle("For developers");
 
@@ -582,11 +582,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             Preference debugPreference = new MaterialPreference(getActivity());
             debugPreference.setTitle("Debug Activity");
-            debugPreference.setSummary("Open a TestActivity.class");
+            debugPreference.setSummary("Open a DebugActivity.class");
             debugPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(getActivity(), TestActivity.class));
+                    startActivity(new Intent(getActivity(), DebugActivity.class));
                     return true;
                 }
             });

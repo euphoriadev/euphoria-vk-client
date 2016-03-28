@@ -10,8 +10,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class VKDocument implements Serializable {
-
     private static final long serialVersionUID = 1L;
+
+    public static final int TYPE_NONE = 0;
+    public static final int TYPE_TEXT = 1;
+    public static final int TYPE_ARCHIVE = 2;
+    public static final int TYPE_GIF = 3;
+    public static final int TYPE_IMAGE = 4;
+    public static final int TYPE_AUDIO = 5;
+    public static final int TYPE_VIDEO = 6;
+    public static final int TYPE_BOOK = 7;
+    public static final int TYPE_UNKNOWN = 8;
 
     /**
      * Document ID.
@@ -58,6 +67,10 @@ public class VKDocument implements Serializable {
      */
     public String access_key;
 
+    /**
+     * The document type (audio, video, book)
+     */
+    public int type;
 
     public static VKDocument parse(JSONObject o) {
         VKDocument doc = new VKDocument();
@@ -66,6 +79,7 @@ public class VKDocument implements Serializable {
         doc.title = o.optString("title");
         doc.url = o.optString("url");
         doc.size = o.optLong("size");
+        doc.type = o.optInt("type");
         doc.ext = o.optString("ext");
         doc.photo_130 = o.optString("photo_130", null);
         doc.photo_100 = o.optString("photo_100", null);
@@ -97,15 +111,97 @@ public class VKDocument implements Serializable {
         return result;
     }
 
+    @Deprecated
     public boolean isGif() {
         return ext.equalsIgnoreCase("gif");
     }
 
+
+    @Deprecated
     public boolean isImage() {
-        return ext.equalsIgnoreCase("jpg") ||
+        return (type == TYPE_NONE || type == TYPE_UNKNOWN) ?
+                ext.equalsIgnoreCase("jpg") ||
                 ext.equalsIgnoreCase("jpeg") ||
                 ext.equalsIgnoreCase("png") ||
-                ext.equalsIgnoreCase("bmp");
+                ext.equalsIgnoreCase("bmp")
+                : type == TYPE_IMAGE;
+    }
+
+    @Deprecated
+    public boolean isText() {
+        return ext.equalsIgnoreCase("text") ||
+                ext.equalsIgnoreCase("txt") ||
+                ext.equalsIgnoreCase("pdf") ||
+                ext.equalsIgnoreCase("fb2") || // FBReader
+                ext.equalsIgnoreCase("doc") ||
+                ext.equalsIgnoreCase("docx") ||
+                ext.equalsIgnoreCase("odt") || // OpenOffice
+                ext.equalsIgnoreCase("xml") ||
+                ext.equalsIgnoreCase("html") ||
+                ext.equalsIgnoreCase("java") ||
+                ext.equalsIgnoreCase("json") ||
+                ext.equalsIgnoreCase("djvu") ||
+                ext.equalsIgnoreCase("chm") ||
+                ext.equalsIgnoreCase("iml") ||
+                ext.equalsIgnoreCase("properties");
+    }
+
+    // The extension list is not complete, only the most basic
+    public boolean isCode() {
+        return ext.equalsIgnoreCase("java") || // Java
+                ext.equalsIgnoreCase("gradle") || // Gradle
+                ext.equalsIgnoreCase("js")  || // JavaScript
+                ext.equalsIgnoreCase("c")   || // C / Objective-C
+                ext.equalsIgnoreCase("h")   || // C (Header)
+                ext.equalsIgnoreCase("cpp") || // C++
+                ext.equalsIgnoreCase("cs")  || // C# (C Sharp)
+                ext.equalsIgnoreCase("pas") || // Delphi
+                ext.equalsIgnoreCase("dpr") || // Delphi
+                ext.equalsIgnoreCase("dpk") || // Delphi
+                ext.equalsIgnoreCase("pp")  || // Delphi
+                ext.equalsIgnoreCase("e")   || // Euphoria
+                ext.equalsIgnoreCase("pm")  || // Perl
+                ext.equalsIgnoreCase("cgi") || // Perl
+                ext.equalsIgnoreCase("pl")  || // Perl
+                ext.equalsIgnoreCase("rb")  || // Ruby
+                ext.equalsIgnoreCase("rbw") || // Ruby
+
+                ext.equalsIgnoreCase("sql")  || // SQL
+                ext.equalsIgnoreCase("xml")  || // XML
+                ext.equalsIgnoreCase("html") || // HTML
+                ext.equalsIgnoreCase("css") ||  // CSS (HTML)
+                ext.equalsIgnoreCase("php");    // PHP
+    }
+
+    // Recently VK has disallowed the executable files,
+    // so users will rename the extension
+    public boolean isAndroidApp() {
+        return ext.contains("apk");
+    }
+
+    public boolean isJar() {
+        return ext.contains("jar");
+    }
+
+    @Deprecated
+    public boolean isAudio() {
+        return ext.equalsIgnoreCase("mp3") ||
+                ext.equalsIgnoreCase("midi") ||
+                ext.equalsIgnoreCase("wav") ||
+                ext.equalsIgnoreCase("ogg");
+    }
+
+    @Deprecated
+    public boolean isVideo() {
+        return ext.equalsIgnoreCase("3gp") ||
+                ext.equalsIgnoreCase("mp4") ||
+                ext.equalsIgnoreCase("avi") ||
+                ext.equalsIgnoreCase("aaf") ||
+                ext.equalsIgnoreCase("mpeg") ||
+                ext.equalsIgnoreCase("mov") ||
+                ext.equalsIgnoreCase("vob") ||
+                ext.equalsIgnoreCase("wmv") ||
+                ext.equalsIgnoreCase("mts");
     }
 
 }

@@ -11,16 +11,14 @@ import java.util.ArrayList;
  */
 public class VKUser implements Serializable {
 
-    /**
-     * Empty user object
-     */
-    public static final VKUser EMPTY_USER = new VKUser() {
-
+    /** Empty user object */
+    public static final VKUser EMPTY = new VKUser() {
         @Override
         public String toString() {
             return "";
         }
     };
+
     public static final String FIELDS_DEFAULT = "photo_50, photo_100, photo_200, status, screen_name, online, online_mobile";
     /**
      * User ID.

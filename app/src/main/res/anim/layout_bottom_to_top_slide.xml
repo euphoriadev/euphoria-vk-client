@@ -4,4 +4,4 @@
 
                  android:animation="@anim/translate"
                  android:animationOrder="normal"
-                 android:delay="30%" />
+                 android:delay="30%"/>

@@ -16,7 +16,7 @@ Euphoria is app for social network Vkontakte on Android with a focus on speed. W
 
 # API, used libraries
 We use the [library] (https://github.com/thest1/Android-VKontakte-SDK) from Kate Mobile app for interaction with vk api
- 
+
 [Picasso] (https://github.com/square/picasso) for load images from network
 
 # Development

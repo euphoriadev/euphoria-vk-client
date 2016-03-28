@@ -53,10 +53,10 @@ public class MaterialsPageAdapter extends FragmentPagerAdapter {
         return type;
     }
 
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return tabs[position];
-    }
+//    @Override
+//    public CharSequence getPageTitle(int position) {
+//        return tabs[position];
+//    }
 
     @Override
     public Fragment getItem(int position) {

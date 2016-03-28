@@ -5,11 +5,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,9 +29,12 @@ import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.api.model.VKMessageAttachment;
 import ru.euphoriadev.vk.api.model.VKPhoto;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.util.ArrayUtil;
+import ru.euphoriadev.vk.util.ViewUtil;
 
 /**
  * Created by user on 17.02.16.
@@ -65,12 +72,19 @@ public class HistoryAttachmentFragment extends Fragment {
 
         int resource = position == MaterialsPageAdapter.POSITION_PICTURES ?
                 R.layout.fragment_photos :
-                R.layout.fragment_audios;
+                R.layout.fragment_attachs;
 
 
         View rootView = inflater.inflate(resource, container, false);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewPhotos);
-        listView = (ListView) rootView.findViewById(R.id.lvAudios);
+        listView = (ListView) rootView.findViewById(R.id.lvAttachments);
+
+        if (listView != null) {
+            View emptyView = inflater.inflate(R.layout.empty_layout, container, false);
+            TextView emptyTextView = (TextView) emptyView.findViewById(R.id.tvEmpty);
+            emptyTextView.setText("Вложений с данным типом нет :(");
+            listView.setEmptyView(emptyView);
+        }
 
         loadAttachments();
         return rootView;
@@ -90,7 +104,7 @@ public class HistoryAttachmentFragment extends Fragment {
     }
 
     private void loadAttachments() {
-        if (!AndroidUtils.isInternetConnection(getActivity())) {
+        if (!AndroidUtils.hasConnection(getActivity())) {
             Toast.makeText(getActivity(), R.string.check_internet, Toast.LENGTH_LONG).show();
             return;
         }
@@ -99,6 +113,18 @@ public class HistoryAttachmentFragment extends Fragment {
             public void run() {
                 try {
                     ArrayList<VKMessageAttachment> attachments = Api.get().getHistoryAttachments(chat_id == 0 ? user_id : VKApi.OFFSET_PEER_ID + chat_id, MaterialsPageAdapter.typeFrom(position), 0, 200, null);
+                    if (ArrayUtil.isEmpty(attachments)) {
+//                        Snackbar.make(getView(), "Вложений с типом  :( ", Snackbar.LENGTH_LONG)
+//                                .show();
+                        Log.w("AttachmentFragment", "attachments is empty");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                inflateEmptyView();
+                            }
+                        });
+                        return;
+                    }
 
                     // generic type throws ClassCastException =(
                     // use for a specific type of a separate list
@@ -121,7 +147,7 @@ public class HistoryAttachmentFragment extends Fragment {
                                 if (videos == null) {
                                     videos = new ArrayList<>(attachments.size());
                                 }
-                                videos.add(new VideosAdapter.VideoItem(VKUser.EMPTY_USER, messageAttachment.video));
+                                videos.add(new VideosAdapter.VideoItem(VKUser.EMPTY, messageAttachment.video));
                                 break;
 
                             case MaterialsPageAdapter.POSITION_AUDIO:
@@ -175,5 +201,28 @@ public class HistoryAttachmentFragment extends Fragment {
         });
     }
 
+    private void inflateEmptyView() {
+        View rootView = getView();
+//        ViewStub stub = (ViewStub) rootView.findViewById(R.id.viewStub);
+
+//        View emptyView = stub.inflate();
+        if (listView != null) {
+            listView.setVisibility(View.GONE);
+        }
+        if (recyclerView != null) {
+            recyclerView.setVisibility(View.GONE);
+        }
+
+        LinearLayout group = (LinearLayout) rootView;
+        if (group != null) {
+            View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_layout, group, false);
+            group.addView(emptyView);
+
+            ImageView sentiment = (ImageView) emptyView.findViewById(R.id.ivSentiment);
+            sentiment.setAlpha(0.5f);
+            ViewUtil.setFilter(sentiment, ThemeManager.getSecondaryTextColor());
+
+        }
+    }
 
 }

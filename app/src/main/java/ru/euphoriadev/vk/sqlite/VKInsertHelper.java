@@ -1,4 +1,4 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.sqlite;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
@@ -6,11 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.euphoriadev.vk.api.model.VKDocument;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.napi.VKApi;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 /**
  * Created by Igor on 22.01.16.
@@ -165,6 +167,54 @@ public class VKInsertHelper {
         }
     }
 
+
+    /**
+     * Insert one doc into SQLite database
+     *
+     * @param database the {@link SQLiteDatabase} to insert message it
+     * @param doc     doc to insert into the database
+     * @return the row ID of the newly inserted row, or -1 if an error occurred
+     */
+    public static long insertDoc(SQLiteDatabase database, VKDocument doc) {
+        prepareConventValuesForDoc(doc);
+        return database.insert(DBHelper.DOCS_TABLE, null, sValues);
+    }
+
+    /**
+     * Insert docs to SQLite database with use transactions
+     *
+     * @param database the {@link SQLiteDatabase} to insert messages it
+     * @param docs    a list of docs to insert into the database
+     */
+    public static void insertDocs(SQLiteDatabase database, List<VKDocument> docs) {
+        insertDocs(database, docs, true);
+    }
+
+    /**
+     * Insert docs to SQLite database
+     *
+     * @param database       the {@link SQLiteDatabase} to insert messages it
+     * @param docs          a list of docs to insert into the database
+     * @param useTransaction true to use transactions, speeds up the inserting
+     * @see SQLiteDatabase#beginTransaction()
+     */
+    public static void insertDocs(SQLiteDatabase database, List<VKDocument> docs, boolean useTransaction) {
+        checkOpen(database);
+        if (checkIsEmpty(docs)) {
+            return;
+        }
+
+        if (useTransaction) database.beginTransaction();
+        for (int i = 0; i < docs.size(); i++) {
+            insertDoc(database, docs.get(i));
+        }
+        sValues.clear();
+        if (useTransaction) {
+            database.setTransactionSuccessful();
+            database.endTransaction();
+        }
+    }
+
     /**
      * Insert or update users to database
      *
@@ -217,6 +267,57 @@ public class VKInsertHelper {
     }
 
     /**
+     * Insert or update docs to SQLite database
+     *
+     * @param database       the {@link SQLiteDatabase} to insert it
+     * @param docs           a list of docs to insert/update into database
+     * @param useTransaction true to use transactions, for speeds up inserting
+     * @see SQLiteDatabase#beginTransaction()
+     */
+    public static void updateDocs(SQLiteDatabase database, List<VKDocument> docs, boolean useTransaction) {
+        checkOpen(database);
+        if (checkIsEmpty(docs)) {
+            return;
+        }
+
+        if (useTransaction) database.beginTransaction();
+        for (int i = 0; i < docs.size(); i++) {
+            updateDoc(database, docs.get(0));
+        }
+        sValues.clear();
+        if (useTransaction) {
+            database.setTransactionSuccessful();
+            database.endTransaction();
+        }
+    }
+
+    /**
+     * Insert or update doc to database with use transactions
+     *
+     * @param database the {@link SQLiteDatabase} to update users it
+     * @param docs    a list of docs to update into the database
+     */
+    public static void updateDocs(SQLiteDatabase database, List<VKDocument> docs) {
+        updateDocs(database, docs, true);
+    }
+
+    /**
+     * Insert or update doc to database
+     *
+     * @param database the {@link SQLiteDatabase} to insert/update it
+     * @param doc     the doc to insert/update into database
+     * @return the number of rows affected,
+     */
+    public static long updateDoc(SQLiteDatabase database, VKDocument doc) {
+        prepareConventValuesForDoc(doc);
+        int updateRows = database.update(DBHelper.DOCS_TABLE, sValues, DBHelper.DOC_ID + " = " + doc.id, null);
+        if (updateRows <= 0) {
+            return database.insert(DBHelper.DOCS_TABLE, null, sValues);
+        }
+        return updateRows;
+    }
+
+    /**
      * Removes all values from {@link VKInsertHelper#sValues};
      */
     public static void clearValues() {
@@ -259,6 +360,18 @@ public class VKInsertHelper {
         sValues.put(DBHelper.DATE, message.date);
         sValues.put(DBHelper.PHOTO_50, message.photo_50);
         sValues.put(DBHelper.PHOTO_100, message.photo_100);
+    }
+
+    private static void prepareConventValuesForDoc(VKDocument doc) {
+        sValues.put(DBHelper.OWNER_ID, doc.owner_id);
+        sValues.put(DBHelper.DOC_ID, doc.id);
+        sValues.put(DBHelper.TITLE, doc.title);
+        sValues.put(DBHelper.SIZE, doc.size);
+        sValues.put(DBHelper.TYPE, doc.type);
+        sValues.put(DBHelper.EXT, doc.ext);
+        sValues.put(DBHelper.URL, doc.url);
+        sValues.put(DBHelper.PHOTO_100, doc.photo_100);
+        sValues.put(DBHelper.PHOTO_130, doc.photo_130);
     }
 
     /**

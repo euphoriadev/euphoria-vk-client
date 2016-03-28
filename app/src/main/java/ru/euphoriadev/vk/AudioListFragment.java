@@ -207,7 +207,7 @@ public class AudioListFragment extends AbstractFragment implements SwipeRefreshL
 
     @Override
     public void onRefresh() {
-        if (AndroidUtils.isInternetConnection(getActivity())) {
+        if (AndroidUtils.hasConnection(getActivity())) {
             getAudios(true);
         } else {
             setRefreshing(false);

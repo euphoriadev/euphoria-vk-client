@@ -7,6 +7,7 @@ public class SearchDialogItem {
     public String email;
     public VKFullUser user;
     public VKMessage chat;
+
     public enum SDIType {USER, CHAT, EMAIL}
 
 }

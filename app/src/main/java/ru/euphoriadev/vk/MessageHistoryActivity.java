@@ -9,13 +9,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.AsyncTaskCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -70,10 +70,10 @@ import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.service.LongPollService;
+import ru.euphoriadev.vk.sqlite.VKInsertHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Encrypter;
 import ru.euphoriadev.vk.util.ThemeUtils;
-import ru.euphoriadev.vk.util.VKInsertHelper;
 import ru.euphoriadev.vk.util.ViewUtil;
 import ru.euphoriadev.vk.util.YandexTranslator;
 import ru.euphoriadev.vk.view.FixedListView;
@@ -104,7 +104,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     private long lastTypeNotification;
     private boolean forceClose;
     private boolean hideTyping;
-    private boolean mShowShadow;
     /**
      * can I load old messages, If false, then messages are loading
      */
@@ -115,6 +114,16 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_history);
+        if (ThemeManager.isLightTheme()) {
+//            getWindow().setBackgroundDrawable(
+//                    new ColorDrawable(
+//                            ResourcesLoader.getColor(R.color.md_grey_200)));
+
+//            ColorDrawable whiteColor = new ColorDrawable(Color.WHITE);
+//            ColorDrawable themeColor = new ColorDrawable(ThemeManager.alphaColor(ThemeManager.getThemeColor(this), 0.10f));
+//
+//            getWindow().setBackgroundDrawable(new LayerDrawable(new Drawable[]{whiteColor, themeColor}));
+        }
 
         String fullName = getIntent().getExtras().getString("fullName");
         uid = getIntent().getExtras().getInt("user_id");
@@ -154,7 +163,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         });
         ViewUtil.setTypeface(etMessageText);
 
-        FloatingActionButton fabSend = (FloatingActionButton) findViewById(R.id.fabMessageSebd);
+        FloatingActionButton fabSend = (FloatingActionButton) findViewById(R.id.fabMessageSend);
         fabSend.setColorNormal(ThemeUtils.getThemeAttrColor(this, R.attr.colorAccent));
         fabSend.setColorPressed(ViewUtil.getPressedColor(fabSend.getColorNormal()));
         fabSend.setOnClickListener(new View.OnClickListener() {
@@ -163,27 +172,53 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 sendMessage(etMessageText.getText().toString());
             }
         });
+
+//        ImageView fabIcon = (ImageView) findViewById(R.id.fabIcon);
+//        ImageView fabBackground = (ImageView) findViewById(R.id.fabBackground);
         if (PrefManager.getBoolean(SettingsFragment.KEY_USE_CAT_ICON_SEND)) {
             fabSend.setImageResource(R.drawable.ic_pets_white);
         } else {
             fabSend.setImageResource(R.drawable.ic_keyboard_arrow_right);
         }
 
-        ViewUtil.setFilter(fabSend, ThemeManager.getPrimaryTextColorOnAccent(this));
-        ViewUtil.setFilter(etMessageText, ThemeManager.isDarkTheme() ? Color.parseColor("#424242") : Color.WHITE);
+        fabSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage(etMessageText.getText().toString());
+            }
+        });
+        fabSend.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String decryptMessage = encrypt(etMessageText.getText().toString().trim());
+                sendMessage(decryptMessage);
+                return true;
+            }
+        });
+//        fabBackground.setImageDrawable(ViewUtil.createStateDrawable(
+//                ViewUtil.getPressedColor(ThemeManager.getThemeColor(this)),
+//                ThemeManager.getThemeColor(this)
+//        ));
 
+        ViewUtil.setFilter(fabSend, ThemeManager.getPrimaryTextColorOnAccent(this));
+        ViewUtil.setFilter(etMessageText, ThemeManager.isDarkTheme() ? MessageAdapter.DEFAULT_COLOR : MessageAdapter.DEFAULT_LIGHT_COLOR);
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setSubtitleTextAppearance(this, android.R.attr.textAppearanceSmall);
         toolbar.setTitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
         toolbar.setSubtitleTextColor(ThemeManager.getPrimaryTextColorOnThemeColor(this));
 
-        viewShadow = findViewById(R.id.vshadow_history);
+        viewShadow = findViewById(R.id.layoutMessageShadow);
         if (!ThemeManager.isDarkTheme()) {
             viewShadow.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.message_drop_shadow_white));
         }
 
-//        setSupportActionBar(toolbar);
+        View toolbarShadow = findViewById(R.id.toolbarShadow);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbarShadow.setVisibility(View.GONE);
+        }
+
+        setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(fullName);
@@ -222,8 +257,8 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     animateShadow(true);
                 }
 
-//                // если находися на 10 position списка - грузим старые сообщеньки
-                if (canLoadOldMessages && adapter != null && firstVisibleItem <= 20) {
+//                // если находися на 15 position списка - грузим старые сообщеньки
+                if (canLoadOldMessages && adapter != null && firstVisibleItem <= 15) {
                     canLoadOldMessages = false;
                     getOldMessages(30, adapter.getCount());
                 }
@@ -267,21 +302,6 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         ));
         lvHistory.addFooterView(listViewFooter);
 
-        fabSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (etMessageText.getText().toString().length() != 0)
-                    sendMessage(etMessageText.getText().toString().trim());
-            }
-        });
-        fabSend.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                String decryptMessage = encrypt(etMessageText.getText().toString().trim());
-                sendMessage(decryptMessage);
-                return true;
-            }
-        });
 
 
         toolbar.setOnClickListener(new View.OnClickListener() {
@@ -364,22 +384,22 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     }
 
     private void animateShadow(boolean show) {
-        if (mShowShadow == show) {
-            return;
-        }
-        mShowShadow = show;
-
-        if (show) {
-            viewShadow.setVisibility(View.VISIBLE);
-            ViewCompat.animate(viewShadow).setDuration(200).withLayer().alpha(1.0f).start();
-        } else {
-            ViewCompat.animate(viewShadow).setDuration(200).alpha(0).withLayer().withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    viewShadow.setVisibility(View.GONE);
-                }
-            }).start();
-        }
+//        if (mShowShadow == show) {
+//            return;
+//        }
+//        mShowShadow = show;
+//
+//        if (show) {
+//            viewShadow.setVisibility(View.VISIBLE);
+//            ViewCompat.animate(viewShadow).setDuration(200).withLayer().alpha(1.0f).start();
+//        } else {
+//            ViewCompat.animate(viewShadow).setDuration(200).alpha(0).withLayer().withEndAction(new Runnable() {
+//                @Override
+//                public void run() {
+//                    viewShadow.setVisibility(View.GONE);
+//                }
+//            }).start();
+//        }
     }
 
     @Override
@@ -627,7 +647,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         alert = builder.create();
         alert.show();
 
-        if (AndroidUtils.isInternetConnection(getApplicationContext()))
+        if (AndroidUtils.hasConnection(getApplicationContext()))
             new Thread() {
                 @Override
                 public void run() {
@@ -810,7 +830,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
     }
 
     private void setTyping() {
-        if (!AndroidUtils.isInternetConnection(this)) {
+        if (!AndroidUtils.hasConnection(this)) {
             return;
         }
         this.lastTypeNotification = System.currentTimeMillis();
@@ -876,12 +896,13 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         if (executor == null) {
             executor = Executors.newSingleThreadExecutor();
         }
+        Log.w("MessageHistoryActivity", "get old messages, count: " + count + ", offset: " + offset);
         executor.execute(new Runnable() {
             @Override
             public void run() {
 //                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
                 try {
-                    VKUser emptyUser = VKUser.EMPTY_USER;
+                    VKUser emptyUser = VKUser.EMPTY;
                     HashMap<Integer, VKUser> mapUsers = null;
                     ArrayList<VKMessage> oldMessages = api.getMessagesHistory(uid, chat_id, offset, count, false);
                     if (oldMessages.isEmpty()) {
@@ -943,6 +964,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                canLoadOldMessages = true;
             }
         });
     }
@@ -1272,11 +1294,10 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             if (cursor.getCount() > 0) {
                 // Start dialog is not first,
                 // loaded messages
-                history.ensureCapacity(cursor.getCount());
                 getMessagesFrom(cursor);
                 publishProgress(null);
             }
-            if (!AndroidUtils.isInternetConnection(MessageHistoryActivity.this)) {
+            if (!AndroidUtils.hasConnection(MessageHistoryActivity.this)) {
                 // if user not have internet connection
                 cursor.close();
                 AndroidUtils.post(new RunnableToast(MessageHistoryActivity.this, R.string.check_internet, true));
@@ -1291,22 +1312,18 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             SparseArray<VKUser> users = new SparseArray<>(30);
             for (int i = 0; i < messages.size(); i++) {
                 VKMessage message = messages.get(i);
-                users.append(message.uid, VKUser.EMPTY_USER);
+                users.append(message.uid, VKUser.EMPTY);
             }
 
-            ArrayList<VKUser> vkUsers = getUsersFrom(database);
             HashSet<Integer> keySet = AndroidUtils.keySet(users);
-            if (vkUsers.isEmpty()) {
-                // database not have users... add
-                vkUsers = loadUsersFromNetwork(keySet);
-
-            }
+            ArrayList<VKUser> vkUsers = loadUsersFromNetwork(keySet);
 
             for (int i = 0; i < vkUsers.size(); i++) {
                 VKUser user = vkUsers.get(i);
                 users.put(user.user_id, user);
             }
 
+            history.clear();
             // Reverse adding
             for (int i = messages.size() - 1; i >= 0; i--) {
                 VKMessage message = messages.get(i);
@@ -1319,7 +1336,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             deleteOldMessages(sql);
 
             VKInsertHelper.insertMessages(database, messages, true);
-            VKInsertHelper.updateUsers(database, loadUsersFromNetwork(keySet), true);
+            VKInsertHelper.updateUsers(database, vkUsers, true);
 
             messages.clear();
             messages.trimToSize();
@@ -1421,7 +1438,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                     user.last_name = lastName;
                 }
 
-                history.add(new MessageItem(message, user == null ? VKUser.EMPTY_USER : user));
+                history.add(new MessageItem(message, user == null ? VKUser.EMPTY : user));
             }
         }
 

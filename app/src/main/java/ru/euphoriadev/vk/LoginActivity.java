@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -22,6 +23,7 @@ public class LoginActivity extends Activity {
 
         webview = (WebView) findViewById(R.id.vkontakteview);
         webview.getSettings().setJavaScriptEnabled(true);
+        ViewCompat.setLayerType(webview, ViewCompat.LAYER_TYPE_HARDWARE, null);
 
         // Чтобы получать уведомления об окончании загрузки страницы
         webview.setWebViewClient(new VkontakteWebViewClient());

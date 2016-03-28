@@ -14,7 +14,7 @@
             android:title="@string/messages"/>
         <item
             android:id="@+id/navAudios"
-            android:icon="@drawable/ic_audiotrack_white"
+            android:icon="@drawable/ic_audiotrack"
             android:title="@string/audios"/>
 
         <item
@@ -43,26 +43,24 @@
     </group>
 
 
-
-
     <group
         android:id="@+id/navMenuOther"
         android:checkableBehavior="none">
         <!--<item-->
-            <!--android:title=""-->
-            <!--app:actionLayout="@layout/navigation_user_item"-->
-            <!--/>-->
+        <!--android:title=""-->
+        <!--app:actionLayout="@layout/navigation_user_item"-->
+        <!--/>-->
 
         <!--<item-->
-            <!--app:showAsAction="ifRoom|collapseActionView"-->
-            <!--app:actionLayout="@layout/navigation_user_item"-->
-            <!--/>-->
+        <!--app:showAsAction="ifRoom|collapseActionView"-->
+        <!--app:actionLayout="@layout/navigation_user_item"-->
+        <!--/>-->
 
         <!--<item-->
-            <!--android:title=""-->
-            <!--app:showAsAction="ifRoom|collapseActionView"-->
-            <!--app:actionLayout="@layout/navigation_user_item"-->
-            <!--/>-->
+        <!--android:title=""-->
+        <!--app:showAsAction="ifRoom|collapseActionView"-->
+        <!--app:actionLayout="@layout/navigation_user_item"-->
+        <!--/>-->
 
         <item
             android:id="@+id/navPrefs"

@@ -23,11 +23,11 @@ import android.widget.Toast;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKResolveScreenName;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.napi.VKApi;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.common.ThemeManager;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.util.ViewUtil;
 
 
@@ -62,27 +62,6 @@ public class WelcomeActivity extends BaseThemedActivity implements View.OnClickL
 
         btnLogin.setOnClickListener(this);
         buttonToken.setOnClickListener(this);
-        buttonToken.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                VKApi.authorization("igmorozkin@gmail.com", "134679852ig", new VKApi.VKOnAuthorizationListener() {
-                    @Override
-                    public void onSuccess(VKApi.VKUserConfig newConfig) {
-                        Intent intent = new Intent();
-                        intent.putExtra("token", newConfig.accessToken);
-                        intent.putExtra("user_id", newConfig.userId);
-
-                        onActivityResult(REQUEST_LOGIN, RESULT_OK, intent);
-                    }
-
-                    @Override
-                    public void onError(VKApi.VKException e) {
-
-                    }
-                });
-                return true;
-            }
-        });
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             ViewUtil.setFilter(btnLogin, ThemeManager.getThemeColor(this));
@@ -122,7 +101,7 @@ public class WelcomeActivity extends BaseThemedActivity implements View.OnClickL
 
                         VKUser user = api.getProfile((int) account.user_id);
                         if (user == null) {
-                            user = VKUser.EMPTY_USER;
+                            user = VKUser.EMPTY;
                         }
 
                         account.fullName = user.toString();
@@ -130,6 +109,9 @@ public class WelcomeActivity extends BaseThemedActivity implements View.OnClickL
                         account.status = user.status;
                         account.save();
                         api.setAccount(account);
+                        VKApi.setUserConfig(new VKApi.VKUserConfig(account.access_token,
+                                null, (int) account.user_id,
+                                Integer.parseInt(Account.API_ID)));
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -299,6 +281,8 @@ public class WelcomeActivity extends BaseThemedActivity implements View.OnClickL
                     account.photo = vkUser.photo_50;
                     account.save();
                 }
+
+                VKApi.setUserConfig(new VKApi.VKUserConfig().restore());
                 finish();
             }
 

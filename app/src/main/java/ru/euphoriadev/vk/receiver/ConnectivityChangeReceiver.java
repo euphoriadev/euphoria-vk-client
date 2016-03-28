@@ -10,10 +10,10 @@ import android.preference.PreferenceManager;
 import java.util.concurrent.TimeUnit;
 
 import ru.euphoriadev.vk.api.Api;
+import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.async.ThreadExecutor;
 
 /**
  * Created by Igor on 06.09.15.
@@ -27,7 +27,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
             // не включен RFN
             return;
         }
-        if (!AndroidUtils.isInternetConnection(context)) {
+        if (!AndroidUtils.hasConnection(context)) {
             // нет интернет подключения
             return;
         }

@@ -3,7 +3,6 @@ package ru.euphoriadev.vk.common;
 import android.content.Context;
 
 import ru.euphoriadev.vk.R;
-import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.SimpleSparseArray;
 

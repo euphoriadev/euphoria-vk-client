@@ -6,11 +6,11 @@ import org.json.JSONObject;
 
 import java.io.Closeable;
 
-import ru.euphoriadev.vk.http.AsyncHttpClient;
+import ru.euphoriadev.vk.http.HttpClient;
+import ru.euphoriadev.vk.http.HttpException;
 import ru.euphoriadev.vk.http.HttpParams;
 import ru.euphoriadev.vk.http.HttpRequest;
 import ru.euphoriadev.vk.http.HttpResponse;
-import ru.euphoriadev.vk.http.HttpResponseCodeException;
 
 
 /**
@@ -22,12 +22,10 @@ public class YandexTranslator implements Closeable {
      * Бесплатный ключ, необходимый осуществления переводов
      */
     private final String apiKey = "trnsl.1.1.20151111T152603Z.2776f2b27e3ca850.db06c544a222c5278777f8c8968629dcf4836182";
-    AsyncHttpClient client;
     private Context context;
 
     public YandexTranslator(Context context) {
         this.context = context;
-        this.client = new AsyncHttpClient(context);
     }
 
     /**
@@ -46,16 +44,16 @@ public class YandexTranslator implements Closeable {
         params.addParam("text", message);
         params.addParam("lang", (languageFrom.equals(Language.AUTO_DETECT.toString()) ? languageTo : languageFrom + "-" + languageTo));
 
-        HttpRequest request = new HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
-        request.useCaches = true;
+        HttpRequest request = HttpRequest.builder("https://translate.yandex.net/api/v1.5/tr.json/translate")
+                .params(params)
+                .method(HttpRequest.METHOD_GET)
+                .build();
+
         request.enableCompression = false;
 
-        if (client == null) {
-            client = new AsyncHttpClient(null);
-        }
         try {
-            HttpResponse response = client.execute(request);
-            JSONObject json = response.getContentAsJson();
+            HttpResponse response = HttpClient.execute(request);
+            JSONObject json = response.asJson();
             if (json != null && json.has("text")) {
                 return json.optJSONArray("text").optString(0);
             }
@@ -68,11 +66,6 @@ public class YandexTranslator implements Closeable {
 
     /**
      * Ассинхронный запрос на перевод текста, т.е не нужно создавать новый поток
-     *
-     * @param message
-     * @param languageFrom
-     * @param languageTo
-     * @param listener
      */
     public void translateAsync(final String message, final String languageFrom, final String languageTo, final OnCompleteListener listener) {
         HttpParams params = new HttpParams();
@@ -80,27 +73,31 @@ public class YandexTranslator implements Closeable {
         params.addParam("text", message);
         params.addParam("lang", (languageFrom.equals(Language.AUTO_DETECT.toString()) ? languageTo : languageFrom + "-" + languageTo));
 
-        final HttpRequest request = new HttpRequest("https://translate.yandex.net/api/v1.5/tr.json/translate", "GET", params);
-        client.execute(request, new HttpRequest.OnResponseListener() {
+        final HttpRequest request = HttpRequest.builder("https://translate.yandex.net/api/v1.5/tr.json/translate")
+                .params(params)
+                .method(HttpRequest.METHOD_GET)
+                .build();
+        HttpClient.execute(request, new HttpRequest.OnResponseListener() {
             @Override
-            public void onResponse(AsyncHttpClient client, HttpResponse response) {
+            public void onResponse(HttpClient client, HttpResponse response) {
                 if (listener != null) {
-                    listener.onCompleteTranslate(YandexTranslator.this, response.getContentAsJson().optJSONArray("text").optString(0));
+                    listener.onCompleteTranslate(YandexTranslator.this, response.asJson().optJSONArray("text").optString(0));
                 }
             }
 
             @Override
-            public void onError(AsyncHttpClient client, HttpResponseCodeException exception) {
+            public void onProgress(char[] buffer, int progress, long totalSize) {
+
+            }
+
+            @Override
+            public void onError(HttpClient client, HttpException exception) {
             }
         });
     }
 
     @Override
     public void close() {
-        if (client != null) {
-            client.close();
-            client = null;
-        }
     }
 
     public enum Language {

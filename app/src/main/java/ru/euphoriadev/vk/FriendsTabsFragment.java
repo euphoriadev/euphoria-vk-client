@@ -17,11 +17,11 @@ import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 
 /**
- * Created by user on 18.02.16.
+ * Created by Igor on 18.02.16.
  */
 public class FriendsTabsFragment extends Fragment {
 
-    FriendsPageAdapter adapter;
+    private FriendsPageAdapter adapter;
     private AppCompatActivity activity;
     private TabLayout tabLayout;
 
@@ -41,7 +41,6 @@ public class FriendsTabsFragment extends Fragment {
         if (!ThemeManager.isDarkTheme()) {
             viewPager.setBackgroundColor(ResourcesLoader.getColor(R.color.md_grey_100));
         }
-
 
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);

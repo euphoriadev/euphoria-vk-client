@@ -1,4 +1,4 @@
-package ru.euphoriadev.vk.util;
+package ru.euphoriadev.vk.common;
 
 import android.os.Build;
 import android.util.Log;
@@ -14,8 +14,6 @@ import java.text.SimpleDateFormat;
 
 import ru.euphoriadev.vk.BuildConfig;
 import ru.euphoriadev.vk.SettingsFragment;
-import ru.euphoriadev.vk.common.AppLoader;
-import ru.euphoriadev.vk.common.PrefManager;
 
 /**
  * Created by Igor on 28.01.16.

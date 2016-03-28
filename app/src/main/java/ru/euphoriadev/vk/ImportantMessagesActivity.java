@@ -1,8 +1,10 @@
 package ru.euphoriadev.vk;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -15,11 +17,11 @@ import ru.euphoriadev.vk.adapter.MessageItem;
 import ru.euphoriadev.vk.api.Api;
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
-import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.async.ThreadExecutor;
+import ru.euphoriadev.vk.util.AndroidUtils;
 
 /**
- * Created by user on 13.11.15.
+ * Created by Igor on 13.11.15.
  */
 public class ImportantMessagesActivity extends BaseThemedActivity {
 
@@ -33,8 +35,10 @@ public class ImportantMessagesActivity extends BaseThemedActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.important_layout_activity);
 
-//        AndroidUtils.setStatusBarColor(this, findViewById(R.id.statusBarBackground));
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            View shadow = findViewById(R.id.toolbarShadow);
+            shadow.setVisibility(View.GONE);
+        }
         listView = (ListView) findViewById(R.id.lvImportantMessages);
         toolbar = getToolbar();
 
@@ -47,7 +51,7 @@ public class ImportantMessagesActivity extends BaseThemedActivity {
     }
 
     private void loadMessages() {
-        if (!AndroidUtils.isInternetConnection(this)) {
+        if (!AndroidUtils.hasConnection(this)) {
             Toast.makeText(this, R.string.check_internet, Toast.LENGTH_LONG).show();
             return;
         }

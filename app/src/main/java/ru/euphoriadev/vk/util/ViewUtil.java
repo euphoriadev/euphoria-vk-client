@@ -4,8 +4,10 @@ import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +29,7 @@ import java.util.WeakHashMap;
 
 import ru.euphoriadev.vk.common.AppLoader;
 import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.common.TypefaceManager;
 import ru.euphoriadev.vk.view.CircleCheckBox;
 
 /**
@@ -47,6 +50,10 @@ public class ViewUtil {
      * @param color The ARGB source color used with the specified Porter-Duff mode
      */
     public static void setFilter(View view, int color) {
+        if (view == null) {
+            return;
+        }
+
         ColorFilter colorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY);
         if (view instanceof ImageView) {
             ImageView iv = (ImageView) view;
@@ -63,6 +70,7 @@ public class ViewUtil {
             if (drawable != null) drawable.setColorFilter(colorFilter);
         }
     }
+
 
     private static Drawable getCheckBoxDrawable(CheckBox checkBox) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -196,6 +204,30 @@ public class ViewUtil {
         SpannableString newTitle = new SpannableString(title);
         newTitle.setSpan(new TypefaceSpan("", typeface), 0, newTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         return newTitle;
+    }
+
+//    public static ColorStateList createState(int pressedColor, int defaultColor) {
+//        final int[][] states = new int[2][];
+//        final int[] colors = new int[2];
+//        int i = 0;
+//
+//        states[i] = new int[] { android.R.attr.state_pressed };
+//        colors[i] = pressedColor;
+//        i++;
+//
+//         Default enabled state
+//        states[i] = new int[] { android.R.attr.state_enabled };
+//        colors[i] = defaultColor;
+//
+//        return new ColorStateList(states, colors);
+//    }
+
+    public static Drawable createStateDrawable(int pressedColor, int defaultColor) {
+        StateListDrawable drawable = new StateListDrawable();
+        drawable.addState(new int[]{android.R.attr.state_pressed}, new ColorDrawable(pressedColor));
+        drawable.addState(new int[]{android.R.attr.state_enabled}, new ColorDrawable(defaultColor));
+        drawable.addState(new int[]{}, new ColorDrawable(defaultColor));
+        return drawable;
     }
 
     /**

@@ -316,7 +316,7 @@ public class HttpHeaders {
      * e.g. Mozilla/5.0 (X11; Linux i686; rv:2.0.1)
      * Gecko/20100101 Firefox/4.0.1
      */
-    public static final String User_Agent = "User-Agent";
+    public static final String USER_AGENT = "User-Agent";
 
 
     /*
@@ -336,20 +336,23 @@ public class HttpHeaders {
      */
     @Retention(CLASS)
     @Target({PARAMETER, METHOD, LOCAL_VARIABLE, FIELD})
-    public @interface RequestHeader {}
+    public @interface RequestHeader {
+    }
 
     /**
      * Used only in responses
      */
     @Retention(CLASS)
     @Target({METHOD})
-    public @interface ResponseHeader {}
+    public @interface ResponseHeader {
+    }
 
     /**
      * Accompany each entity of the message. Used in requests and responses
      */
     @Retention(CLASS)
     @Target({METHOD})
-    public @interface EntityHeader {}
+    public @interface EntityHeader {
+    }
 
 }

@@ -19,7 +19,6 @@ import java.util.concurrent.Executors;
 import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.SettingsFragment;
 import ru.euphoriadev.vk.napi.VKApi;
-import ru.euphoriadev.vk.util.CrashManager;
 import ru.euphoriadev.vk.util.ThemeUtils;
 
 /**

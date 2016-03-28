@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.text.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -363,7 +364,9 @@ public class FileHelper {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         //  request.setDescription("Some descrition");
         request.setTitle(title);
-        request.setMimeType(mimeType);
+        if (!TextUtils.isEmpty(mimeType)) {
+            request.setMimeType(mimeType);
+        }
         // in order for this if to run, you must use the android 3.2 to compile your app
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             request.allowScanningByMediaScanner();

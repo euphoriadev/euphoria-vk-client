@@ -5,24 +5,21 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.AtomicFile;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicReference;
 
 import ru.euphoriadev.vk.api.model.VKMessage;
 import ru.euphoriadev.vk.api.model.VKUser;
+import ru.euphoriadev.vk.sqlite.VKInsertHelper;
 import ru.euphoriadev.vk.util.ArrayUtil;
-import ru.euphoriadev.vk.util.VKInsertHelper;
 
 /**
  * Created by Igor on 06.03.15.
  */
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "euphoria.db";
-    private static final int DATABASE_VERSION = 83;
+    private static final int DATABASE_VERSION = 85;
 
     /** Tables */
     public static final String USERS_TABLE = "users";
@@ -45,6 +42,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String FRIEND_ID = "friend_id";
     public static final String AUDIO_ID = "audio_id";
     public static final String CHAT_ID = "chat_id";
+    public static final String DOC_ID = "doc_id";
     public static final String LYRICS_ID = "lyrics_id";
     public static final String MESSAGE_ID = "message_id";
     public static final String TITLE = "title";
@@ -67,6 +65,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String IS_FRIEND = "is_friend";
     public static final String PHOTO_50 = "photo_50";
     public static final String PHOTO_100 = "photo_100";
+    public static final String PHOTO_130 = "photo_130";
     public static final String PHOTO_200 = "photo_200";
     public static final String PHOTO_400 = "photo_400";
     public static final String PHOTO_MAX = "photo_max";
@@ -92,11 +91,11 @@ public class DBHelper extends SQLiteOpenHelper {
             " [" + LAST_NAME + "] VARCHAR(255), " +
             " [" + SCREEN_NAME + "] VARCHAR(255), " +
             " [" + NICKNAME + "] VARCHAR(255), " +
-            " [" + ONLINE + "] INTEGER VARCHAR(255), " +
-            " [" + ONLINE_MOBILE + "] INTEGER VARCHAR(255), " +
+            " [" + ONLINE + "] INTEGER, " +
+            " [" + ONLINE_MOBILE + "] INTEGER, " +
             " [" + STATUS + "] VARCHAR(255), " +
             " [" + IS_FRIEND + "] VARCHAR(255), " +
-            " [" + LAST_SEEN + "] INTEGER VARCHAR(255), " +
+            " [" + LAST_SEEN + "] INTEGER, " +
             " [" + PHOTO_50 + "] VARCHAR(255), " +
             " [" + PHOTO_100 + "] VARCHAR(255), " +
             " [" + PHOTO_200 + "] VARCHAR(255), " +
@@ -173,12 +172,15 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private final static String SQL_CREATE_TABLE_DOCS = "CREATE TABLE " + DOCS_TABLE +
             " (" + _ID + " INTEGER PRIMARY KEY, " +
+            " [" + DOC_ID + "] INTEGER, " +
             " [" + OWNER_ID + "] INTEGER, " +
             " [" + TITLE + "] VARCHAR(255), " +
             " [" + SIZE + "] INTEGER, " +
+            " [" + TYPE + "] INTEGER, " +
             " [" + EXT + "] VARCHAR(255), " +
             " [" + URL + "] VARCHAR(255), " +
-            " [" + PHOTO_100 + "] VARCHAR(255) " +
+            " [" + PHOTO_100 + "] VARCHAR(255), " +
+            " [" + PHOTO_130 + "] VARCHAR(255)" +
             ");";
 
     private final static String SQL_CREATE_TABLE_GROUPS = "CREATE TABLE " + GROUPS_TABLE +
@@ -318,7 +320,7 @@ public class DBHelper extends SQLiteOpenHelper {
         checkDatabaseForOpen();
 
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM " + DBHelper.USERS_TABLE + " WHERE " + DBHelper.USER_ID + " = " + uid, null);
-        VKUser user = VKUser.EMPTY_USER;
+        VKUser user = VKUser.EMPTY;
         if (cursor.getCount() != 0)
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(0);

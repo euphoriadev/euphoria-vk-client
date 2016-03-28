@@ -18,6 +18,7 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -32,7 +33,6 @@ import android.widget.ImageButton;
 import android.widget.ScrollView;
 
 import com.nineoldandroids.view.ViewHelper;
-import com.nineoldandroids.view.ViewPropertyAnimator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -339,8 +339,14 @@ public class FloatingActionButton extends ImageButton {
             }
             int translationY = visible ? 0 : height + getMarginBottom();
             if (animate) {
-                ViewPropertyAnimator.animate(this).setInterpolator(mInterpolator)
+//                ViewPropertyAnimator.animate(this).setInterpolator(mInterpolator)
+//                        .setDuration(TRANSLATE_DURATION_MILLIS)
+//                        .translationY(translationY);
+
+                ViewCompat.animate(this)
+                        .setInterpolator(mInterpolator)
                         .setDuration(TRANSLATE_DURATION_MILLIS)
+                        .withLayer()
                         .translationY(translationY);
             } else {
                 ViewHelper.setTranslationY(this, translationY);

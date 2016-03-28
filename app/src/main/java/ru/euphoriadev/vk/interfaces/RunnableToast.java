@@ -3,6 +3,8 @@ package ru.euphoriadev.vk.interfaces;
 import android.content.Context;
 import android.widget.Toast;
 
+import ru.euphoriadev.vk.common.AppLoader;
+
 /**
  * Created by Igor on 02.02.16.
  * <p/>
@@ -43,7 +45,7 @@ public class RunnableToast implements Runnable {
 
     @Override
     public void run() {
-        Toast.makeText(context, message, longShow ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)
+        Toast.makeText(context == null ? AppLoader.appContext : context, message, longShow ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)
                 .show();
     }
 }

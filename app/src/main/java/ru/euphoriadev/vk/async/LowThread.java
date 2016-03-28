@@ -17,7 +17,6 @@ public class LowThread extends Thread {
      *
      * @param runnable a whose method <code>run</code> will be
      *                 executed by the new {@code Thread}
-     *
      * @see java.lang.ThreadGroup
      * @see java.lang.Runnable
      */
