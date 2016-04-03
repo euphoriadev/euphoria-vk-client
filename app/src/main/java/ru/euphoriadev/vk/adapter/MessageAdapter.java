@@ -47,8 +47,10 @@ import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.common.PrefManager;
 import ru.euphoriadev.vk.common.ResourcesLoader;
 import ru.euphoriadev.vk.common.ThemeManager;
+import ru.euphoriadev.vk.common.TypefaceManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.helper.MediaPlayerHelper;
+import ru.euphoriadev.vk.sqlite.VKSqliteHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
 import ru.euphoriadev.vk.util.Emoji;
 import ru.euphoriadev.vk.util.VKUpdateController;
@@ -88,6 +90,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
     private boolean isBlackTheme;
     private int primaryDarkColorLight;
     private int primaryDarkColorDark;
+    private boolean systemEmoji;
+    private Typeface typeface;
 
 
     public MessageAdapter(Context context, ArrayList<MessageItem> items, long uid, long chat_id) {
@@ -102,7 +106,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         isColorInMessages = PrefManager.getBoolean(SettingsFragment.KEY_COLOR_IN_MESSAGES, true);
         isColorOutMessages = PrefManager.getBoolean(SettingsFragment.KEY_COLOR_OUT_MESSAGES, false);
         isNightTheme = ThemeManager.isDarkTheme();
-        isBlackTheme = ThemeManager.getThemeColor(getContext()) == ThemeManager.PALETTE[19];
+        isBlackTheme = ThemeManager.getThemeColor(getContext()) == ThemeManager.PALETTE[20];
 
         if (isColorInMessages) {
             colorInMessages = ThemeManager.getThemeColor(getContext());
@@ -150,6 +154,8 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         mHelper = DBHelper.get(mContext);
         cacheMessages = new CacheMessages(CacheMessages.DEFAULT_SIZE);
 
+        systemEmoji = PrefManager.getBoolean(SettingsFragment.KEY_USE_SYSTEM_EMOJI);
+        typeface = TypefaceManager.getTypeface(context);
         VKUpdateController.getInstance().addMessageListener(this);
 
     }
@@ -191,14 +197,70 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         }
 
         final MessageItem item = getItem(position);
-        if (item == null) return view;
 
-        ViewUtil.setTypeface(holder.tvBody);
-        ViewUtil.setTypeface(holder.tvDate);
+        if (!TextUtils.isEmpty(item.message.action)) {
+            View serviceView = getInflater().inflate(R.layout.list_item_service_message, parent, false);
+            TextView textServiceView = (TextView) serviceView.findViewById(R.id.tvServiceText);
+            switch (item.message.action) {
+                case VKMessage.ACTION_CHAT_CREATE:
+                    textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> created chat \"%s\"", item.user.toString(), item.message.action_text)));
+                    break;
 
+                case VKMessage.ACTION_CHAT_PHOTO_UPDATE:
+                    textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> has updated chat photo ", item.user.toString())));
+                    break;
+
+                case VKMessage.ACTION_CHAT_PHOTO_REMOVE:
+                    textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> has removed chat photo ", item.user.toString())));
+                    break;
+
+                case VKMessage.ACTION_CHAT_TITLE_UPDATE:
+                    textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> changed title on <b><i>«%s»</i></b>", item.user.toString(), item.message.action_text)));
+                    break;
+
+                case VKMessage.ACTION_CHAT_KICK_USER:
+                    if (item.user.user_id == item.message.action_mid) {
+                        textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> leaved from chat ", item.user.toString())));
+                    } else {
+                        textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> kick <b><i>«%s»</i></b>", item.user.toString(), VKSqliteHelper.getUser(DBHelper.getDatabase(getContext()), item.message.action_mid))));
+                    }
+                    break;
+
+                case VKMessage.ACTION_CHAT_INVITE_USER:
+                    if (item.user.user_id == item.message.action_mid) {
+                        textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> returned to chat ", item.user.toString())));
+                    } else {
+                        textServiceView.setText(Html.fromHtml(String.format("<b><i>%s</i></b> invite <b><i>«%s»</i></b>", item.user.toString(), VKSqliteHelper.getUser(DBHelper.getDatabase(getContext()), item.message.action_mid))));
+                    }
+                    break;
+
+
+
+            }
+
+            return serviceView;
+        }
+
+//        ViewUtil.setTypeface(holder.tvBody);
+//        ViewUtil.setTypeface(holder.tvDate);
+
+        if (holder == null) {
+            Log.e("MessageAdapter", "inflate item layout again");
+            // inflate again, because last was is service layout
+            view = getInflater().inflate(R.layout.list_item_message, parent, false);
+
+            holder = new ViewHolder(view);
+            view.setTag(holder);
+        }
+
+        holder.tvBody.setTypeface(typeface);
+        if (mShowTime) {
+            holder.tvDate.setTypeface(typeface);
+        }
+
+        holder.spaceSelected.setVisibility(item.message.is_out ? View.VISIBLE : View.GONE);
         if (isInMultiSelectMode()) {
             holder.ivSelected.setVisibility(View.VISIBLE);
-            holder.spaceSelected.setVisibility(item.message.is_out ? View.GONE : View.VISIBLE);
             if (isSelectedItem(item)) {
                 holder.ivSelected.setImageResource(R.drawable.ic_selected);
                 holder.ivSelected.setColorFilter(ThemeManager.getColorAccent(getContext()));
@@ -308,7 +370,9 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
         holder.llContainer.setMaxWidth(widthDisplay - (widthDisplay / 4));
 //        holder.tvBody.setMaxWidth(widthDisplay - (widthDisplay / 4));
         holder.tvBody.setTextColor(primaryTextColor);
-        holder.tvDate.setTextColor(ThemeManager.getSecondaryTextColor());
+        if (mShowTime) {
+            holder.tvDate.setTextColor(ThemeManager.getSecondaryTextColor());
+        }
 
         if (TextUtils.isEmpty(item.message.body) && !item.message.emoji && !item.message.attachments.isEmpty()) {
             holder.tvBody.setVisibility(View.GONE);
@@ -355,12 +419,14 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
                 break;
 
             case SENDING:
-                holder.tvDate.setText(mContext.getString(R.string.sending));
+                if (mShowTime) holder.tvDate.setText(mContext.getString(R.string.sending));
                 break;
 
             case ERROR:
-                holder.tvDate.setText(mContext.getString(R.string.error));
-                holder.tvDate.setTextColor(mContext.getResources().getColor(R.color.md_red_500));
+                if (mShowTime) {
+                    holder.tvDate.setText(mContext.getString(R.string.error));
+                    holder.tvDate.setTextColor(mContext.getResources().getColor(R.color.md_red_500));
+                }
                 break;
         }
 
@@ -369,7 +435,7 @@ public class MessageAdapter extends BaseArrayAdapter<MessageItem> implements VKU
             holder.llAttachContainer.removeAllViewsInLayout();
         }
 
-        if (item.message.emoji) {
+        if (item.message.emoji && !systemEmoji) {
             Emoji.parseEmoji(holder.tvBody);
         }
         if (!item.message.attachments.isEmpty()) {

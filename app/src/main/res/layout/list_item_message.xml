@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:focusable="false"
+    android:gravity="end"
     android:orientation="vertical"
     android:paddingBottom="4dp"
     android:paddingLeft="6dp"
@@ -25,7 +26,7 @@
         android:textSize="12sp"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
@@ -44,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <ru.euphoriadev.vk.view.CircleImageView
             android:id="@+id/ivMessagePhoto"
@@ -77,7 +78,7 @@
                 android:linksClickable="true"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
-                tools:text="Hey everyone how about adding new functionality in the app? it would be nice!"/>
+                tools:text="Message!"/>
 
             <LinearLayout
                 android:id="@+id/llMessageAttachments"

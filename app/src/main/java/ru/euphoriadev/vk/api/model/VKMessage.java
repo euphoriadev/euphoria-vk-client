@@ -22,6 +22,14 @@ public class VKMessage implements Serializable {
     public static final int MEDIA = 512;      // сообщение содержит медиаконтент
     public static final int BESEDA = 8192;    // беседа
 
+    public static final String ACTION_CHAT_CREATE = "chat_create";
+    public static final String ACTION_CHAT_INVITE_USER = "chat_invite_user";
+    public static final String ACTION_CHAT_KICK_USER = "chat_kick_user";
+
+    public static final String ACTION_CHAT_TITLE_UPDATE = "chat_title_update";
+    public static final String ACTION_CHAT_PHOTO_UPDATE = "chat_photo_update";
+    public static final String ACTION_CHAT_PHOTO_REMOVE = "chat_photo_remove";
+
     private static final long serialVersionUID = 1L;
     /**
      * Message ID. (Not returned for forwarded messages), positive number

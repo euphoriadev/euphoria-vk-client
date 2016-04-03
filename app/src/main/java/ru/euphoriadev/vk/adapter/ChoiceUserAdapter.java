@@ -1,6 +1,7 @@
 package ru.euphoriadev.vk.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -69,7 +70,10 @@ public class ChoiceUserAdapter extends BaseArrayAdapter<VKUser> implements View.
         ViewUtil.setTypeface(holder.tvFullName);
         ViewUtil.setTypeface(holder.tvOnlineStatus);
 
-        Picasso.with(getContext()).load(user.photo_50).into(holder.ivPhoto);
+        Picasso.with(getContext())
+                .load(user.photo_50)
+                .config(Bitmap.Config.RGB_565)
+                .into(holder.ivPhoto);
         return convertView;
     }
 

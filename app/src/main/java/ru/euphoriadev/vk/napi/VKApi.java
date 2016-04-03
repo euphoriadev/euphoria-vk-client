@@ -1638,6 +1638,15 @@ public class VKApi {
             return this.request.execute();
         }
 
+        public JSONObject executeTry() {
+            try {
+                return execute();
+            } catch (VKException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
         /**
          * ASYNC (in new Thread) Executes request and convert to {@link String}
          *
@@ -2061,7 +2070,7 @@ public class VKApi {
          * <p/>
          * TODO: accessible for versions from 5.38
          */
-        public VKMessageMethodSetter peerId(int peerId) {
+        public VKMessageMethodSetter peerId(long peerId) {
             this.request.params.put(VKConst.PEER_ID, peerId);
             return this;
         }
@@ -2861,17 +2870,20 @@ public class VKApi {
                 JSONObject json = response.asJson();
                 VKUtil.checkErrors(url, json);
                 return json;
-            } catch (VKException e) {
+            } catch (Exception e) {
                 if (DEBUG) e.printStackTrace();
-                if (e.errorCode == VKErrorCodes.TOO_MANY_REQUESTS) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
+                if (e instanceof VKException) {
+                    if (((VKException) e).errorCode == VKErrorCodes.TOO_MANY_REQUESTS) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                        return execute();
                     }
-                    return execute();
+                    throw e;
                 }
-                throw e;
+                throw VKException.from(url, 0, e);
             }
         }
     }
@@ -2966,6 +2978,10 @@ public class VKApi {
          */
         public static boolean isEmpty(JSONObject source) {
             return source == null || source.length() <= 0;
+        }
+
+        public static long peerIdFrom(int chatId, int userId) {
+            return chatId > 0 ? VKApi.OFFSET_PEER_ID + chatId : userId;
         }
 
         public static void checkErrors(String url, JSONObject source) throws VKException {
@@ -3604,7 +3620,7 @@ public class VKApi {
         public static final int WINDOWS_OFFICIAL = 3697615;
 
         /** Unofficial client, mods and messengers */
-        public static final int KATE_MODILE = 2685278;
+        public static final int KATE_MOBILE = 2685278;
         public static final int EUPHORIA = 4510232;
         public static final int LYNT = 3469984;
         public static final int SWEET = 4856309;

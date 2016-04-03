@@ -34,7 +34,7 @@
             android:id="@+id/lvHistory"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
+            android:gravity="top"
             android:divider="@android:color/transparent"
             android:smoothScrollbar="true"/>
 

@@ -251,6 +251,18 @@ public class ResourcesLoader {
         sColors.put(md_blue_grey_800, getColor(context, R.color.md_blue_grey_800));
         sColors.put(md_blue_grey_900, getColor(context, R.color.md_blue_grey_900));
 
+        // VK Official
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+        sColors.putForce(vk_official, getColor(context, R.color.vk_official));
+
     }
 
     public static int getColor(int resId) {

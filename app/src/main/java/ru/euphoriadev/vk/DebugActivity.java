@@ -391,6 +391,7 @@ public class DebugActivity extends BaseThemedActivity {
             }
         });
         rootLayout.addView(button);
+
     }
 
 
@@ -420,6 +421,7 @@ public class DebugActivity extends BaseThemedActivity {
                 logHttp(" ");
             }
         });
+
     }
 
     private void logHttp(String message) {

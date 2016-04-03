@@ -3,8 +3,8 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical"
               android:fitsSystemWindows="true"
+              android:orientation="vertical"
               tools:context=".CreateChatActivity">
 
 
@@ -15,5 +15,6 @@
     <ListView
         android:id="@+id/lvCreateChat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layoutAnimation="@anim/layout_bottom_to_top_slide"/>
 </LinearLayout>

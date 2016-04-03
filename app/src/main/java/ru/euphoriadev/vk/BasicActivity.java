@@ -53,6 +53,7 @@ import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.interfaces.Refreshable;
 import ru.euphoriadev.vk.napi.VKApi;
+import ru.euphoriadev.vk.service.CrazyTypingService;
 import ru.euphoriadev.vk.service.LongPollService;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
@@ -582,6 +583,9 @@ public class BasicActivity extends BaseThemedActivity implements
         } else if (backPressedTime + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
             VKApi.close();
+            if (AndroidUtils.serviceIsRunning(CrazyTypingService.class)) {
+                stopService(new Intent(this, CrazyTypingService.class));
+            }
             if (!PrefManager.getBoolean(SettingsFragment.KEY_ENABLE_NOTIFY, true) || !PrefManager.getBoolean(SettingsFragment.KEY_IS_LIVE_ONLINE_SERVICE)) {
                 stopService(new Intent(this, LongPollService.class));
                 appLoader.getHandler().postDelayed(new Runnable() {

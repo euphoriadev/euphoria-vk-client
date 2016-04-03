@@ -5,13 +5,16 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 
+import ru.euphoriadev.vk.R;
 import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.common.TypefaceManager;
+import ru.euphoriadev.vk.util.ThemeUtils;
 
 /**
  * Created by Igor on 22.02.16.
@@ -23,7 +26,6 @@ public class CircleView extends View {
     private final Paint mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private String mText;
-
     public CircleView(Context context) {
         super(context);
     }
@@ -36,6 +38,20 @@ public class CircleView extends View {
     public CircleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
+
+//        TypedArray a = context.obtainStyledAttributes(
+//                attrs, com.android.internal.R.styleable.TextView, defStyleAttr, 0);
+//
+//        for (int i = 0; i < a.getIndexCount(); i++) {
+//            int attr = a.getIndex(i);
+//            switch (attr) {
+//                case com.android.internal.R.styleable.TextView_textColor:
+//                    mText = a.getText(attr).toString();
+//                    break;
+//
+//            }
+//        }
+//        a.recycle();
     }
 
     private void init(Context context) {
@@ -44,17 +60,23 @@ public class CircleView extends View {
         mTextPaint.setStyle(Paint.Style.FILL);
         mTextPaint.setColor(Color.WHITE);
         mTextPaint.setAntiAlias(true);
-        mTextPaint.setTypeface(TypefaceManager.getBoldTypeface(getContext()));
+        mTextPaint.setTypeface(isInEditMode() ? Typeface.DEFAULT : TypefaceManager.getBoldTypeface(getContext()));
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setTextSize(16);
 
         mCirclePaint.setStyle(Paint.Style.FILL);
-        mCirclePaint.setColor(ThemeManager.isBlackThemeColor() ? Color.WHITE : ThemeManager.getThemeColor(getContext()));
+        if (isInEditMode()) {
+            mText = "12";
+            mCirclePaint.setColor(ThemeUtils.getThemeAttrColor(context, R.attr.colorPrimary));
+        } else {
+            mCirclePaint.setColor(ThemeManager.isBlackThemeColor() ? Color.WHITE : ThemeManager.getThemeColor(getContext()));
+        }
         mCirclePaint.setAntiAlias(true);
 
         mBorderPaint.setStyle(Paint.Style.FILL);
         mBorderPaint.setColor(Color.WHITE);
         mBorderPaint.setAntiAlias(true);
+
     }
 
     @Override

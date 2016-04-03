@@ -59,6 +59,10 @@
     <color name="bright_blue">#ff33b5e5</color>
     <color name="selection_background_color">#fffebb20</color>
 
+    <color name="vk_official">#5281B9</color>
+    <color name="vk_official_dark">#3C5F87</color>
+
+
     <!-- Colors copied from http://www.google.com/design/spec/style/color.html#color-color-palette-->
 
     <color name="md_dark_background">#303030</color>

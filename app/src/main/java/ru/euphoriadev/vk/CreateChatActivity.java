@@ -24,6 +24,7 @@ import ru.euphoriadev.vk.api.KException;
 import ru.euphoriadev.vk.api.model.VKUser;
 import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.sqlite.CursorBuilder;
 import ru.euphoriadev.vk.sqlite.VKInsertHelper;
 import ru.euphoriadev.vk.sqlite.VKSqliteHelper;
@@ -66,10 +67,6 @@ public class CreateChatActivity extends BaseThemedActivity {
     }
 
     private void loadUsers() {
-        if (!AndroidUtils.hasConnection(this)) {
-            Toast.makeText(this, R.string.check_internet, Toast.LENGTH_LONG).show();
-            return;
-        }
         ThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -81,7 +78,6 @@ public class CreateChatActivity extends BaseThemedActivity {
                         friends = api.getFriends(api.getUserId(), "hints", null, null, null, null);
                     }
 
-
                     adapter = new ChoiceUserAdapter(CreateChatActivity.this, friends);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -89,6 +85,11 @@ public class CreateChatActivity extends BaseThemedActivity {
                             lv.setAdapter(adapter);
                         }
                     });
+                    if (!AndroidUtils.hasConnection(CreateChatActivity.this)) {
+                        AndroidUtils.post(new RunnableToast(CreateChatActivity.this, R.string.check_internet, true));
+                        return;
+                    }
+
                     ArrayList<VKUser> newFriends = api.getFriends(api.getUserId(), "hints", null, null, null, null);
                     if (!ArrayUtil.isEmpty(newFriends)) {
                         friends.clear();

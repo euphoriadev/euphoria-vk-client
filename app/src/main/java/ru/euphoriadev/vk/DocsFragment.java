@@ -74,7 +74,7 @@ public class DocsFragment extends AbstractFragment {
                     View itemView = AndroidUtils.getViewByPosition(position, listView);
                     ImageView imageView = (ImageView) itemView.findViewById(R.id.ivOocCircle);
                     Drawable drawable = imageView.getDrawable();
-                    if (drawable != null) {
+                    if (drawable != null && drawable instanceof BitmapDrawable) {
                         Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
                         PhotoViewerActivity.start(getActivity(), doc.url, bitmap, false);
                         Log.w("Docs", "start with placeholder!");

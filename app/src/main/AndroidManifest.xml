@@ -85,6 +85,10 @@
             android:enabled="true"
             android:exported="true"/>
         <service
+            android:name=".service.CrazyTypingService"
+            android:enabled="true"
+            android:exported="true"/>
+        <service
             android:name=".service.LongPollService"
             android:enabled="true"
             android:exported="true"/>

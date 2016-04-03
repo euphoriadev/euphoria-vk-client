@@ -65,25 +65,36 @@ public class VKSqliteHelper {
     public static ArrayList<VKUser> getAllFriends(SQLiteDatabase database) {
         Cursor cursor = CursorBuilder.create().
                 selectAllFrom(DBHelper.FRIENDS_TABLE)
-                .where(DBHelper.USER_ID, Api.get().getUserId())
+                .leftJoin(DBHelper.USERS_TABLE)
+                .on(DBHelper.FRIENDS_TABLE, DBHelper.FRIEND_ID,
+                        DBHelper.USERS_TABLE, DBHelper.USER_ID)
+                .where(DBHelper.FRIENDS_TABLE + "." + DBHelper.USER_ID,
+                        Api.get().getUserId())
                 .cursor(database);
 
-        ArrayList<Integer> friendIds = new ArrayList<>(cursor.getCount());
+        ArrayList<VKUser> friends = new ArrayList<>(cursor.getCount());
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
-                int id = cursor.getInt(2);
-                friendIds.add(id);
-            }
-        }
-        cursor.close();
-
-        ArrayList<VKUser> friends = new ArrayList<>(friendIds.size());
-        for (int i = 0; i < friendIds.size(); i++) {
-            VKUser user = getUser(database, friendIds.get(i));
-            if (user != null) {
+                VKUser user = userForRow(cursor);
                 friends.add(user);
             }
         }
+//        ArrayList<Integer> friendIds = new ArrayList<>(cursor.getCount());
+//        if (cursor.getCount() > 0) {
+//            while (cursor.moveToNext()) {
+//                int id = cursor.getInt(2);
+//                friendIds.add(id);
+//            }
+//        }
+//        cursor.close();
+//
+//        ArrayList<VKUser> friends = new ArrayList<>(friendIds.size());
+//        for (int i = 0; i < friendIds.size(); i++) {
+//            VKUser user = getUser(database, friendIds.get(i));
+//            if (user != null) {
+//                friends.add(user);
+//            }
+//        }
         return friends;
 
     }
@@ -124,14 +135,14 @@ public class VKSqliteHelper {
 
     public static VKUser userForRow(Cursor cursor) {
         VKUser user = new VKUser();
-        user.user_id = cursor.getInt(0);
-        user.first_name = cursor.getString(1);
-        user.last_name = cursor.getString(2);
-        user.screen_name = cursor.getString(3);
-        user.status = cursor.getString(7);
-        user.photo_50 = cursor.getString(10);
-        user.photo_100 = cursor.getString(11);
-        user.photo_200 = cursor.getString(12);
+        user.user_id = cursor.getInt(cursor.getColumnIndex(DBHelper.USER_ID));
+        user.first_name = cursor.getString(cursor.getColumnIndex(DBHelper.FIRST_NAME));
+        user.last_name = cursor.getString(cursor.getColumnIndex(DBHelper.LAST_NAME));
+        user.screen_name = cursor.getString(cursor.getColumnIndex(DBHelper.SCREEN_NAME));
+        user.status = cursor.getString(cursor.getColumnIndex(DBHelper.STATUS));
+        user.photo_50 = cursor.getString(cursor.getColumnIndex(DBHelper.PHOTO_50));
+        user.photo_100 = cursor.getString(cursor.getColumnIndex(DBHelper.PHOTO_100));
+        user.photo_200 = cursor.getString(cursor.getColumnIndex(DBHelper.PHOTO_200));
 
         user.online = cursor.getInt(cursor.getColumnIndex(DBHelper.ONLINE)) == 1;
         user.online_mobile = cursor.getInt(cursor.getColumnIndex(DBHelper.ONLINE_MOBILE)) == 1;

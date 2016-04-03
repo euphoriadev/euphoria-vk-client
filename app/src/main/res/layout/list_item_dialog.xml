@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="78dp"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:gravity="center_vertical"
               android:orientation="vertical"
               android:paddingLeft="16dp"
@@ -23,15 +24,19 @@
                 android:id="@+id/ivDialogPhoto"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
+                android:src="@drawable/camera_b"
                 app:border_color="@color/white"
-                app:border_width="1dp"
-                android:src="@drawable/camera_b"/>
+                app:border_width="1dp"/>
 
-            <ru.euphoriadev.vk.view.CircleView
-                android:id="@+id/vDialogUnreadIndicator"
-                android:layout_width="17dp"
-                android:layout_height="17dp"
-                android:layout_gravity="right|bottom"/>
+            <ImageView
+                android:id="@+id/viewDialogOnlineIndicator"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="bottom|end"
+                android:background="@drawable/online_circle_indicator"
+                android:padding="2dp"
+                android:src="@drawable/ic_android"/>
+
 
             <!--<TextView-->
             <!--android:id="@+id/tvUnreadCount"-->
@@ -55,11 +60,11 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
+                android:gravity="start|center"
+                android:orientation="horizontal"
+                android:paddingRight="6dp">
 
                 <TextView
                     android:id="@+id/tvDialogTitle"
@@ -73,13 +78,17 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@android:color/primary_text_dark"/>
 
-                <View
-                    android:id="@+id/viewDialogOnlineIndicator"
+                <android.support.v4.widget.Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/crazyTypingIndicator"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginBottom="2dp"
-                    android:background="@drawable/ic_android"/>
-
+                    android:src="@drawable/ic_mode_edit"/>
 
             </LinearLayout>
 
@@ -87,6 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:minHeight="29dp"
                 android:orientation="horizontal">
 
                 <ru.euphoriadev.vk.view.CircleImageView
@@ -111,20 +121,41 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginRight="2dp"
-            android:gravity="right"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvDialogDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_gravity="top"
                 android:paddingTop="2dp"
 
                 android:text="17:17"
                 android:textColor="@android:color/secondary_text_dark"
                 android:textSize="12sp"/>
+
+            <!--<ru.euphoriadev.vk.view.CircleView-->
+            <!--android:id="@+id/vDialogUnreadIndicator"-->
+            <!--android:layout_width="24dp"-->
+            <!--android:layout_height="24dp"-->
+            <!--android:layout_marginTop="12dp"-->
+            <!--android:layout_gravity="center"/>-->
+
+            <TextView
+                android:id="@+id/vDialogUnreadIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="22dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/rectangle_unread_indicator"
+                android:gravity="center"
+                android:layout_gravity="end"
+                android:minWidth="22dp"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="20"/>
 
         </LinearLayout>
 

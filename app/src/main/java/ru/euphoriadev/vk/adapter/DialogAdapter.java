@@ -3,7 +3,6 @@ package ru.euphoriadev.vk.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -37,11 +35,13 @@ import ru.euphoriadev.vk.async.ThreadExecutor;
 import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.common.TypefaceManager;
 import ru.euphoriadev.vk.helper.DBHelper;
+import ru.euphoriadev.vk.interfaces.AsyncRunnable;
+import ru.euphoriadev.vk.napi.VKApi;
+import ru.euphoriadev.vk.service.CrazyTypingService;
+import ru.euphoriadev.vk.sqlite.VKInsertHelper;
 import ru.euphoriadev.vk.util.AndroidUtils;
-import ru.euphoriadev.vk.util.ThemeUtils;
 import ru.euphoriadev.vk.util.VKUpdateController;
 import ru.euphoriadev.vk.util.ViewUtil;
-import ru.euphoriadev.vk.view.CircleView;
 
 /**
  * Created by Igor on 30.03.15.
@@ -85,8 +85,6 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         update(message); // заменяем элемент
         Collections.sort(dialogItems); // сортируем по дате
         notifyDataSetChanged(); // обновляем
-
-
     }
 
 
@@ -211,8 +209,7 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         }
         holder.tvDate.setText(sdf.format(item.date.getTime()));
 
-        holder.indicator.setTextSize(10);
-        holder.indicator.setTextColor(ThemeManager.getPrimaryTextColorOnAccent(context));
+        holder.unreadIndicator.setTextColor(ThemeManager.getPrimaryTextColorOnAccent(context));
         if (message.isChat()) {
             holder.tvFullName.setText(holder.tvFullName.getText());
         } else {
@@ -228,23 +225,29 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
             // holder.tvBody.setBackgroundColor(Color.TRANSPARENT);
             holder.tvFullName.setTextColor(fullNameTextColor);
             holder.tvDate.setTextColor(fullNameTextColor);
+        }
 
+        if (CrazyTypingService.contains(VKApi.VKUtil.peerIdFrom(message.chat_id, message.uid))) {
+            holder.typingIndicator.setVisibility(View.VISIBLE);
+            ViewUtil.setFilter(holder.typingIndicator, ThemeManager.getThemeColor(context));
+        } else {
+            holder.typingIndicator.setVisibility(View.GONE);
         }
 
         // Если мне отправили, и я не прочитал
         if (!message.is_out && !message.read_state) {
-            holder.indicator.setVisibility(View.VISIBLE);
-//            holder.indicator.getBackground().setColorFilter(ThemeManager.getColorAccent(context), PorterDuff.Mode.MULTIPLY);
-            holder.tvDate.setTextColor(ThemeManager.getColorAccent(context));
+            holder.unreadIndicator.setVisibility(View.VISIBLE);
+//            holder.unreadIndicator.getBackground().setColorFilter(ThemeManager.getColorAccent(context), PorterDuff.Mode.MULTIPLY);
+            holder.tvDate.setTextColor(ThemeManager.getThemeColor(context));
 
             holder.tvBody.setTextColor(fullNameTextColor);
             if (item.message.unread != 0)
-                holder.indicator.setText(item.message.unread > 1000 ? item.message.unread / 1000 + "к" : item.message.unread + "");
+                holder.unreadIndicator.setText(item.message.unread > 1000 ? item.message.unread / 1000 + "k" : item.message.unread + "");
             //      holder.lLayout.setBackgroundColor(context.getResources().getColor(R.color.translucent_white));
         } else {
             //      holder.lLayout.setBackgroundColor(Color.TRANSPARENT);
-            holder.indicator.setVisibility(View.GONE);
-            holder.indicator.setText("");
+            holder.unreadIndicator.setVisibility(View.GONE);
+            holder.unreadIndicator.setText("");
             holder.tvBody.setTextColor(bodyTextColor);
             //       holder.tvDate.setTextColor(fullNameTextColor);
 
@@ -252,19 +255,57 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
 
         if (user.online && !item.message.isChat()) {
             holder.onlineIndicator.setVisibility(View.VISIBLE);
-            if (holder.onlineIndicator.getBackground() == null) {
-                holder.onlineIndicator.setBackgroundDrawable(user.online_mobile ?
-                        AndroidUtils.getDrawable(context, R.drawable.ic_android) :
-                        AndroidUtils.getDrawable(context, R.drawable.shape_circle));
-            }
+            int resource = R.drawable.ic_vector_smartphone;
+//          int tintColor = -1;
+            if (user.online_mobile) {
+                // online from mobile app
+                switch (user.online_app) {
+                    case VKApi.VKIdentifiers.EUPHORIA:
+                        resource = R.drawable.ic_pets_white;
+                        break;
 
-            holder.onlineIndicator.setLayoutParams(new LinearLayout.LayoutParams(
-                    AndroidUtils.pxFromDp(context, user.online_mobile ? 15 : 10),
-                    AndroidUtils.pxFromDp(context, user.online_mobile ? 15 : 10)
-            ));
-            holder.onlineIndicator.getBackground().setColorFilter(ThemeUtils.getThemeAttrColor(context, R.attr.colorAccent), PorterDuff.Mode.MULTIPLY);
+                    case VKApi.VKIdentifiers.ANDROID_OFFICIAL:
+                        resource = R.drawable.ic_vector_android;
+                        break;
+
+                    case VKApi.VKIdentifiers.WP_OFFICIAL:
+                    case VKApi.VKIdentifiers.WINDOWS_OFFICIAL:
+                        resource = R.drawable.ic_vector_win;
+                        break;
+
+                    case VKApi.VKIdentifiers.IPAD_OFFICIAL:
+                    case VKApi.VKIdentifiers.IPHONE_OFFICIAL:
+                        resource = R.drawable.ic_vector_apple;
+                        break;
+
+                    case VKApi.VKIdentifiers.KATE_MOBILE:
+                        resource = R.drawable.ic_kate;
+                        break;
+
+                    case VKApi.VKIdentifiers.ROCKET:
+                        resource = R.drawable.ic_vector_rocket;
+                        break;
+
+                    case VKApi.VKIdentifiers.SWEET:
+                        resource = R.drawable.ic_vector_sweet;
+                        break;
+
+                    case VKApi.VKIdentifiers.PHOENIX:
+                    case VKApi.VKIdentifiers.MESSENGER:
+//                      tintColor = ResourcesLoader.getColor(R.color.md_indigo_500);
+                        resource = R.drawable.ic_phoenix;
+                        break;
+
+                }
+            } else {
+                // online from desktop (PC)
+                resource = R.drawable.ic_vector_web;
+            }
+            holder.onlineIndicator.setImageDrawable(AndroidUtils.getDrawable(context, resource));
+//            if (tintColor != -1) {
+//               DrawableCompat.setTint(holder.onlineIndicator.getDrawable(), tintColor);
+//            }
         } else {
-            holder.onlineIndicator.setBackgroundDrawable(null);
             holder.onlineIndicator.setVisibility(View.GONE);
         }
 
@@ -400,8 +441,8 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
                     item.message.uid = updateMessage.uid;
                     //  item.message.chat_id = updateMessage.chat_id;
                     item.message.title = updateMessage.title;
-                    item.message.photo_50 = updateMessage.photo_50;
-                    item.message.photo_100 = updateMessage.photo_100;
+//                    item.message.photo_50 = updateMessage.photo_50;
+//                    item.message.photo_100 = updateMessage.photo_100;
                     item.message.body = updateMessage.body;
                     item.message.is_out = updateMessage.is_out;
                     item.message.read_state = updateMessage.read_state;
@@ -468,12 +509,36 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
 
     @Override
     public void onOffline(int user_id) {
-
+        DialogItem item = search(user_id, 0);
+        if (item != null) {
+            item.user.online = false;
+            item.user.online_mobile = false;
+            VKInsertHelper.updateUser(DBHelper.get(context).getWritableDatabase(), item.user);
+            notifyDataSetChanged();
+        }
     }
 
     @Override
-    public void onOnline(int user_id) {
+    public void onOnline(final int user_id) {
+        ThreadExecutor.execute(new AsyncRunnable() {
+            @Override
+            protected void doInBackground() throws Exception {
+                DialogItem item = search(user_id, 0);
+                if (item != null) {
+                    VKUser profile = Api.get().getProfile(user_id);
+                    item.user.online = profile.online;
+                    item.user.online_mobile = profile.online_mobile;
+                    item.user.online_app = profile.online_app;
 
+                    VKInsertHelper.updateUser(DBHelper.getDatabase(context), profile);
+                }
+            }
+
+            @Override
+            protected void onPostExecute() {
+                notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -500,12 +565,11 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
         TextView tvFullName;
         TextView tvBody;
         TextView tvDate;
-        CircleView indicator;
-        //        TextView tvUnreadCount;
+        TextView unreadIndicator;
         ImageView ivPhoto;
         ImageView ivLastPhotoUser;
-        View onlineIndicator;
-        //     LinearLayout lLayout;
+        ImageView onlineIndicator;
+        ImageView typingIndicator;
 
         public ViewHolder(View v) {
             tvFullName = (TextView) v.findViewById(R.id.tvDialogTitle);
@@ -513,10 +577,9 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
             tvDate = (TextView) v.findViewById(R.id.tvDialogDate);
             ivPhoto = (ImageView) v.findViewById(R.id.ivDialogPhoto);
             ivLastPhotoUser = (ImageView) v.findViewById(R.id.ivDialogLastPhotoUser);
-//            tvUnreadCount = (TextView) v.findViewById(R.id.tvUnreadCount);
-            indicator = (CircleView) v.findViewById(R.id.vDialogUnreadIndicator);
-            onlineIndicator = v.findViewById(R.id.viewDialogOnlineIndicator);
-
+            unreadIndicator = (TextView) v.findViewById(R.id.vDialogUnreadIndicator);
+            onlineIndicator = (ImageView) v.findViewById(R.id.viewDialogOnlineIndicator);
+            typingIndicator = (ImageView) v.findViewById(R.id.crazyTypingIndicator);
         }
 
     }

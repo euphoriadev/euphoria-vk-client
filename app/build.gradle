@@ -8,8 +8,8 @@ android {
         applicationId "ru.euphoriadev.vk"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 1010
-        versionName "1.1"
+        versionCode 1020
+        versionName "1.2"
     }
 
     signingConfigs {

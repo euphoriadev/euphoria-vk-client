@@ -308,6 +308,10 @@ public class DBHelper extends SQLiteOpenHelper {
         VKInsertHelper.updateUser(mDatabase, profile);
     }
 
+    public static SQLiteDatabase getDatabase(Context context) {
+        return DBHelper.get(context).getWritableDatabase();
+    }
+
     public void addMessageToDB(VKMessage message) {
         if (mDatabase == null || !mDatabase.isOpen()) {
             mDatabase = DBHelper.get(mContext).getWritableDatabase();

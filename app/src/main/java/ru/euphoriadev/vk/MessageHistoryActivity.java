@@ -130,7 +130,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
         chat_id = getIntent().getExtras().getInt("chat_id");
         int users_count = getIntent().getExtras().getInt("users_count");
         boolean isOnline = getIntent().getExtras().getBoolean("online");
-        boolean from_saved = getIntent().getExtras().getBoolean("from_saved", false);
+        final boolean from_saved = getIntent().getExtras().getBoolean("from_saved", false);
         boolean from_service = getIntent().getExtras().getBoolean("from_sarvice", false);
 
         api = Api.get();
@@ -258,7 +258,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
                 }
 
 //                // если находися на 15 position списка - грузим старые сообщеньки
-                if (canLoadOldMessages && adapter != null && firstVisibleItem <= 15) {
+                if (canLoadOldMessages && !from_saved && adapter != null && firstVisibleItem <= 15) {
                     canLoadOldMessages = false;
                     getOldMessages(30, adapter.getCount());
                 }
@@ -1350,7 +1350,7 @@ public class MessageHistoryActivity extends BaseThemedActivity {
             keySet = null;
             cursor.close();
 
-            System.gc();
+            Runtime.getRuntime().gc();
             return null;
         }
 

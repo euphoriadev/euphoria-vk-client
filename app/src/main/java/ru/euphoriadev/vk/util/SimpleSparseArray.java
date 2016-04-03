@@ -78,6 +78,22 @@ public class SimpleSparseArray implements Cloneable {
     }
 
     /**
+     * Adding force (without check index of key)
+     * a mapping from the specified key to the specified value
+     *
+     * @param key   the key for map to value
+     * @param value the value for map to key
+     */
+    public void putForce(int key, int value) {
+        if (mSize > mKeys.length) {
+            throw new RuntimeException("Capacity is overflow");
+        }
+        mKeys[mSize] = key;
+        mValues[mSize] = value;
+        mSize++;
+    }
+
+    /**
      * Directly set the key at a particular index
      *
      * @param index the index at which to set the specified value

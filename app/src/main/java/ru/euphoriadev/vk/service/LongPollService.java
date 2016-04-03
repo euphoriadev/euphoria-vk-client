@@ -235,7 +235,7 @@ public class LongPollService extends Service {
                         Thread.sleep(3000);
                         continue;
                     }
-                    pollServer = api.getLongPollServer(null, null);
+                    pollServer = Api.get().getLongPollServer(null, null);
                     break;
                 }
 

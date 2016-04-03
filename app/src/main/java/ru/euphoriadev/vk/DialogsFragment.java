@@ -58,6 +58,7 @@ import ru.euphoriadev.vk.common.ThemeManager;
 import ru.euphoriadev.vk.helper.DBHelper;
 import ru.euphoriadev.vk.interfaces.RunnableToast;
 import ru.euphoriadev.vk.napi.VKApi;
+import ru.euphoriadev.vk.service.CrazyTypingService;
 import ru.euphoriadev.vk.sqlite.VKInsertHelper;
 import ru.euphoriadev.vk.util.Account;
 import ru.euphoriadev.vk.util.AndroidUtils;
@@ -135,8 +136,9 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
                 final DialogItem item = (DialogItem) parent.getItemAtPosition(position);
                 final boolean exists = DBHelper.get(getActivity()).exists(database, DBHelper.SAVED_MESSAGES_TABLE + "_" + item.user.user_id);
 
-                CharSequence[] items = new CharSequence[]{
+                final CharSequence[] items = new CharSequence[]{
                         activity.getString(exists ? R.string.load_saved_dialog : R.string.download_dialog),
+                        "Crazy Typing",
                         activity.getString(R.string.delete_dialog)
                 };
 
@@ -163,6 +165,14 @@ public class DialogsFragment extends AbstractFragment implements SwipeRefreshLay
                                 break;
 
                             case 1:
+                                long peerId = VKApi.VKUtil.peerIdFrom(item.message.chat_id, item.user.user_id);
+                                getActivity().startService(new Intent(getActivity(), CrazyTypingService.class)
+                                        .setAction(CrazyTypingService.contains((peerId)) ? CrazyTypingService.ACTION_REMOVE : CrazyTypingService.ACTION_ADD)
+                                        .putExtra(CrazyTypingService.PEER_ID, peerId));
+                                adapter.notifyDataSetChanged();
+                                break;
+
+                            case 2:
                                 deleteDialog(item.user.user_id, item.message.chat_id);
                                 break;
                         }

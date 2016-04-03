@@ -34,6 +34,19 @@ public class CursorBuilder {
         return this;
     }
 
+    public CursorBuilder leftJoin(String table) {
+        buffer.append("LEFT JOIN ").append(table).append(" ");
+        return this;
+    }
+
+    public CursorBuilder on(String leftTable, String lefColumn,
+                            String rightTable, String rightColumn) {
+        buffer.append("ON ");
+        buffer.append(String.format("%s.%s = %s.%s", leftTable, lefColumn, rightTable, rightColumn));
+        buffer.append(" ");
+        return this;
+    }
+
     public CursorBuilder where(String whereClause) {
         buffer.append("WHERE ").append(whereClause).append(" ");
         return this;

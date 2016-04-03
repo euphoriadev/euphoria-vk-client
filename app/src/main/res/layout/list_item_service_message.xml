@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:clickable="false"
+              android:enabled="false"
+              android:focusable="false"
+              android:gravity="center|top"
+              android:orientation="vertical"
+              android:padding="6dp">
+
+    <TextView
+        android:id="@+id/tvServiceText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:gravity="center"
+        android:padding="6dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:textColorSecondary"
+        tools:text="Igor Morozkin changed title on Euphoria"/>
+
+
+</LinearLayout>

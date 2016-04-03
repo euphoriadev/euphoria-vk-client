@@ -19,7 +19,7 @@ public class VKUser implements Serializable {
         }
     };
 
-    public static final String FIELDS_DEFAULT = "photo_50, photo_100, photo_200, status, screen_name, online, online_mobile";
+    public static final String FIELDS_DEFAULT = "photo_50, photo_100, photo_200, status, screen_name, online, online_mobile, ";
     /**
      * User ID.
      */
@@ -49,6 +49,11 @@ public class VKUser implements Serializable {
      * If user utilizes a mobile application or site mobile version, it returns online_mobile as additional.
      */
     public boolean online_mobile;
+
+    /**
+     * ID of mobile application, if user is online
+     */
+    public int online_app;
 
     /**
      * URL of default square photo of the user with 50 pixels in width.
@@ -83,6 +88,10 @@ public class VKUser implements Serializable {
         user.online = source.optInt("online") == 1;
         user.status = source.optString("status");
         user.online_mobile = source.optInt("online_mobile") == 1;
+        if (user.online_mobile) {
+            user.online_app = source.optInt("online_app");
+        }
+//        Log.w("VKApi", String.format("name: %s, online: %s, online mobile: %s, online app %s", user.toString(), user.online, user.online_mobile, user.online_app));
 
         return user;
     }
