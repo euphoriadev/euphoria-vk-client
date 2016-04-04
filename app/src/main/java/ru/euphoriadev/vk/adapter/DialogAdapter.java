@@ -170,6 +170,8 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
             return view;
         }
 
+
+
         final VKUser user = item.user;
         final VKMessage message = item.message;
         holder.tvFullName.setTextColor(fullNameTextColor);
@@ -208,6 +210,9 @@ public class DialogAdapter extends BaseAdapter implements VKUpdateController.Mes
 
         }
         holder.tvDate.setText(sdf.format(item.date.getTime()));
+
+        AndroidUtils.setFilter(holder.unreadIndicator.getBackground(), ThemeManager.getThemeColor(context));
+        AndroidUtils.setFilter(holder.onlineIndicator.getBackground(), ThemeManager.getThemeColor(context));
 
         holder.unreadIndicator.setTextColor(ThemeManager.getPrimaryTextColorOnAccent(context));
         if (message.isChat()) {
